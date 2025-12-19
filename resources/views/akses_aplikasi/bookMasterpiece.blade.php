@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Ebook Master Maker</title>
+    <title>Ebook Masterpiece</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link
@@ -234,7 +234,7 @@
 
     <!-- Header -->
     <div class="text-center py-8">
-        <h1 class="text-4xl font-bold text-gray-800">Ebook Master Maker</h1>
+        <h1 class="text-4xl font-bold text-gray-800">Ebook Masterpiece</h1>
         <p class="text-gray-500 mt-2">
             Ubah masalah Anda menjadi solusi praktis dalam bentuk ebook profesional.
         </p>
@@ -432,7 +432,7 @@
     <div class="text-center pb-6 text-gray-500 text-sm mt-8">
         <div class="max-w-4xl mx-auto px-4">
             <div class="border-t border-gray-200 pt-4">
-                <p>© 2025. Ebook Master Maker v4.0 - Enhanced Edition</p>
+                <p>© 2025. Ebook Masterpiece v4.0 - Enhanced Edition</p>
                 <p class="mt-1 text-xs">Dibuat dengan <i class="fas fa-heart text-red-400"></i> untuk para penulis
                     digital</p>
             </div>

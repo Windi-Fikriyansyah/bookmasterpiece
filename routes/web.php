@@ -13,6 +13,14 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('/ebook-master', function () {
+    return view('ebook_master');
+})->middleware(['auth', 'verified'])->name('ebook_master');
+
+Route::get('/cover-master', function () {
+    return view('cover_master');
+})->middleware(['auth', 'verified'])->name('cover_master');
+
 Route::middleware('auth')->group(function () {
     Route::get('akses-aplikasi', [AksesAplikasiController::class, 'aksesAplikasi'])
         ->name('akses.aplikasi');
