@@ -445,6 +445,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch("/ebook/get-api-key", {
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if (res.api_key) {
+                        const input = document.getElementById("api_key_input");
+                        if (input) {
+                            input.value = res.api_key;
+                            localStorage.setItem("api_key", res.api_key);
+                        }
+                    }
+                })
+                .catch(err => console.error("Gagal load API Key:", err));
+        });
         // Inisialisasi state ebook
         let ebookState = {
             title: null,
@@ -476,14 +494,42 @@
 
         function saveApiKey() {
             const apiKey = document.getElementById('api_key_input').value.trim();
+
             if (!apiKey) {
                 showToast("API Key tidak boleh kosong", "error");
                 return;
             }
 
-            localStorage.setItem('api_key', apiKey);
-            showToast("API Key berhasil disimpan", "success");
+            fetch("/save-api-key", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute("content")
+                    },
+                    body: JSON.stringify({
+                        api_key: apiKey
+                    })
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if (!res.status) {
+                        showToast(res.message, "error");
+                        return;
+                    }
+
+                    // OPTIONAL: tetap simpan di localStorage untuk UX
+                    localStorage.setItem("api_key", apiKey);
+
+                    showToast(res.message, "success");
+                })
+                .catch(err => {
+                    console.error(err);
+                    showToast("Gagal menyimpan API Key", "error");
+                });
         }
+
 
         function setupFormAutosave() {
             const inputs = ['masalah_input', 'gaya_input', 'jumlah_bab_input', 'penulis_input'];
