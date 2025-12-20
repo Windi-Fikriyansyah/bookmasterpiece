@@ -30,7 +30,7 @@
                     </a>
 
                     {{-- Alert Penting --}}
-                    <div class="alert alert-danger border-start border-5 rounded-3 p-4 mb-5">
+                    {{-- <div class="alert alert-danger border-start border-5 rounded-3 p-4 mb-5">
                         <p class="mb-0 fs-5">
                             Jika tulisan yang ada di <strong>kotak merah</strong> pada gambar tutorial
                             <strong>tidak muncul</strong> di aplikasi Anda,
@@ -41,7 +41,7 @@
                             </strong>
                             sampai versi terbaru tampil.
                         </p>
-                    </div>
+                    </div> --}}
 
                     {{-- Info Versi --}}
                     <div class="mb-5">
@@ -70,7 +70,7 @@
                     </div>
 
                     {{-- Peringatan --}}
-                    <div class="alert alert-warning border-start border-5 rounded-3 p-4 mb-5">
+                    {{-- <div class="alert alert-warning border-start border-5 rounded-3 p-4 mb-5">
                         <p class="mb-0 fs-5">
                             <strong>Tidak disarankan menggunakan versi lama</strong>
                             karena dapat menyebabkan error saat pembuatan konten ebook.
@@ -78,18 +78,15 @@
                             Wajib menggunakan
                             <strong>versi 3.0 (Update 19 November 2025)</strong>.
                         </p>
-                    </div>
+                    </div> --}}
 
                     {{-- Catatan --}}
                     <div class="border-top pt-4 mt-4">
                         <p class="mb-0 fs-5">
                             <strong>Catatan:</strong>
-                            Untuk menghindari kebingungan,
-                            <strong>wajib menonton tutorial versi terbaru</strong>.
-                            <br>
-                            Video tersedia di modul
-                            <strong>“Tutorial Penggunaan”</strong>,
-                            video nomor <strong>10</strong>.
+                            Akses Masterbook AI diberikan secara eksklusif selama 30 hari untuk memastikan pengalaman
+                            penggunaan yang optimal. Akun bersifat pribadi dan tidak diperkenankan untuk dibagikan, demi
+                            menjaga kualitas layanan dan keamanan sistem.
                         </p>
                     </div>
 

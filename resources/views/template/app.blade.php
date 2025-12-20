@@ -50,7 +50,7 @@
         <div class="navbar-wrapper">
             <div class="m-header">
                 <a href="{{ route('dashboard') }}" class="b-brand d-flex align-items-center text-decoration-none">
-                    <span class="fw-bold fs-4 text-primary">
+                    <span class="fw-bold fs-3 text-primary">
                         Book<span class="text-dark"> Masterpiece AI</span>
                     </span>
                 </a>
