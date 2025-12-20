@@ -70,8 +70,8 @@
                     </li>
                     <li class="pc-item">
                         <a href="{{ route('ebook_master') }}" class="pc-link"><span class="pc-micon"><i
-                                    class="ti ti-book"></i></span><span class="pc-mtext">Link Akses Aplikasi "Ebook
-                                Masterpiece"</span></a>
+                                    class="ti ti-book"></i></span><span class="pc-mtext">Link Akses Aplikasi "Book
+                                Masterpiece AI"</span></a>
                     </li>
                     <li class="pc-item">
                         <a href="{{ route('cover_master') }}" class="pc-link">
@@ -138,8 +138,7 @@
                         <a class="pc-head-link head-link-primary dropdown-toggle arrow-none me-0"
                             data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false"
                             aria-expanded="false">
-                            <img src="{{ asset('layouts/assets/images/user/avatar-2.jpg') }}" alt="user-image"
-                                class="user-avtar" />
+                            <img src="{{ asset('image/user.png') }}" alt="user-image" class="user-avtar" />
                             <span>
                                 <i class="ti ti-settings"></i>
                             </span>

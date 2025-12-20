@@ -13,7 +13,7 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/ebook-master', function () {
+Route::get('/book-master', function () {
     return view('ebook_master');
 })->middleware(['auth', 'verified'])->name('ebook_master');
 
