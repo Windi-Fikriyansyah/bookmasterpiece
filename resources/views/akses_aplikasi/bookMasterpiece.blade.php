@@ -236,7 +236,7 @@
     <div class="text-center py-8">
         <h1 class="text-4xl font-bold text-gray-800">Book Masterpiece AI</h1>
         <p class="text-gray-500 mt-2">
-            Ubah masalah Anda menjadi solusi praktis dalam bentuk ebook profesional.
+            Dari Masalah Nyata Menjadi Karya Buku yang Siap Terbit.
         </p>
     </div>
 
@@ -358,7 +358,7 @@
                 <div class="mt-6 pt-4 border-t border-gray-200 space-y-2">
                     <button onclick="downloadEbook()"
                         class="w-full bg-purple-600 text-white py-3 rounded-lg text-sm hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center gap-2">
-                        <i class="fas fa-download mr-2"></i>Download Ebook (PDF)
+                        <i class="fas fa-download mr-2"></i>Download Book (PDF)
                     </button>
 
                     <button onclick="resetEbook()"
@@ -370,7 +370,7 @@
 
         </div>
 
-        <!-- PANEL ISI EBOOK -->
+        <!-- PANEL ISI Book -->
         <div class="lg:col-span-2">
             <div class="bg-white p-4 rounded-xl shadow">
                 <div class="flex justify-between items-center mb-4">
@@ -396,7 +396,7 @@
                         <div class="text-6xl mb-4 text-blue-300">
                             <i class="fas fa-book-open"></i>
                         </div>
-                        <h3 class="text-xl font-semibold">Ebook Anda akan tampil di sini</h3>
+                        <h3 class="text-xl font-semibold">Book Anda akan tampil di sini</h3>
                         <p class="text-gray-500 mt-2">Mulai dengan menjelaskan masalah Anda dan klik tombol di panel
                             kiri untuk membuat konten.</p>
 
@@ -432,7 +432,7 @@
     <div class="text-center pb-6 text-gray-500 text-sm mt-8">
         <div class="max-w-4xl mx-auto px-4">
             <div class="border-t border-gray-200 pt-4">
-                <p>© 2025. Ebook Masterpiece v4.0 - Enhanced Edition</p>
+                <p>© 2025. Book Masterpiece v4.0 - Enhanced Edition</p>
                 <p class="mt-1 text-xs">Dibuat dengan <i class="fas fa-heart text-red-400"></i> untuk para penulis
                     digital</p>
             </div>
@@ -635,7 +635,7 @@
                     <p>Bagian ini dapat Anda edit sesuai kebutuhan. Klik pada teks untuk mulai mengedit.</p>
                     <p>Gunakan bagian ini untuk menambahkan konten tambahan, contoh, studi kasus, atau informasi lain yang relevan.</p>
                     <blockquote>
-                        <p>Tips: Gunakan format yang konsisten dengan bagian lainnya untuk menjaga profesionalitas ebook.</p>
+                        <p>Tips: Gunakan format yang konsisten dengan bagian lainnya untuk menjaga profesionalitas book.</p>
                     </blockquote>
                 `,
                 type: 'manual',
@@ -984,7 +984,7 @@
         <div class="text-6xl mb-4 text-blue-300">
             <i class="fas fa-book-open"></i>
         </div>
-        <h3 class="text-xl font-semibold">Ebook Anda akan tampil di sini</h3>
+        <h3 class="text-xl font-semibold">Book Anda akan tampil di sini</h3>
         <p class="text-gray-500 mt-2">
             Mulai dengan menjelaskan masalah Anda dan klik tombol di panel kiri untuk membuat konten.
         </p>
@@ -1540,7 +1540,7 @@
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>Ebook - Print</title>
+                    <title>Book - Print</title>
                     <style>
                         body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.6; }
                         h1 { font-size: 24pt; text-align: center; margin-top: 2in; }
@@ -1577,7 +1577,7 @@
             } else {
                 contentEl.classList.remove('ebook-content');
                 contentEl.classList.add('bg-white');
-                toggleBtn.innerHTML = '<i class="fas fa-eye mr-1"></i>Ebook View';
+                toggleBtn.innerHTML = '<i class="fas fa-eye mr-1"></i>Book View';
             }
         }
 
