@@ -12,7 +12,7 @@
                     {{-- Judul --}}
                     <h2 class="fw-bold mb-2">
                         1. Link Akses Aplikasi
-                        <span class="text-primary">“Ebook Masterpiece”</span>
+                        <span class="text-primary">“Book Masterpiece AI”</span>
                     </h2>
 
                     {{-- Last Updated --}}
@@ -26,7 +26,7 @@
                         class="btn btn-primary btn-lg px-4 py-3 d-inline-flex align-items-center gap-2 mb-5">
                         <i class="ti ti-external-link fs-4"></i>
                         <span class="fw-semibold">
-                            Akses Ebook Masterpiece Versi Terbaru (3.0)
+                            Akses Ebook Masterpiece AI Versi Terbaru (3.0)
                         </span>
                     </a>
 
