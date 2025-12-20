@@ -279,7 +279,56 @@
                         <label class="text-sm font-medium block mb-1">Jelaskan Masalah Anda:</label>
                         <textarea rows="4" id="masalah_input"
                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                            placeholder="Contoh: Saya kesulitan fokus saat bekerja…"></textarea>
+                            placeholder="Contoh: •	Ingin membuka usaha bimbel, tapi tidak punya modal besar
+•	Bingung harus mulai dari mana: izin, tempat, murid, kurikulum
+•	Takut usaha sepi karena merasa bukan pebisnis
+•	Punya kemampuan mengajar, tapi tidak tahu cara menjualnya"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-medium block mb-1">Jelaskan Kebutuhan (Need) Anda:</label>
+                        <textarea rows="4" id="kebutuhan_input"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            placeholder="Contoh: •	Panduan langkah demi langkah yang realistis
+•	Contoh usaha bimbel yang benar-benar dimulai dari rumah
+•	Cara mencari murid pertama tanpa biaya iklan mahal
+•	Rasa yakin bahwa orang biasa juga bisa memulai"></textarea>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium block mb-1">Jelaskan Solusi (Solution) Anda:</label>
+                        <textarea rows="4" id="solusi_input"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            placeholder="Contoh: •	Model bimbel rumahan tanpa sewa tempat
+•	Strategi mulai dari 1–3 murid dulu
+•	Cara promosi sederhana (WA grup orang tua, tetangga, kenalan)
+•	Sistem belajar sederhana tanpa ribet administrasi
+•	Contoh jadwal, materi, dan biaya bimbel pemula"></textarea>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium block mb-1">Jelaskan Pengalaman (Experience) Anda:</label>
+                        <textarea rows="4" id="pengalaman_input"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            placeholder="Contoh: •	Model bimbel rumahan tanpa sewa tempat
+•	Strategi mulai dari 1–3 murid dulu
+•	Cara promosi sederhana (WA grup orang tua, tetangga, kenalan)
+•	Sistem belajar sederhana tanpa ribet administrasi
+•	Contoh jadwal, materi, dan biaya bimbel pemula"></textarea>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium block mb-1">Jelaskan Kompetensi (Competence) Anda:</label>
+                        <textarea rows="4" id="kompetensi_input"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            placeholder="Contoh: •	Lulusan pendidikan / guru honorer
+•	Pernah mengajar les privat
+•	Pernah mendampingi anak-anak belajar
+•	Punya pengalaman mengajar meski informal"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-medium block mb-1">Calon Pembaca:</label>
+                        <textarea rows="4" id="calon_pembaca_input"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            placeholder="Siapa satu orang nyata yang paling ingin saya tolong melalui buku ini? contoh calon pengusaha bimbel pemula dari kalangan guru honorer"></textarea>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
@@ -298,8 +347,8 @@
                         </div>
 
                         <div>
-                            <label class="text-sm font-medium block mb-1">Jumlah Bab Awal:</label>
-                            <input id="jumlah_bab_input" type="number" value="3" min="1" max="20"
+                            <label class="text-sm font-medium block mb-1">Jumlah Isi Outline Buku Anda:</label>
+                            <input id="jumlah_bab_input" type="text" placeholder="contoh : 5 Bab 5 Sub Bab"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                         </div>
                     </div>
@@ -309,6 +358,12 @@
                         <textarea rows="2" id="penulis_input"
                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                             placeholder="Tulis bio singkat Anda di sini."></textarea>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium block mb-1">Pengantar Penulis (Opsional):</label>
+                        <textarea rows="2" id="pengantar_input"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            placeholder="Tulis satu deskripsi singkat pengantar buku Anda."></textarea>
                     </div>
                 </div>
             </div>
@@ -332,11 +387,12 @@
                         Buat Pendahuluan
                     </button>
 
-                    {{-- <button onclick="generateEbook('outline')"
+                    <!-- TAMBAH tombol ini di bagian Langkah 2, setelah tombol "Buat Pendahuluan" -->
+                    <button onclick="generateOutlineFromUserInput()"
                         class="w-full bg-blue-600 text-white py-3 rounded-lg text-sm hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2">
                         <i class="fas fa-list-ol"></i>
                         Buat Daftar Isi
-                    </button> --}}
+                    </button>
 
                     <div class="grid grid-cols-2 gap-3 pt-2">
                         <button onclick="addManualSection()"
@@ -561,44 +617,70 @@
 
 
         function setupFormAutosave() {
-            const inputs = ['masalah_input', 'gaya_input', 'jumlah_bab_input', 'penulis_input'];
+            const inputs = [
+                'masalah_input',
+                'kebutuhan_input',
+                'solusi_input',
+                'pengalaman_input',
+                'kompetensi_input',
+                'calon_pembaca_input',
+                'gaya_input',
+                'jumlah_bab_input',
+                'penulis_input',
+                'pengantar_input'
+            ];
 
             inputs.forEach(inputId => {
-                const element = document.getElementById(inputId);
-                if (element) {
-                    element.addEventListener('input', () => {
-                        saveFormData();
-                        updateStats();
-                    });
-                    element.addEventListener('change', () => {
-                        saveFormData();
-                        updateStats();
-                    });
-                }
+                const el = document.getElementById(inputId);
+                if (!el) return;
+
+                el.addEventListener('input', () => {
+                    saveFormData();
+                    updateStats();
+                });
+                el.addEventListener('change', () => {
+                    saveFormData();
+                    updateStats();
+                });
             });
         }
+
 
         function saveFormData() {
             const formData = {
                 masalah: document.getElementById("masalah_input").value,
+                kebutuhan: document.getElementById("kebutuhan_input").value,
+                solusi: document.getElementById("solusi_input").value,
+                pengalaman: document.getElementById("pengalaman_input").value,
+                kompetensi: document.getElementById("kompetensi_input").value,
+                calon_pembaca: document.getElementById("calon_pembaca_input").value,
                 gaya: document.getElementById("gaya_input").value,
-                jumlah_bab: document.getElementById("jumlah_bab_input").value,
-                penulis: document.getElementById("penulis_input").value
+                jumlah_outline: document.getElementById("jumlah_bab_input").value, // biarkan string: "5 Bab 5 Sub Bab"
+                tentang_penulis: document.getElementById("penulis_input").value,
+                pengantar_penulis: document.getElementById("pengantar_input").value
             };
 
             localStorage.setItem('ebook_form_data', JSON.stringify(formData));
         }
 
+
         function loadFormData() {
-            const savedData = localStorage.getItem('ebook_form_data');
-            if (savedData) {
-                const formData = JSON.parse(savedData);
-                document.getElementById("masalah_input").value = formData.masalah || '';
-                document.getElementById("gaya_input").value = formData.gaya ||
-                    'Profesional & Formal (Resmi, kredibel, berjarak)';
-                document.getElementById("jumlah_bab_input").value = formData.jumlah_bab || 3;
-                document.getElementById("penulis_input").value = formData.penulis || '';
-            }
+            const saved = localStorage.getItem('ebook_form_data');
+            if (!saved) return;
+
+            const d = JSON.parse(saved);
+
+            document.getElementById("masalah_input").value = d.masalah || '';
+            document.getElementById("kebutuhan_input").value = d.kebutuhan || '';
+            document.getElementById("solusi_input").value = d.solusi || '';
+            document.getElementById("pengalaman_input").value = d.pengalaman || '';
+            document.getElementById("kompetensi_input").value = d.kompetensi || '';
+            document.getElementById("calon_pembaca_input").value = d.calon_pembaca || '';
+
+            document.getElementById("gaya_input").value = d.gaya || 'Edukatif & Praktis (Mengajar tanpa menggurui)';
+            document.getElementById("jumlah_bab_input").value = d.jumlah_outline || '';
+            document.getElementById("penulis_input").value = d.tentang_penulis || '';
+            document.getElementById("pengantar_input").value = d.pengantar_penulis || '';
         }
 
         function loadEbookState() {
@@ -682,35 +764,40 @@
         function getFormValues() {
             return {
                 masalah: document.getElementById("masalah_input").value,
+                kebutuhan: document.getElementById("kebutuhan_input").value,
+                solusi: document.getElementById("solusi_input").value,
+                pengalaman: document.getElementById("pengalaman_input").value,
+                kompetensi: document.getElementById("kompetensi_input").value,
+                calon_pembaca: document.getElementById("calon_pembaca_input").value,
                 gaya: document.getElementById("gaya_input").value,
-                jumlah_bab: document.getElementById("jumlah_bab_input").value || 3,
-                penulis: document.getElementById("penulis_input").value
+                jumlah_outline: document.getElementById("jumlah_bab_input").value, // string
+                tentang_penulis: document.getElementById("penulis_input").value,
+                pengantar_penulis: document.getElementById("pengantar_input").value
             };
         }
+
 
         function extractChapterTitles() {
             const titles = [];
 
-            // Ambil dari daftar isi jika ada
             if (ebookState.outline) {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = ebookState.outline;
+                const temp = document.createElement('div');
+                temp.innerHTML = ebookState.outline;
 
-                const listItems = tempDiv.querySelectorAll('li');
-                listItems.forEach(li => {
+                // Cari semua bab
+                temp.querySelectorAll('li').forEach(li => {
                     const text = li.textContent.trim();
-                    titles.push(text);
+                    const match = text.match(/Bab\s+\d+:\s*(.+?)(?:\s*\d+\.\d+|$)/i);
+                    if (match) {
+                        titles.push(match[1].trim());
+                    }
                 });
             }
 
-            // Juga ambil dari bab yang sudah ada
-            ebookState.chapters.forEach(chapter => {
-                if (chapter.title) {
-                    const titleText = `Bab ${chapter.chapterNumber}: ${chapter.title}`;
-                    // Cek apakah sudah ada di array
-                    if (!titles.some(t => t.includes(`Bab ${chapter.chapterNumber}`))) {
-                        titles.push(titleText);
-                    }
+            // Gabungkan dengan bab yang sudah dibuat
+            ebookState.chapters.forEach(ch => {
+                if (ch.title && !titles.includes(ch.title)) {
+                    titles.push(ch.title);
                 }
             });
 
@@ -774,6 +861,7 @@
         }
 
 
+
         async function generateEbook(action) {
             if (isGenerating) {
                 showToast("Sedang membuat konten, mohon tunggu...", "warning");
@@ -782,7 +870,8 @@
 
             const val = getFormValues();
 
-            if (!val.masalah.trim()) {
+            // Hanya untuk action selain 'title', cek masalah harus diisi
+            if (action !== 'title' && !val.masalah.trim()) {
                 showToast("Masalah harus diisi dulu.", "error");
                 return;
             }
@@ -800,16 +889,70 @@
             showLoadingIndicator(action);
 
             try {
-                const currentChapterCount = ebookState.chapters.length; // Ambil jumlah bab yang sudah ada
-                const chapterTitles = extractChapterTitles();
+                // JIKA ACTION TITLE - buat judul saja
+                if (action === "title") {
+                    const response = await fetch("/ebook/generate", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({
+                            action: action,
+                            masalah: val.masalah,
+                            kebutuhan: val.kebutuhan,
+                            pengalaman: val.pengalaman,
+                            solusi: val.solusi,
+                            kompetensi: val.kompetensi,
+                            calon_pembaca: val.calon_pembaca,
+                            gaya: val.gaya,
+                            jumlah_outline: val.jumlah_outline,
+                            tentang_penulis: val.tentang_penulis,
+                            pengantar_penulis: val.pengantar_penulis,
+                            existing_title: "",
+                            current_chapter_count: 0,
+                            chapter_titles: [],
+                            target_chapter: null
+                        })
+                    });
 
-                // Tentukan nomor bab selanjutnya
-                const nextChapterNumber = currentChapterCount + 1;
+                    const result = await response.json();
 
-                // Jika membuat bab baru (action === 'chapter')
-                if (action === "chapter") {
-                    // Cek apakah bab ini sudah ada di daftar isi
-                    const tocItem = chapterTitles.find(title => title.includes(`Bab ${nextChapterNumber}`));
+                    if (!result.status) {
+                        showToast(result.message, "error");
+                        return;
+                    }
+
+                    // Simpan hanya judul
+                    ebookState.title = result.html;
+                    ebookState.intro = null; // Reset intro agar bisa dibuat lagi
+                    ebookState.outline = null; // Reset outline
+
+                    saveEbookState();
+                    renderEbookContent();
+                    showToast("Judul book berhasil dibuat!", "success");
+
+                    // Tampilkan dialog konfirmasi untuk lanjut ke pendahuluan
+                    setTimeout(() => {
+                        if (confirm(
+                                "Judul book berhasil dibuat! Apakah Anda ingin melanjutkan membuat Pendahuluan?"
+                            )) {
+                            generateEbook('intro');
+                        }
+                    }, 500);
+
+                    return;
+                }
+
+                // JIKA ACTION INTRO - dan judul sudah ada, buat pendahuluan
+                if (action === "intro") {
+                    if (!ebookState.title) {
+                        showToast("Buat judul book terlebih dahulu!", "error");
+                        return;
+                    }
+
+                    const currentChapterCount = ebookState.chapters.length;
+                    const chapterTitles = extractChapterTitles();
 
                     const response = await fetch("/ebook/generate", {
                         method: "POST",
@@ -820,13 +963,105 @@
                         body: JSON.stringify({
                             action: action,
                             masalah: val.masalah,
+                            kebutuhan: val.kebutuhan,
+                            solusi: val.solusi,
+                            pengalaman: val.pengalaman,
+                            kompetensi: val.kompetensi,
+                            calon_pembaca: val.calon_pembaca,
                             gaya: val.gaya,
-                            jumlah_bab: val.jumlah_bab,
-                            penulis: val.penulis,
+                            jumlah_outline: val.jumlah_outline,
+                            tentang_penulis: val.tentang_penulis,
+                            pengantar_penulis: val.pengantar_penulis,
                             existing_title: ebookState.title || "",
                             current_chapter_count: currentChapterCount,
                             chapter_titles: chapterTitles,
-                            target_chapter: nextChapterNumber // Gunakan nextChapterNumber yang sudah dihitung
+                            target_chapter: null
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (!result.status) {
+                        showToast(result.message, "error");
+                        return;
+                    }
+
+                    // Simpan pendahuluan
+                    ebookState.intro = result.html;
+
+                    saveEbookState();
+                    renderEbookContent();
+                    showToast("Pendahuluan berhasil dibuat!", "success");
+
+                    // Tampilkan dialog konfirmasi untuk lanjut ke daftar isi
+                    setTimeout(() => {
+                        if (confirm(
+                                "Pendahuluan berhasil dibuat! Apakah Anda ingin melanjutkan membuat Daftar Isi?"
+                            )) {
+                            generateOutlineFromUserInput();
+                        }
+                    }, 500);
+
+                    return;
+                }
+
+                // JIKA ACTION LAINNYA (termasuk chapter)
+                const currentChapterCount = ebookState.chapters.length;
+                const chapterTitles = extractChapterTitles();
+                const nextChapterNumber = currentChapterCount + 1;
+
+                if (action === "chapter") {
+                    // Ambil struktur lengkap dari daftar isi
+                    const outlineTitles = extractChapterTitlesFromOutline();
+                    const nextChapterNumber = currentChapterCount + 1;
+
+                    // Cari data bab yang akan dibuat
+                    const tocItem = outlineTitles.find(item => item.number === nextChapterNumber);
+
+                    let subBabTitles = [];
+                    let chapterTitleFromTOC = '';
+
+                    if (tocItem) {
+                        chapterTitleFromTOC = tocItem.title;
+                        subBabTitles = tocItem.subBabs || [];
+
+                        console.log(`📖 Membuat Bab ${nextChapterNumber}: ${chapterTitleFromTOC}`);
+                        console.log('📑 Sub-bab yang harus dibuat:', subBabTitles);
+                    } else {
+                        console.warn(`⚠️ Bab ${nextChapterNumber} tidak ditemukan di daftar isi`);
+                    }
+
+                    // Validasi: pastikan ada sub-bab
+                    if (subBabTitles.length === 0) {
+                        showToast(
+                            `Peringatan: Bab ${nextChapterNumber} tidak memiliki sub-bab di daftar isi. Pastikan daftar isi sudah dibuat dengan benar.`,
+                            "warning");
+                    }
+
+                    const response = await fetch("/ebook/generate", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({
+                            action: action,
+                            masalah: val.masalah,
+                            kebutuhan: val.kebutuhan,
+                            pengalaman: val.pengalaman,
+                            solusi: val.solusi,
+                            kompetensi: val.kompetensi,
+                            calon_pembaca: val.calon_pembaca,
+                            gaya: val.gaya,
+                            jumlah_outline: val.jumlah_outline,
+                            tentang_penulis: val.tentang_penulis,
+                            pengantar_penulis: val.pengantar_penulis,
+                            existing_title: ebookState.title || "",
+                            current_chapter_count: currentChapterCount,
+                            chapter_titles: extractChapterTitles(),
+                            target_chapter: nextChapterNumber,
+                            chapter_title_from_toc: chapterTitleFromTOC, // ✅ Tambahkan ini
+                            sub_bab_titles: subBabTitles // ✅ Data sub-bab lengkap
                         })
                     });
 
@@ -856,7 +1091,7 @@
                         id: "chapter_" + Date.now(),
                         content: result.html,
                         type: "chapter",
-                        chapterNumber: nextChapterNumber, // Gunakan nomor yang benar
+                        chapterNumber: nextChapterNumber,
                         title: chapterTitle
                     };
 
@@ -873,7 +1108,7 @@
                     return;
                 }
 
-                // Untuk action lainnya (title, intro, dll)
+                // Untuk action lainnya (outline, summary, closing)
                 const response = await fetch("/ebook/generate", {
                     method: "POST",
                     headers: {
@@ -883,9 +1118,15 @@
                     body: JSON.stringify({
                         action: action,
                         masalah: val.masalah,
+                        kebutuhan: val.kebutuhan,
+                        solusi: val.solusi,
+                        pengalaman: val.pengalaman,
+                        kompetensi: val.kompetensi,
+                        calon_pembaca: val.calon_pembaca,
                         gaya: val.gaya,
-                        jumlah_bab: val.jumlah_bab,
-                        penulis: val.penulis,
+                        jumlah_outline: val.jumlah_outline,
+                        tentang_penulis: val.tentang_penulis,
+                        pengantar_penulis: val.pengantar_penulis,
                         existing_title: ebookState.title || "",
                         current_chapter_count: currentChapterCount,
                         chapter_titles: chapterTitles,
@@ -914,55 +1155,202 @@
             }
         }
 
+        async function generateOutlineFromUserInput() {
+            const val = getFormValues();
+            const apiKey = document.getElementById("api_key_input").value.trim();
+
+            if (!apiKey) {
+                showToast("API Key belum disimpan.", "error");
+                return;
+            }
+
+            if (!val.jumlah_outline.trim()) {
+                showToast("Jumlah Isi Outline Buku harus diisi terlebih dahulu!", "error");
+                return;
+            }
+
+            isGenerating = true;
+            showLoadingIndicator("outline");
+
+            try {
+                const response = await fetch("/ebook/generate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        action: "outline",
+                        masalah: val.masalah,
+                        kebutuhan: val.kebutuhan,
+                        solusi: val.solusi,
+                        pengalaman: val.pengalaman,
+                        kompetensi: val.kompetensi,
+                        calon_pembaca: val.calon_pembaca,
+                        gaya: val.gaya,
+                        jumlah_outline: val.jumlah_outline,
+                        tentang_penulis: val.tentang_penulis,
+                        pengantar_penulis: val.pengantar_penulis,
+                        existing_title: ebookState.title || "",
+                        current_chapter_count: 0,
+                        chapter_titles: [],
+                        target_chapter: null
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!result.status) {
+                    showToast(result.message, "error");
+                    return;
+                }
+
+                // Simpan daftar isi
+                ebookState.outline = result.html;
+
+                saveEbookState();
+                renderEbookContent();
+                showToast("Daftar isi berhasil dibuat sesuai dengan jumlah yang diinput!", "success");
+
+            } catch (e) {
+                console.error("Error:", e);
+                showToast("Error membuat daftar isi: " + e.message, "error");
+            } finally {
+                isGenerating = false;
+                removeLoadingIndicator();
+            }
+        }
+
+        function parseOutlineInput() {
+            const input = document.getElementById("jumlah_bab_input").value.trim();
+            if (!input) return {
+                bab: 5,
+                subBab: 5
+            };
+
+            // Cari pola seperti "5 Bab 5 Sub Bab" atau "3 Bab 4 Sub"
+            const matches = input.match(/(\d+)\s*(?:bab|bab)?\s*(\d+)?/i);
+
+            if (matches) {
+                const bab = parseInt(matches[1]) || 5;
+                const subBab = matches[2] ? parseInt(matches[2]) : 5;
+                return {
+                    bab,
+                    subBab
+                };
+            }
+
+            return {
+                bab: 5,
+                subBab: 5
+            };
+        }
+
         function getNextChapterNumber() {
             return ebookState.chapters.length + 1;
         }
 
+        function extractChapterTitlesFromOutline() {
+            if (!ebookState.outline) return [];
+
+            const chapters = [];
+            const temp = document.createElement('div');
+            temp.innerHTML = ebookState.outline;
+
+            // Cari semua elemen li level pertama (bab utama)
+            const mainList = temp.querySelector('ol');
+            if (!mainList) return chapters;
+
+            const mainItems = mainList.children; // Ambil direct children saja
+
+            Array.from(mainItems).forEach(item => {
+                if (item.tagName !== 'LI') return;
+
+                const text = item.firstChild?.textContent?.trim() || '';
+
+                // Cari pola "Bab X: Judul"
+                const chapterMatch = text.match(/Bab\s+(\d+):\s*(.+)/i);
+                if (chapterMatch) {
+                    const chapterNum = parseInt(chapterMatch[1]);
+                    let title = chapterMatch[2].trim();
+
+                    // Ekstrak sub-bab dari <ul> di dalam <li> ini
+                    const subBabList = item.querySelector('ul');
+                    const subBabs = [];
+
+                    if (subBabList) {
+                        const subBabItems = subBabList.querySelectorAll('li');
+                        subBabItems.forEach(subItem => {
+                            const subText = subItem.textContent.trim();
+                            // Format bisa: "1.1 Judul" atau "1.1. Judul"
+                            const subMatch = subText.match(/(\d+\.\d+)\.?\s+(.+)/);
+                            if (subMatch) {
+                                subBabs.push({
+                                    number: subMatch[1],
+                                    title: subMatch[2].trim()
+                                });
+                            }
+                        });
+                    }
+
+                    chapters.push({
+                        number: chapterNum,
+                        title: title,
+                        subBabs: subBabs
+                    });
+                }
+            });
+
+            console.log('📋 Ekstraksi dari daftar isi:', chapters); // Debug log
+            return chapters;
+        }
+
         function updateOutlineAfterChapterChange() {
-            // Pastikan bab diurutkan berdasarkan nomor
+            // Urutkan bab berdasarkan nomor
             ebookState.chapters.sort((a, b) => a.chapterNumber - b.chapterNumber);
 
-            // Update judul dari konten jika ada perubahan
-            ebookState.chapters.forEach(chapter => {
-                if (chapter.content) {
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = chapter.content;
-                    const h2 = tempDiv.querySelector('h2');
+            // Ambil spesifikasi dari input user
+            const outlineSpec = parseOutlineInput();
+            const totalBabRequested = outlineSpec.bab;
+            const subBabPerBab = outlineSpec.subBab;
 
+            // Jika ada daftar isi yang dibuat user, gunakan itu
+            if (ebookState.outline) {
+                // Ekstrak judul dari daftar isi yang ada
+                const outlineTitles = extractChapterTitlesFromOutline();
+
+                // Update judul bab berdasarkan daftar isi
+                outlineTitles.forEach(outlineTitle => {
+                    const chapter = ebookState.chapters.find(ch => ch.chapterNumber === outlineTitle.number);
+                    if (chapter && outlineTitle.title) {
+                        chapter.title = outlineTitle.title;
+                    }
+                });
+            }
+
+            // Update bab-bab yang ada
+            ebookState.chapters.forEach((chapter, index) => {
+                const chapterNum = index + 1;
+
+                // Update chapterNumber jika perlu
+                chapter.chapterNumber = chapterNum;
+
+                // Update konten dengan nomor bab yang benar
+                if (chapter.content) {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = chapter.content;
+                    const h2 = temp.querySelector('h2');
                     if (h2) {
-                        const text = h2.textContent.trim();
-                        const match = text.match(/Bab\s+\d+:\s*(.+)/i);
-                        if (match && match[1]) {
-                            chapter.title = match[1].trim();
-                        } else {
-                            // Format alternatif
-                            const altMatch = text.match(/(?:BAB|Bab|bab)\s+\d+\s*[:\.]?\s*(.+)/i);
-                            if (altMatch && altMatch[1]) {
-                                chapter.title = altMatch[1].trim();
-                            }
-                        }
+                        const currentTitle = chapter.title || `Judul Bab ${chapterNum}`;
+                        h2.textContent = `Bab ${chapterNum}: ${currentTitle}`;
+                        chapter.content = temp.innerHTML;
                     }
                 }
             });
 
-            // Buat daftar isi baru
-            if (ebookState.chapters.length > 0) {
-                let html = `<h2>Daftar Isi</h2><ol>`;
-
-                ebookState.chapters.forEach(chapter => {
-                    const title = chapter.title || `Bab ${chapter.chapterNumber}`;
-                    html += `<li>Bab ${chapter.chapterNumber}: ${title}</li>`;
-                });
-
-                html += `</ol>`;
-                ebookState.outline = html;
-            } else {
-                ebookState.outline = null;
-            }
-
-            // Langsung save state
             saveEbookState();
         }
+
 
         function getChapterTitleFor(number) {
             const toc = extractOutlineTitles();
@@ -1307,9 +1695,16 @@
                     body: JSON.stringify({
                         action: "chapter",
                         masalah: val.masalah,
+                        kebutuhan: val.kebutuhan,
+                        solusi: val.solusi,
+                        pengalaman: val.pengalaman,
+                        kompetensi: val.kompetensi,
+                        calon_pembaca: val.calon_pembaca,
                         gaya: val.gaya,
-                        jumlah_bab: val.jumlah_bab,
-                        penulis: val.penulis,
+                        jumlah_outline: val.jumlah_outline,
+                        tentang_penulis: val.tentang_penulis,
+                        pengantar_penulis: val.pengantar_penulis,
+
                         existing_title: ebookState.title || "",
                         current_chapter_count: existingChaptersCount,
                         chapter_titles: chapterTitles,
