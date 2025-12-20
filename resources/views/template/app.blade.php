@@ -80,13 +80,13 @@
                                 Masterpiece"</span>
                         </a>
                     </li>
-                    <li class="pc-item">
+                    {{-- <li class="pc-item">
                         <a href="{{ asset('layouts/elements/bc_color.html') }}" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-trending-up"></i></span>
                             <span class="pc-mtext">Link Akses Bonus Ebook "Ebook Banjir
                                 Pembeli Tanpa Ngiklan"</span>
                         </a>
-                    </li>
+                    </li> --}}
 
                     <li class="pc-item pc-caption">
                         <label>TUTORIAL</label>
