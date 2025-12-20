@@ -277,12 +277,13 @@
                             <label class="text-sm font-medium block mb-1">Gaya Bahasa:</label>
                             <select id="gaya_input"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                                <option>Profesional</option>
-                                <option>Santai</option>
-                                <option>Persuasif</option>
-                                <option>Formal</option>
-                                <option>Inspiratif</option>
-                                <option>Teknis</option>
+                                <option>Personal & Akrab (Seperti ngobrol dengan teman dekat)</option>
+                                <option>Inspiratif & Reflektif (Menyentuh hati dan kesadaran)</option>
+                                <option>Edukatif & Praktis (Mengajar tanpa menggurui)</option>
+                                <option>Persuasif (Membujuk dengan logika dan emosi)</option>
+                                <option>Naratif & Storytelling (Bercerita untuk menyampaikan pesan)</option>
+                                <option>Tegas & Provokatif (Menggugah dan mengusik)</option>
+                                <option>Profesional & Formal (Resmi, kredibel, berjarak)</option>
                             </select>
                         </div>
 
@@ -565,7 +566,8 @@
             if (savedData) {
                 const formData = JSON.parse(savedData);
                 document.getElementById("masalah_input").value = formData.masalah || '';
-                document.getElementById("gaya_input").value = formData.gaya || 'Profesional';
+                document.getElementById("gaya_input").value = formData.gaya ||
+                    'Profesional & Formal (Resmi, kredibel, berjarak)';
                 document.getElementById("jumlah_bab_input").value = formData.jumlah_bab || 3;
                 document.getElementById("penulis_input").value = formData.penulis || '';
             }
