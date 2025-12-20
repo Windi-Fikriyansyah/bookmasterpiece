@@ -14,11 +14,7 @@
                         <span class="text-primary">“Book Masterpiece AI”</span>
                     </h3>
 
-                    {{-- Last Updated --}}
-                    <p class="text-muted fs-5 mb-5">
-                        Last updated:
-                        <strong>19 November 2025, 15:19</strong>
-                    </p>
+
 
                     {{-- Tombol Akses --}}
                     <a href="{{ route('bookmasterpiece.index') }}"
@@ -46,23 +42,23 @@
                     {{-- Info Versi --}}
                     <div class="mb-5">
                         <h4 class="fw-semibold mb-3">
-                            Versi Terbaru (3.0) – Update 19 November 2025
+                            Book Masterpiece AI Versi 3.0
                         </h4>
 
                         <ul class="list-unstyled fs-5 ms-2">
-                            <li class="mb-3">
+                            <li class="mb-2">
                                 <i class="ti ti-check text-success me-2"></i>
                                 Bisa sisipkan bab baru antar bab
                             </li>
-                            <li class="mb-3">
+                            <li class="mb-2">
                                 <i class="ti ti-check text-success me-2"></i>
                                 Bisa regenerate berkali-kali oleh AI
                             </li>
-                            <li class="mb-3">
+                            <li class="mb-2">
                                 <i class="ti ti-check text-success me-2"></i>
                                 Bisa menambah judul bab secara manual
                             </li>
-                            <li class="mb-3">
+                            <li class="mb-2">
                                 <i class="ti ti-check text-success me-2"></i>
                                 Menggunakan update AI Google terbaru
                             </li>
@@ -84,7 +80,7 @@
                     <div class="border-top pt-4 mt-4">
                         <p class="mb-0 fs-5">
                             <strong>Catatan:</strong>
-                            Akses Masterbook AI diberikan secara eksklusif selama 30 hari untuk memastikan pengalaman
+                            Akses Book Masterpiece AI diberikan secara eksklusif selama 30 hari untuk memastikan pengalaman
                             penggunaan yang optimal. Akun bersifat pribadi dan tidak diperkenankan untuk dibagikan, demi
                             menjaga kualitas layanan dan keamanan sistem.
                         </p>

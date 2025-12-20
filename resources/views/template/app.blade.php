@@ -76,8 +76,14 @@
                     <li class="pc-item">
                         <a href="{{ route('cover_master') }}" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-photo"></i></span>
-                            <span class="pc-mtext">Link Akses Aplikasi BONUS "Ebook Cover
+                            <span class="pc-mtext">Link Akses Aplikasi BONUS "Book Cover
                                 Masterpiece"</span>
+                        </a>
+                    </li>
+                    <li class="pc-item">
+                        <a href="{{ route('langganan') }}" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-photo"></i></span>
+                            <span class="pc-mtext">Langganan</span>
                         </a>
                     </li>
                     {{-- <li class="pc-item">

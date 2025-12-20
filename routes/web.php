@@ -21,6 +21,10 @@ Route::get('/cover-master', function () {
     return view('cover_master');
 })->middleware(['auth', 'verified'])->name('cover_master');
 
+Route::get('/berlangganan', function () {
+    return view('langganan.index');
+})->middleware(['auth', 'verified'])->name('langganan');
+
 Route::middleware('auth')->group(function () {
     Route::get('akses-aplikasi', [AksesAplikasiController::class, 'aksesAplikasi'])
         ->name('akses.aplikasi');
