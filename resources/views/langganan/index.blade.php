@@ -47,7 +47,7 @@
                                 </li>
                                 <li class="mb-2">
                                     <i class="ti ti-check text-success me-2"></i>
-                                    Generate ebook tanpa batas
+                                    Generate book tanpa batas
                                 </li>
                                 <li class="mb-2">
                                     <i class="ti ti-check text-success me-2"></i>
