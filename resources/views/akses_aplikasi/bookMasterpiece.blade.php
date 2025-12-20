@@ -248,7 +248,7 @@
             <!-- Langkah 1 -->
             <div class="bg-white p-6 rounded-xl shadow">
                 <h2 class="font-semibold text-lg flex items-center gap-2 text-blue-600">
-                    <span class="bg-blue-100 p-2 rounded-lg">🔧</span> Langkah 1: Konfigurasi Ebook
+                    <span class="bg-blue-100 p-2 rounded-lg">🔧</span> Langkah 1: Konfigurasi Book
                 </h2>
 
                 <div class="mt-4 space-y-4">
@@ -312,7 +312,7 @@
                     <button onclick="generateEbook('title')"
                         class="w-full bg-blue-600 text-white py-3 rounded-lg text-sm hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2">
                         <i class="fas fa-heading"></i>
-                        Buat Judul Ebook
+                        Buat Judul Book
                     </button>
 
                     <button onclick="generateEbook('intro')"
@@ -375,7 +375,7 @@
             <div class="bg-white p-4 rounded-xl shadow">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="font-semibold text-lg text-gray-800">
-                        <i class="fas fa-book mr-2"></i>Preview Ebook
+                        <i class="fas fa-book mr-2"></i>Preview Book
                     </h2>
                     <div class="flex gap-2">
                         <button onclick="toggleEbookView()" id="toggleViewBtn"
