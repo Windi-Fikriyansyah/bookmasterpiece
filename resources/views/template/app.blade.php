@@ -3,7 +3,7 @@
 <!-- [Head] start -->
 
 <head>
-    <title>Dashboard | Berry Dashboard Template</title>
+    <title>Book Masterpiece AI</title>
     <!-- [Meta] -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
@@ -51,7 +51,7 @@
             <div class="m-header">
                 <a href="{{ route('dashboard') }}" class="b-brand d-flex align-items-center text-decoration-none">
                     <span class="fw-bold fs-4 text-primary">
-                        Book<span class="text-dark">Masterpiece</span>
+                        Book<span class="text-dark"> Masterpiece AI</span>
                     </span>
                 </a>
 
