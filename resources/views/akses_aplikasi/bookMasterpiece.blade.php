@@ -236,7 +236,7 @@
     <div class="text-center py-8">
         <h1 class="text-4xl font-bold text-gray-800">Book Masterpiece AI</h1>
         <p class="text-gray-500 mt-2">
-            Dari Masalah Nyata Menjadi Karya Buku yang Siap Terbit.
+            Asisten Menulis Buku Anda yang Siap Terbit
         </p>
     </div>
 
@@ -255,14 +255,24 @@
 
                     <div>
                         <label class="text-sm font-medium block mb-1">Google AI API Key:</label>
-                        <input type="text" id="api_key_input"
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                            placeholder="Masukkan API Key Anda di sini">
+
+                        <div class="relative">
+                            <input type="password" id="api_key_input"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                placeholder="Masukkan API Key Anda di sini">
+
+                            <!-- Tombol mata -->
+                            <button type="button" id="toggle_api_key"
+                                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700">
+                                <i id="eye_icon" class="fas fa-eye"></i>
+                            </button>
+                        </div>
 
                         <button id="save_api_key"
                             class="mt-3 w-full bg-green-600 text-white py-2 rounded-lg text-sm hover:bg-green-700 transition-colors duration-200">
                             <i class="fas fa-save mr-2"></i>Simpan API Key
                         </button>
+
                     </div>
 
                     <div>
@@ -444,6 +454,24 @@
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const apiInput = document.getElementById("api_key_input");
+            const toggleBtn = document.getElementById("toggle_api_key");
+            const eyeIcon = document.getElementById("eye_icon");
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener("click", () => {
+                    const isPassword = apiInput.type === "password";
+
+                    apiInput.type = isPassword ? "text" : "password";
+                    eyeIcon.classList.toggle("fa-eye");
+                    eyeIcon.classList.toggle("fa-eye-slash");
+                });
+            }
+        });
+    </script>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
