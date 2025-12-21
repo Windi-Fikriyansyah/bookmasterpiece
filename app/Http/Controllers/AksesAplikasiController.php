@@ -61,7 +61,7 @@ class AksesAplikasiController extends Controller
     public function generateEbookPart(Request $request)
     {
         $request->validate([
-            'action' => 'required|in:title,preface,intro,outline,chapter,summary,closing,daftarpustaka,profilpenulis,continue_chapter,continue_subbab,continue_intro_part,extend_outline',
+            'action' => 'required|in:title,preface,intro,outline,chapter,summary,closing,daftarpustaka,profilpenulis,continue_chapter,continue_subbab,continue_intro_part,extend_outline,continue_preface,continue_summary',
             'masalah' => 'nullable|string',
             'kebutuhan' => 'nullable|string',
             'solusi' => 'nullable|string',
@@ -100,6 +100,13 @@ class AksesAplikasiController extends Controller
             'chapter_number'      => 'nullable|integer|min:1',
             'last_subbab_index'   => 'nullable|integer|min:0',
             'add_count'           => 'nullable|integer|min:1|max:5',
+
+            'preface_text' => 'nullable|string',
+            'preface_html' => 'nullable|string',
+
+            'summary_text' => 'nullable|string',
+            'summary_html' => 'nullable|string',
+
 
 
         ]);
@@ -604,6 +611,54 @@ Ringkasan harus:
                         "- Judul harus progresif dan relevan dengan masalah & solusi.\n";
                 }
                 break;
+
+            case 'continue_preface':
+                $prefaceText = $request->preface_text ?? '';
+
+                $instruction =
+                    "LANJUTKAN (PERPANJANG) KATA PENGANTAR YANG SUDAH ADA.\n\n" .
+                    "KONTEKS kata pengantar saat ini (ringkas):\n{$prefaceText}\n\n" .
+                    "ATURAN OUTPUT:\n" .
+                    "- Output HANYA HTML bersih: p,ul,ol,li,blockquote (TANPA h1/h2/h3).\n" .
+                    "- Jangan ulangi paragraf yang sama.\n" .
+                    "- Tambahkan isi baru yang lebih dalam, lebih terasa manusia, dan actionable.\n" .
+                    "- Panjang tambahan: 250–450 kata.\n" .
+                    "- Tetap konsisten dengan gaya bahasa: {$gaya}\n" .
+                    "- Patuhi Kontrak Kreatif Penulis AI ini: {$kontrakKreatif}\n";
+                break;
+
+
+            case 'continue_summary':
+                $summaryText = $request->summary_text ?? '';
+
+                $instruction =
+                    "LANJUTKAN RINGKASAN YANG SUDAH ADA.\n\n" .
+                    "KONTEKS ringkasan saat ini (ringkas):\n{$summaryText}\n\n" .
+                    "ATURAN OUTPUT:\n" .
+                    "- Output HANYA HTML bersih: p,ul,ol,li,blockquote (TANPA h1/h2/h3).\n" .
+                    "- Jangan mengulang kalimat/paragraf yang sama.\n" .
+                    "- Tambahkan poin baru: kesimpulan yang lebih tajam, rangkuman aksi, dan penekanan manfaat.\n" .
+                    "- Panjang tambahan: 200–350 kata.\n" .
+                    "- Konsisten dengan gaya bahasa: {$gaya}\n";
+
+                break;
+
+            case 'continue_closing':
+                $closingText = $request->closing_text ?? '';
+
+                $instruction =
+                    "LANJUTKAN BAGIAN PENUTUP YANG SUDAH ADA.\n\n" .
+                    "KONTEKS penutup saat ini (ringkas):\n{$closingText}\n\n" .
+                    "ATURAN OUTPUT:\n" .
+                    "- Output HANYA HTML bersih: p,ul,ol,li,blockquote (TANPA h1/h2/h3).\n" .
+                    "- Jangan ulangi paragraf yang sama.\n" .
+                    "- Tambahkan isi baru yang lebih kuat sebagai penutup: rangkum poin penting, beri dorongan tindakan, dan tutup dengan nada yang menguatkan.\n" .
+                    "- Panjang tambahan: 250–450 kata.\n" .
+                    "- Tetap konsisten dengan gaya bahasa: {$gaya}\n" .
+                    "- Jangan buat heading/bagian baru.\n";
+                break;
+
+
             default:
                 return response()->json([
                     'status'  => false,

@@ -1705,7 +1705,7 @@
                     ebookState.summary = html;
                     break;
                 case 'closing':
-                    ebookState.closing = html;
+                    ebookState.closing = stripAboutAuthorSection(html);
                     break;
                 case 'profilpenulis':
                     ebookState.authorProfile = html;
@@ -1943,6 +1943,33 @@
   `;
             }
 
+            if (type === 'preface') {
+                buttons += `
+    <button onclick="continuePreface()"
+            class="px-3 py-1 bg-emerald-600 text-white rounded text-sm hover:bg-emerald-700 transition-colors duration-200">
+      <i class="fas fa-forward mr-1"></i> Perpanjang
+    </button>
+  `;
+            }
+
+            if (type === 'summary') {
+                buttons += `
+    <button onclick="continueSummary()"
+            class="px-3 py-1 bg-emerald-600 text-white rounded text-sm hover:bg-emerald-700 transition-colors duration-200">
+      <i class="fas fa-forward mr-1"></i> Perpanjang
+    </button>
+  `;
+            }
+
+            if (type === 'closing') {
+                buttons += `
+    <button onclick="continueClosing()"
+            class="px-3 py-1 bg-emerald-600 text-white rounded text-sm hover:bg-emerald-700 transition-colors duration-200">
+      <i class="fas fa-forward mr-1"></i> Perpanjang
+    </button>
+  `;
+            }
+
 
             if (type === 'chapter') {
                 buttons += `
@@ -2167,6 +2194,209 @@
             } catch (e) {
                 console.error(e);
                 showToast("Error melanjutkan bab: " + e.message, "error");
+            } finally {
+                isGenerating = false;
+                removeLoadingIndicator();
+            }
+        }
+
+        function stripHtmlToText(html, maxLen = 2500) {
+            const temp = document.createElement('div');
+            temp.innerHTML = html || '';
+            return (temp.textContent || '')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .slice(0, maxLen);
+        }
+
+        async function continuePreface() {
+            if (!ebookState.preface) return showToast("Kata Pengantar belum dibuat", "warning");
+
+            const apiKey = document.getElementById("api_key_input").value.trim();
+            if (!apiKey) return showToast("API Key belum disimpan.", "error");
+
+            if (isGenerating) return showToast("Sedang membuat konten, mohon tunggu...", "warning");
+
+            const val = getFormValues();
+
+            isGenerating = true;
+            showLoadingIndicator("preface");
+
+            try {
+                const response = await fetch("/ebook/generate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        action: "continue_preface",
+
+                        masalah: val.masalah,
+                        kebutuhan: val.kebutuhan,
+                        solusi: val.solusi,
+                        pengalaman: val.pengalaman,
+                        kompetensi: val.kompetensi,
+                        kontrak_kreatif: val.kontrak_kreatif,
+                        calon_pembaca: val.calon_pembaca,
+                        gaya: val.gaya,
+                        existing_title: ebookState.title || "",
+
+                        // konteks kata pengantar saat ini
+                        preface_text: stripHtmlToText(ebookState.preface, 2500),
+                        preface_html: ebookState.preface
+                    })
+                });
+
+                const result = await response.json();
+                if (!result.status) return showToast(result.message || "Gagal memperpanjang kata pengantar", "error");
+
+                // Append hasil AI ke akhir kata pengantar
+                ebookState.preface = (ebookState.preface || '') + "\n" + (result.html || '').trim();
+
+                saveEbookState();
+                renderEbookContent();
+                showToast("Kata Pengantar berhasil diperpanjang!", "success");
+            } catch (e) {
+                console.error(e);
+                showToast("Error memperpanjang kata pengantar: " + e.message, "error");
+            } finally {
+                isGenerating = false;
+                removeLoadingIndicator();
+            }
+        }
+
+        async function continueSummary() {
+            if (!ebookState.summary) return showToast("Ringkasan belum dibuat", "warning");
+
+            const apiKey = document.getElementById("api_key_input").value.trim();
+            if (!apiKey) return showToast("API Key belum disimpan.", "error");
+
+            if (isGenerating) return showToast("Sedang membuat konten, mohon tunggu...", "warning");
+
+            const val = getFormValues();
+
+            isGenerating = true;
+            showLoadingIndicator("summary");
+
+            try {
+                const response = await fetch("/ebook/generate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        action: "continue_summary",
+
+                        masalah: val.masalah,
+                        kebutuhan: val.kebutuhan,
+                        solusi: val.solusi,
+                        pengalaman: val.pengalaman,
+                        kompetensi: val.kompetensi,
+                        kontrak_kreatif: val.kontrak_kreatif,
+                        calon_pembaca: val.calon_pembaca,
+                        gaya: val.gaya,
+                        existing_title: ebookState.title || "",
+
+                        // konteks ringkasan saat ini
+                        summary_text: stripHtmlToText(ebookState.summary, 2500),
+                        summary_html: ebookState.summary
+                    })
+                });
+
+                // Aman kalau server balikin HTML error (419/500) biar gak "Unexpected token <"
+                const text = await response.text();
+                let result;
+                try {
+                    result = JSON.parse(text);
+                } catch (e) {
+                    console.error("Server tidak mengembalikan JSON:", text);
+                    showToast("Response server bukan JSON (cek error 419/500 di Network).", "error");
+                    return;
+                }
+
+                if (!result.status) return showToast(result.message || "Gagal memperpanjang ringkasan", "error");
+
+                // Append hasil AI ke akhir ringkasan
+                ebookState.summary = (ebookState.summary || '') + "\n" + (result.html || "").trim();
+
+                saveEbookState();
+                renderEbookContent();
+                showToast("Ringkasan berhasil diperpanjang!", "success");
+
+            } catch (e) {
+                console.error(e);
+                showToast("Error memperpanjang ringkasan: " + e.message, "error");
+            } finally {
+                isGenerating = false;
+                removeLoadingIndicator();
+            }
+        }
+
+
+        async function continueClosing() {
+            if (!ebookState.closing) return showToast("Penutup belum dibuat", "warning");
+
+            const apiKey = document.getElementById("api_key_input").value.trim();
+            if (!apiKey) return showToast("API Key belum disimpan.", "error");
+
+            if (isGenerating) return showToast("Sedang membuat konten, mohon tunggu...", "warning");
+
+            const val = getFormValues();
+
+            isGenerating = true;
+            showLoadingIndicator("closing");
+
+            try {
+                const response = await fetch("/ebook/generate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        action: "continue_closing",
+
+                        masalah: val.masalah,
+                        kebutuhan: val.kebutuhan,
+                        solusi: val.solusi,
+                        pengalaman: val.pengalaman,
+                        kompetensi: val.kompetensi,
+                        kontrak_kreatif: val.kontrak_kreatif,
+                        calon_pembaca: val.calon_pembaca,
+                        gaya: val.gaya,
+                        existing_title: ebookState.title || "",
+
+                        // konteks penutup saat ini
+                        closing_text: stripHtmlToText(ebookState.closing, 2500),
+                        closing_html: ebookState.closing
+                    })
+                });
+
+                // ✅ aman kalau server balikin HTML error (419/500) biar gak "Unexpected token <"
+                const text = await response.text();
+                let result;
+                try {
+                    result = JSON.parse(text);
+                } catch (e) {
+                    console.error("Server tidak mengembalikan JSON:", text);
+                    showToast("Response server bukan JSON (cek error 419/500 di Network).", "error");
+                    return;
+                }
+
+                if (!result.status) return showToast(result.message || "Gagal memperpanjang penutup", "error");
+
+                const cleaned = stripAboutAuthorSection(result.html || "");
+                ebookState.closing = (ebookState.closing || '') + "\n" + cleaned.trim();
+
+                saveEbookState();
+                renderEbookContent();
+                showToast("Penutup berhasil diperpanjang!", "success");
+
+            } catch (e) {
+                console.error(e);
+                showToast("Error memperpanjang penutup: " + e.message, "error");
             } finally {
                 isGenerating = false;
                 removeLoadingIndicator();
@@ -2444,6 +2674,70 @@
                 .replaceAll('"', '&quot;')
                 .replaceAll("'", '&#039;');
         }
+
+        function stripAboutAuthorSection(html) {
+            const temp = document.createElement('div');
+            temp.innerHTML = html || '';
+
+            const keywords = [
+                'tentang penulis',
+                'profil penulis',
+                'bio penulis',
+                'biografi penulis',
+                'about the author',
+                'author profile'
+            ];
+
+            const isAbout = (txt) => {
+                const t = String(txt || '').toLowerCase().replace(/\s+/g, ' ').trim();
+                return keywords.some(k => t.includes(k));
+            };
+
+            // 1) Hapus jika ada heading "Tentang/Profil Penulis" beserta isinya sampai heading berikutnya (H2)
+            const headings = Array.from(temp.querySelectorAll('h1,h2,h3'));
+            headings.forEach(h => {
+                if (!isAbout(h.textContent)) return;
+
+                const tag = (h.tagName || '').toUpperCase();
+
+                // target berhenti: jika H2, berhenti di H2 berikutnya; jika H3, berhenti di H2 atau H3 berikutnya
+                const stopSelector = (tag === 'H3') ? 'H2,H3' : 'H2';
+
+                // kumpulkan node setelah heading sampai stopSelector
+                const toRemove = [h];
+                let cur = h.nextSibling;
+                while (cur) {
+                    if (cur.nodeType === 1) {
+                        const el = cur;
+                        if (stopSelector.split(',').includes(el.tagName)) break;
+                    }
+                    toRemove.push(cur);
+                    cur = cur.nextSibling;
+                }
+
+                toRemove.forEach(n => n && n.parentNode && n.parentNode.removeChild(n));
+            });
+
+            // 2) Kalau tanpa heading tapi ada paragraf pembuka “Tentang Penulis ...”, buang paragraf itu
+            const paras = Array.from(temp.querySelectorAll('p'));
+            paras.forEach(p => {
+                const t = (p.textContent || '').trim();
+                if (t && isAbout(t) && t.length < 120) {
+                    p.remove();
+                }
+            });
+
+            // 3) Rapikan: kalau ada container kosong
+            temp.querySelectorAll('*').forEach(el => {
+                if (el.children.length === 0 && !(el.textContent || '').trim() && el.tagName !== 'BR') {
+                    // jangan agresif banget; cukup div kosong yang sering nyisa
+                    if (el.tagName === 'DIV') el.remove();
+                }
+            });
+
+            return temp.innerHTML.trim();
+        }
+
 
         async function continueSubBab(chapterId, subBabNumber) {
             const chapter = getChapterById(chapterId);
