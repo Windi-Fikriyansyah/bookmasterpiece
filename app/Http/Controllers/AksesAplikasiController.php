@@ -433,28 +433,40 @@ ATURAN WAJIB:
 
 
             case 'summary':
-                $instruction = "
-BUATKAN RINGKASAN EKSEKUTIF:
+                $gaya = $request->gaya ?? 'Bahasa Indonesia yang rapi, jelas, dan mengalir.';
+                $summaryContext = $request->summary_context ?? '';
 
-Format yang HARUS digunakan:
-<h2>Ringkasan</h2>
-<p>Paragraf pertama: Ringkasan inti masalah dan solusi...</p>
-<p>Paragraf kedua: Poin-poin kunci yang dibahas...</p>
-<ul>
-<li>Poin penting pertama</li>
-<li>Poin penting kedua</li>
-<li>Poin penting ketiga</li>
-</ul>
-<p>Paragraf penutup: Manfaat yang didapat pembaca...</p>
+                // kalau summary_context kosong tapi chapters ada, bisa build ulang di backend (opsional)
+                $chapters = $request->chapters ?? [];
+                if (!$summaryContext && is_array($chapters)) {
+                    $parts = [];
+                    foreach ($chapters as $i => $ch) {
+                        $babTitle = $ch['title'] ?? ('Bab ' . ($i + 1));
+                        $babContent = $ch['content'] ?? '';
+                        $subParts = [];
+                        foreach (($ch['subChapters'] ?? []) as $s) {
+                            $subParts[] = "- " . ($s['title'] ?? 'Subbab') . ": " . ($s['content'] ?? '');
+                        }
+                        $parts[] = "BAB " . ($i + 1) . ": {$babTitle}\nISI: {$babContent}\nSUBBAB:\n" . implode("\n", $subParts);
+                    }
+                    $summaryContext = implode("\n\n", $parts);
+                }
 
-Ringkasan harus:
-1. Merangkum seluruh konten ebook secara singkat
-2. Menyoroti poin-poin kunci
-3. Menggunakan bahasa yang powerful dan persuasif
-4. Memberikan nilai tambah untuk pembaca
-5. Panjang: 300-500 kata
-";
+                $instruction =
+                    "BUAT RINGKASAN (KESIMPULAN) BERDASARKAN KONTEN NYATA DI BAWAH INI SAJA.\n\n" .
+                    "KONTEN YANG BOLEH DIPAKAI (Bab & Subbab yang SUDAH ADA ISINYA):\n" .
+                    $summaryContext . "\n\n" .
+                    "ATURAN WAJIB:\n" .
+                    "- DILARANG menyebut/membahas Bab/Subbab yang tidak ada pada konteks.\n" .
+                    "- DILARANG mengarang fakta/isi baru di luar konteks.\n" .
+                    "- Jika konteks hanya Bab 1, ringkasan fokus ke Bab 1 saja (jangan sebut Bab 2 dst).\n" .
+                    "- Output HANYA HTML bersih: <p>, <ul>, <ol>, <li>, <blockquote> (TANPA h1/h2/h3).\n" .
+                    "- Tulis sebagai paragraf mengalir, 2–5 paragraf (boleh bullet seperlunya).\n" .
+                    "- Nada tulisan konsisten dengan gaya: {$gaya}\n";
+
                 break;
+
+
 
             case 'closing':
                 $instruction =

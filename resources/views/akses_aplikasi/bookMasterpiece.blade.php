@@ -925,6 +925,9 @@
                     ebookState.chapters = [];
                 }
 
+                if (ebookState.summary) ebookState.summary = sanitizeSummaryHtml(ebookState.summary);
+
+
                 rebuildReferencesFromAllChapters();
                 saveEbookState();
                 renderEbookContent();
@@ -1129,6 +1132,59 @@
                 showToast("API Key belum disimpan.", "error");
                 return;
             }
+
+            let payload = {
+                action: action,
+                masalah: val.masalah,
+                kebutuhan: val.kebutuhan,
+                solusi: val.solusi,
+                pengalaman: val.pengalaman,
+                kompetensi: val.kompetensi,
+                kontrak_kreatif: val.kontrak_kreatif,
+                calon_pembaca: val.calon_pembaca,
+                gaya: val.gaya,
+                jumlah_outline: val.jumlah_outline,
+
+                // default (nanti bisa dioverride)
+                tentang_penulis: val.tentang_penulis,
+                pengantar_penulis: val.pengantar_penulis,
+                dont_write_author_section: false,
+
+                existing_title: ebookState.title || "",
+                current_chapter_count: ebookState.chapters.length,
+                chapter_titles: extractChapterTitles(),
+                target_chapter: null,
+
+                outline_text: stripHtmlToText(ebookState.outline || "", 6000),
+            };
+            // Khusus summary: harus ada minimal 1 bab agar bisa menyimpulkan Bab 1..N
+            if (action === "summary") {
+                const chaptersForSummary = normalizeChaptersForSummary(ebookState.chapters);
+
+                if (!chaptersForSummary.length) {
+                    showToast("Buat minimal 1 Bab/Subbab yang ada isinya agar ringkasan bisa dibuat.", "warning");
+                    isGenerating = false;
+                    removeLoadingIndicator();
+                    return;
+                }
+
+                const summaryContext = buildSummaryContext(chaptersForSummary);
+
+                // payload khusus summary: KIRIM KONTEKS INI SAJA (atau plus chaptersForSummary)
+                payload = {
+                    ...payload,
+                    action: "summary",
+                    chapters: chaptersForSummary, // optional (kalau backend mau)
+                    summary_context: summaryContext, // paling penting
+                };
+
+                // penting: jangan kirim outline / daftar rencana bab kalau masih ada di payload
+                delete payload.outline;
+                delete payload.toc;
+                delete payload.plan;
+            }
+
+
 
             isGenerating = true;
             let placeholder = document.getElementById("ebook_placeholder");
@@ -1420,6 +1476,12 @@
                 // Untuk action lainnya (outline, summary, closing)
                 const aboutAuthor = (action === 'closing') ? '' : val.tentang_penulis;
                 const pengantarAuthor = (action === 'closing') ? '' : val.pengantar_penulis;
+
+                const chapters_digest = (action === "summary") ?
+                    buildChaptersDigestWithSubBabs(18000, 900, 700) :
+                    "";
+
+
                 const response = await fetch("/ebook/generate", {
                     method: "POST",
                     headers: {
@@ -1445,7 +1507,9 @@
                         existing_title: ebookState.title || "",
                         current_chapter_count: currentChapterCount,
                         chapter_titles: chapterTitles,
-                        target_chapter: action === 'chapter' ? nextChapterNumber : null
+                        target_chapter: action === 'chapter' ? nextChapterNumber : null,
+                        chapters_digest: chapters_digest,
+                        outline_text: stripHtmlToText(ebookState.outline || "", 6000),
                     })
                 });
 
@@ -1707,7 +1771,7 @@
                     ebookState.outline = html;
                     break;
                 case 'summary':
-                    ebookState.summary = html;
+                    ebookState.summary = sanitizeSummaryHtml(html);
                     break;
                 case 'closing':
                     ebookState.closing = sanitizeClosingHtml(html);
@@ -1869,16 +1933,23 @@
         </div>`;
             });
 
-            // Render ringkasan jika ada
+
+
             if (ebookState.summary) {
                 html += `
-        <div class="section-container summary-section" data-type="summary">
-            ${addActionButtons('summary', null)}
-            <div contenteditable="true" ${bmStyleAttr('summary', null)} onfocus="showActions(this)" onblur="saveEditedSection('summary', this.innerHTML)"
-                 class="outline-none cursor-text">
-                ${ebookState.summary}
-            </div>
-        </div>`;
+    <div class="section-container summary-section" data-type="summary">
+      ${addActionButtons('summary', null)}
+
+      <!-- Judul Ringkasan fixed (tidak ikut tersimpan di ebookState.summary) -->
+      <h2 class="bm-fixed-heading">Ringkasan</h2>
+
+      <div contenteditable="true" ${bmStyleAttr('summary', null)}
+           onfocus="showActions(this)"
+           onblur="saveEditedSection('summary', this.innerHTML)"
+           class="outline-none cursor-text">
+        ${ebookState.summary}
+      </div>
+    </div>`;
             }
 
             // Render penutup jika ada
@@ -2217,6 +2288,156 @@
                 .slice(0, maxLen);
         }
 
+        function stripHtml(html = "") {
+            const div = document.createElement("div");
+            div.innerHTML = html;
+            return (div.textContent || div.innerText || "").replace(/\s+/g, " ").trim();
+        }
+
+        function hasMeaningfulText(html = "", minLen = 40) {
+            return stripHtml(html).length >= minLen;
+        }
+
+        function normalizeChaptersForSummary(chapters = []) {
+            return (chapters || [])
+                .map((ch, idx) => {
+                    const subChapters = (ch.subChapters || ch.subchapters || [])
+                        .map((s, sIdx) => ({
+                            title: s.title || `Sub Bab ${idx + 1}.${sIdx + 1}`,
+                            content: s.content || s.text || "",
+                        }))
+                        // hanya subbab yang punya konten
+                        .filter(s => hasMeaningfulText(s.content, 25));
+
+                    return {
+                        title: ch.title || `Bab ${idx + 1}`,
+                        content: ch.content || ch.text || "",
+                        subChapters,
+                    };
+                })
+                // hanya bab yang punya konten bab ATAU punya subbab yang berisi
+                .filter(ch => hasMeaningfulText(ch.content, 40) || (ch.subChapters && ch.subChapters.length > 0));
+        }
+
+        function buildSummaryContext(chapters = []) {
+            return chapters.map((ch, i) => {
+                const babText = stripHtml(ch.content || "");
+                const subText = (ch.subChapters || []).map((s, j) => {
+                    return `  - Subbab: ${s.title}\n    Isi: ${stripHtml(s.content || "")}`;
+                }).join("\n");
+
+                return `BAB ${i + 1}: ${ch.title}\nIsi Bab: ${babText || "(kosong)"}\n${subText ? "Subbab:\n" + subText : ""}`
+                    .trim();
+            }).join("\n\n");
+        }
+
+
+        function buildChaptersDigest(maxCharsTotal = 12000, perChapterMax = 1200) {
+            const chapters = (ebookState.chapters || [])
+                .slice()
+                .sort((a, b) => (a.chapterNumber || 0) - (b.chapterNumber || 0));
+
+            const parts = [];
+            let used = 0;
+
+            for (const ch of chapters) {
+                const num = ch.chapterNumber || 0;
+                const title = ch.title || `Bab ${num}`;
+
+                const text = stripHtmlToText(ch.content || '', perChapterMax);
+                const block = `Bab ${num}: ${title}\n${text}\n`;
+
+                if (used + block.length > maxCharsTotal) break;
+
+                parts.push(block);
+                used += block.length;
+            }
+
+            return parts.join("\n---\n");
+        }
+
+        function normalizeSpaces(s) {
+            return String(s || '').replace(/\s+/g, ' ').trim();
+        }
+
+        function getChapterIntroText(chapterHtml, chapterNumber, maxLen = 700) {
+            const temp = document.createElement('div');
+            temp.innerHTML = chapterHtml || '';
+
+            const h2 = temp.querySelector('h2');
+            if (!h2) return '';
+
+            // cari sub-bab pertama: h3 yang diawali "X.Y" sesuai nomor bab
+            const re = new RegExp('^\\s*' + chapterNumber + '\\.\\d+\\b');
+            const firstSub = Array.from(temp.querySelectorAll('h3'))
+                .find(h => re.test((h.textContent || '').trim()));
+
+            const wrapper = document.createElement('div');
+
+            // ambil node setelah h2 sampai sebelum subbab pertama (kalau ada)
+            let cur = h2.nextSibling;
+            while (cur && cur !== firstSub) {
+                wrapper.appendChild(cur.cloneNode(true));
+                cur = cur.nextSibling;
+            }
+
+            const text = normalizeSpaces(wrapper.textContent || '');
+            return text.slice(0, maxLen);
+        }
+
+        /**
+         * Digest ringkasan yang berisi:
+         * - Bab N: Judul
+         * - Pengantar Bab (sebelum sub-bab)
+         * - Sub-bab X.Y: Judul + ringkas isi sub-bab (berdasarkan konten yang sudah ada)
+         */
+        function buildChaptersDigestWithSubBabs(maxCharsTotal = 18000, perSubBabMax = 900, introMax = 700) {
+            const chapters = (ebookState.chapters || [])
+                .slice()
+                .sort((a, b) => (a.chapterNumber || 0) - (b.chapterNumber || 0));
+
+            const parts = [];
+            let used = 0;
+
+            for (const ch of chapters) {
+                const num = ch.chapterNumber || 0;
+                const title = ch.title || `Bab ${num}`;
+
+                // intro bab (sebelum sub-bab)
+                const introText = getChapterIntroText(ch.content || '', num, introMax);
+                let block = `Bab ${num}: ${title}\n`;
+                if (introText) block += `Pengantar Bab:\n${introText}\n`;
+
+                // sub-bab dari HTML bab yang sudah dibuat
+                const subs = extractSubBabsFromChapterHtml(ch.content || '');
+
+                if (subs.length) {
+                    for (const s of subs) {
+                        const seg = getSubBabSegmentHtml(ch.content || '', s.number);
+                        const segText = normalizeSpaces(seg.segmentText || '').slice(0, perSubBabMax);
+
+                        // kalau segmen tidak kebaca, fallback ambil teks bab overall (biar tidak kosong)
+                        const fallback = normalizeSpaces(stripHtmlToText(ch.content || '', perSubBabMax));
+
+                        block += `Sub-bab ${s.number}: ${s.title}\n${segText || fallback}\n\n`;
+                    }
+                } else {
+                    // fallback kalau bab belum punya sub-bab
+                    const text = normalizeSpaces(stripHtmlToText(ch.content || '', Math.min(perSubBabMax, 1200)));
+                    block += `${text}\n\n`;
+                }
+
+                // cut total
+                if (used + block.length > maxCharsTotal) break;
+                parts.push(block);
+                used += block.length;
+            }
+
+            return parts.join("\n---\n");
+        }
+
+
+
         async function continuePreface() {
             if (!ebookState.preface) return showToast("Kata Pengantar belum dibuat", "warning");
 
@@ -2309,7 +2530,11 @@
 
                         // konteks ringkasan saat ini
                         summary_text: stripHtmlToText(ebookState.summary, 2500),
-                        summary_html: ebookState.summary
+                        summary_html: ebookState.summary,
+                        chapters_digest: buildChaptersDigestWithSubBabs(18000, 900, 700),
+                        outline_text: stripHtmlToText(ebookState.outline || "", 6000),
+
+
                     })
                 });
 
@@ -2327,7 +2552,10 @@
                 if (!result.status) return showToast(result.message || "Gagal memperpanjang ringkasan", "error");
 
                 // Append hasil AI ke akhir ringkasan
-                ebookState.summary = (ebookState.summary || '') + "\n" + (result.html || "").trim();
+                ebookState.summary = sanitizeSummaryHtml(
+                    (ebookState.summary || '') + "\n" + (result.html || "").trim()
+                );
+
 
                 saveEbookState();
                 renderEbookContent();
@@ -2729,6 +2957,117 @@
 
             return temp.innerHTML.trim();
         }
+
+        function getBookTitlePlain() {
+            if (!ebookState?.title) return '';
+
+            const temp = document.createElement('div');
+            temp.innerHTML = ebookState.title || '';
+
+            // biasanya judul ada di h1
+            const h1 = temp.querySelector('h1');
+            const title = (h1 ? h1.textContent : temp.textContent) || '';
+
+            return title.replace(/\s+/g, ' ').trim();
+        }
+
+        function sanitizeSummaryHtml(html) {
+            const temp = document.createElement('div');
+            temp.innerHTML = html || '';
+
+            const bookTitle = (getBookTitlePlain() || '').toLowerCase();
+
+            const norm = (s) => String(s || '')
+                .replace(/\s+/g, ' ')
+                .replace(/[“”"]/g, '"')
+                .trim()
+                .toLowerCase();
+
+            // 1) Hapus SEMUA heading (biar tidak ada judul buku/ringkasan/kesimpulan tampil dari AI)
+            temp.querySelectorAll('h1,h2,h3,h4,h5,h6').forEach(h => h.remove());
+
+            // 2) Hapus paragraf/div yang isinya SAMA DENGAN judul buku (kalau AI mengulang judul)
+            if (bookTitle) {
+                temp.querySelectorAll('p,div').forEach(el => {
+                    const t = norm(el.textContent);
+                    if (!t) return;
+                    if (t === bookTitle) el.remove();
+                });
+            }
+
+            // 3) Hapus baris yang diawali "Judul:" / "Judul Buku:" / "Title:" (kalau AI bikin label)
+            temp.querySelectorAll('p,div').forEach(el => {
+                const t = norm(el.textContent);
+                if (/^(judul(\s+buku)?|title)\s*[:\-]/i.test(t)) el.remove();
+            });
+
+            // 4) Ubah list jadi paragraf
+            temp.querySelectorAll('ul,ol').forEach(list => {
+                const items = Array.from(list.querySelectorAll('li'))
+                    .map(li => (li.textContent || '').replace(/\s+/g, ' ').trim())
+                    .filter(Boolean);
+
+                if (items.length) {
+                    const p = document.createElement('p');
+                    p.textContent = items.map(x => (/[.!?]$/.test(x) ? x : x + '.')).join(' ');
+                    list.replaceWith(p);
+                } else {
+                    list.remove();
+                }
+            });
+
+            // 5) Blockquote -> paragraf biasa
+            temp.querySelectorAll('blockquote').forEach(bq => {
+                const t = (bq.textContent || '').replace(/\s+/g, ' ').trim();
+                if (!t) return bq.remove();
+                const p = document.createElement('p');
+                p.textContent = t;
+                bq.replaceWith(p);
+            });
+
+            // 6) Bersihkan atribut aneh
+            temp.querySelectorAll('*').forEach(el => {
+                el.removeAttribute('style');
+                el.removeAttribute('class');
+            });
+
+            // 7) Paksa output jadi paragraf saja (kalau ada DIV/SPAN di root)
+            Array.from(temp.childNodes).forEach(node => {
+                if (node.nodeType === 3) {
+                    const t = (node.textContent || '').replace(/\s+/g, ' ').trim();
+                    node.remove();
+                    if (t) {
+                        const p = document.createElement('p');
+                        p.textContent = t;
+                        temp.appendChild(p);
+                    }
+                    return;
+                }
+
+                if (node.nodeType === 1) {
+                    const el = node;
+                    const tag = el.tagName.toUpperCase();
+                    const t = (el.textContent || '').replace(/\s+/g, ' ').trim();
+
+                    if (!t) return el.remove();
+
+                    if (tag !== 'P') {
+                        const p = document.createElement('p');
+                        p.textContent = t;
+                        el.replaceWith(p);
+                    }
+                }
+            });
+
+            // 8) Hapus paragraf kosong
+            temp.querySelectorAll('p').forEach(p => {
+                if (!(p.textContent || '').trim()) p.remove();
+            });
+
+            return temp.innerHTML.trim();
+        }
+
+
 
         async function continueSubBab(chapterId, subBabNumber) {
             const chapter = getChapterById(chapterId);
