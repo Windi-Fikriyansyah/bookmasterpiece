@@ -276,7 +276,7 @@
                     </div>
 
                     <div>
-                        <label class="text-sm font-medium block mb-1">Jelaskan Masalah Anda:</label>
+                        <label class="text-sm font-medium block mb-1">Masalah:</label>
                         <textarea rows="4" id="masalah_input"
                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                             placeholder="Contoh: •	Ingin membuka usaha bimbel, tapi tidak punya modal besar
@@ -286,7 +286,7 @@
                     </div>
 
                     <div>
-                        <label class="text-sm font-medium block mb-1">Jelaskan Kebutuhan (Need) Anda:</label>
+                        <label class="text-sm font-medium block mb-1">Kebutuhan (Need):</label>
                         <textarea rows="4" id="kebutuhan_input"
                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                             placeholder="Contoh: •	Panduan langkah demi langkah yang realistis
@@ -295,7 +295,7 @@
 •	Rasa yakin bahwa orang biasa juga bisa memulai"></textarea>
                     </div>
                     <div>
-                        <label class="text-sm font-medium block mb-1">Jelaskan Solusi (Solution) Anda:</label>
+                        <label class="text-sm font-medium block mb-1">Solusi (Solution):</label>
                         <textarea rows="4" id="solusi_input"
                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                             placeholder="Contoh: •	Model bimbel rumahan tanpa sewa tempat
@@ -305,7 +305,7 @@
 •	Contoh jadwal, materi, dan biaya bimbel pemula"></textarea>
                     </div>
                     <div>
-                        <label class="text-sm font-medium block mb-1">Jelaskan Pengalaman (Experience) Anda:</label>
+                        <label class="text-sm font-medium block mb-1">Pengalaman (Experience):</label>
                         <textarea rows="4" id="pengalaman_input"
                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                             placeholder="Contoh: •	Model bimbel rumahan tanpa sewa tempat
@@ -315,7 +315,7 @@
 •	Contoh jadwal, materi, dan biaya bimbel pemula"></textarea>
                     </div>
                     <div>
-                        <label class="text-sm font-medium block mb-1">Jelaskan Kompetensi (Competence) Anda:</label>
+                        <label class="text-sm font-medium block mb-1">Kompetensi (Competence):</label>
                         <textarea rows="4" id="kompetensi_input"
                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                             placeholder="Contoh: •	Lulusan pendidikan / guru honorer
@@ -347,7 +347,7 @@
                         </div>
 
                         <div>
-                            <label class="text-sm font-medium block mb-1">Jumlah Isi Outline Buku Anda:</label>
+                            <label class="text-sm font-medium block mb-1">Jumlah Isi Outline Buku:</label>
                             <input id="jumlah_bab_input" type="text" placeholder="contoh : 5 Bab 5 Sub Bab"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                         </div>
