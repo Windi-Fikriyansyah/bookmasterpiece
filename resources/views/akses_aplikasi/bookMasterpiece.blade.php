@@ -72,6 +72,24 @@
             margin-bottom: 1.2rem;
         }
 
+        .ebook-content h1+p {
+            text-align: center;
+            margin-top: -0.5rem;
+            margin-bottom: 2rem;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: #4a5568;
+        }
+
+        /* Garis (tabline) di bawah tagline */
+        .ebook-content h1+p::after {
+            content: "";
+            display: block;
+            width: 60%;
+            margin: 1.2rem auto 0;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
         .ebook-content li {
             margin-bottom: 0.5rem;
         }
@@ -276,7 +294,7 @@
                     </div>
 
                     <div>
-                        <label class="text-sm font-medium block mb-1">Masalah:</label>
+                        <label class="text-sm font-medium block mb-1">Masalah (Problem):</label>
                         <textarea rows="4" id="masalah_input"
                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                             placeholder="Contoh: •	Ingin membuka usaha bimbel, tapi tidak punya modal besar
@@ -1700,14 +1718,14 @@
                 `;
             }
 
-            if (type !== 'manual') {
-                buttons += `
-                <button onclick="regenerateSection('${type}', '${id}')"
-                        class="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors duration-200">
-                    <i class="fas fa-sync-alt mr-1"></i> Regenerate
-                </button>
-                `;
-            }
+            // if (type !== 'manual') {
+            //     buttons += `
+        //     <button onclick="regenerateSection('${type}', '${id}')"
+        //             class="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors duration-200">
+        //         <i class="fas fa-sync-alt mr-1"></i> Regenerate
+        //     </button>
+        //     `;
+            // }
 
             if (type !== 'manual' && type !== 'bibliography') {
                 buttons += `

@@ -167,25 +167,26 @@ class AksesAplikasiController extends Controller
         switch ($action) {
             case 'title':
                 $instruction = "
-BUATKAN HANYA JUDUL EBOOK (JANGAN BUAT SUBJUDUL ATAU KONTEN LAIN):
+BUATKAN JUDUL EBOOK + TAGLINE (SUBJUDUL) SAJA (JANGAN BUAT KONTEN LAIN):
 
 Format yang HARUS digunakan:
 <h1>Judul Utama Ebook</h1>
+<p>Tagline singkat (maks 12 kata) yang menegaskan manfaat utama</p>
 
-Contoh format yang benar:
+CONTOH format yang benar:
 <h1>Mastering Productivity: Seni Menyelesaikan Pekerjaan</h1>
+<p>Metode sederhana agar fokus, selesai, dan konsisten setiap hari</p>
 
-JANGAN TAMBAHKAN SUBJUDUL, PARAGRAF, ATAU KONTEN LAINNYA.
-HANYA SATU TAG <h1> SAJA.
-
-Judul harus:
-1. Relevan dengan masalah: {$masalah}
-2. Menggunakan gaya bahasa: {$gaya}
-3. Cukup panjang (4-8 kata)
-4. Menarik perhatian pembaca
-5. BERFOKUS PADA MASALAH DAN SOLUSI
+ATURAN WAJIB:
+1) HANYA boleh ada 1 tag <h1> dan 1 tag <p> (tagline).
+2) JANGAN buat paragraf tambahan, subjudul lain, atau daftar poin.
+3) Tagline maksimal 12 kata, tidak pakai bullet/nomor.
+4) Judul relevan dengan masalah: {$masalah}
+5) Menggunakan gaya bahasa: {$gaya}
+6) Judul ideal 4–10 kata (boleh lebih jika tetap natural).
 ";
                 break;
+
 
             case 'preface':
                 $instruction =
