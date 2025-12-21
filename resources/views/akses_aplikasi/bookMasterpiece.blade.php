@@ -359,12 +359,12 @@
                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                             placeholder="Tulis bio singkat Anda di sini."></textarea>
                     </div>
-                    <div>
+                    {{-- <div>
                         <label class="text-sm font-medium block mb-1">Pengantar Penulis (Opsional):</label>
                         <textarea rows="2" id="pengantar_input"
                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                             placeholder="Tulis satu deskripsi singkat pengantar buku Anda."></textarea>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
 
@@ -381,11 +381,18 @@
                         Buat Judul Book
                     </button>
 
+                    <button onclick="generateEbook('preface')"
+                        class="w-full bg-blue-600 text-white py-3 rounded-lg text-sm hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2">
+                        <i class="fas fa-pen-nib"></i>
+                        Buat Kata Pengantar
+                    </button>
                     <button onclick="generateEbook('intro')"
                         class="w-full bg-blue-600 text-white py-3 rounded-lg text-sm hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2">
                         <i class="fas fa-book-open"></i>
                         Buat Pendahuluan
                     </button>
+
+
 
                     <!-- TAMBAH tombol ini di bagian Langkah 2, setelah tombol "Buat Pendahuluan" -->
                     <button onclick="generateOutlineFromUserInput()"
@@ -419,6 +426,13 @@
                         <i class="fas fa-flag-checkered"></i>
                         Buat Penutup
                     </button>
+
+                    <button onclick="generateDaftarPustaka()"
+                        class="w-full bg-gray-800 text-white py-3 rounded-lg text-sm hover:bg-gray-900 transition-colors duration-200 flex items-center justify-center gap-2">
+                        <i class="fas fa-book"></i>
+                        Buat Daftar Pustaka
+                    </button>
+
                 </div>
 
                 <!-- Tombol Reset & Download -->
@@ -551,12 +565,15 @@
         // Inisialisasi state ebook
         let ebookState = {
             title: null,
+            preface: null,
             intro: null,
             outline: null,
             chapters: [],
             summary: null,
             closing: null,
-            manualSections: []
+            manualSections: [],
+            references: [],
+            bibliography: null
         };
 
         let isGenerating = false;
@@ -648,16 +665,16 @@
 
         function saveFormData() {
             const formData = {
-                masalah: document.getElementById("masalah_input").value,
-                kebutuhan: document.getElementById("kebutuhan_input").value,
-                solusi: document.getElementById("solusi_input").value,
-                pengalaman: document.getElementById("pengalaman_input").value,
-                kompetensi: document.getElementById("kompetensi_input").value,
-                calon_pembaca: document.getElementById("calon_pembaca_input").value,
-                gaya: document.getElementById("gaya_input").value,
-                jumlah_outline: document.getElementById("jumlah_bab_input").value, // biarkan string: "5 Bab 5 Sub Bab"
-                tentang_penulis: document.getElementById("penulis_input").value,
-                pengantar_penulis: document.getElementById("pengantar_input").value
+                masalah: safeVal("masalah_input"),
+                kebutuhan: safeVal("kebutuhan_input"),
+                solusi: safeVal("solusi_input"),
+                pengalaman: safeVal("pengalaman_input"),
+                kompetensi: safeVal("kompetensi_input"),
+                calon_pembaca: safeVal("calon_pembaca_input"),
+                gaya: safeVal("gaya_input"),
+                jumlah_outline: safeVal("jumlah_bab_input"),
+                tentang_penulis: safeVal("penulis_input"),
+                pengantar_penulis: safeVal("pengantar_input")
             };
 
             localStorage.setItem('ebook_form_data', JSON.stringify(formData));
@@ -670,17 +687,17 @@
 
             const d = JSON.parse(saved);
 
-            document.getElementById("masalah_input").value = d.masalah || '';
-            document.getElementById("kebutuhan_input").value = d.kebutuhan || '';
-            document.getElementById("solusi_input").value = d.solusi || '';
-            document.getElementById("pengalaman_input").value = d.pengalaman || '';
-            document.getElementById("kompetensi_input").value = d.kompetensi || '';
-            document.getElementById("calon_pembaca_input").value = d.calon_pembaca || '';
+            safeSetVal("masalah_input", d.masalah || '');
+            safeSetVal("kebutuhan_input", d.kebutuhan || '');
+            safeSetVal("solusi_input", d.solusi || '');
+            safeSetVal("pengalaman_input", d.pengalaman || '');
+            safeSetVal("kompetensi_input", d.kompetensi || '');
+            safeSetVal("calon_pembaca_input", d.calon_pembaca || '');
 
-            document.getElementById("gaya_input").value = d.gaya || 'Edukatif & Praktis (Mengajar tanpa menggurui)';
-            document.getElementById("jumlah_bab_input").value = d.jumlah_outline || '';
-            document.getElementById("penulis_input").value = d.tentang_penulis || '';
-            document.getElementById("pengantar_input").value = d.pengantar_penulis || '';
+            safeSetVal("gaya_input", d.gaya || 'Edukatif & Praktis (Mengajar tanpa menggurui)');
+            safeSetVal("jumlah_bab_input", d.jumlah_outline || '');
+            safeSetVal("penulis_input", d.tentang_penulis || '');
+            safeSetVal("pengantar_input", d.pengantar_penulis || '');
         }
 
         function loadEbookState() {
@@ -693,6 +710,7 @@
                     ebookState.chapters = [];
                 }
 
+                rebuildReferencesFromAllChapters();
                 saveEbookState();
                 renderEbookContent();
                 updateStats();
@@ -710,10 +728,12 @@
 
             const sections = [
                 ebookState.title,
+                ebookState.preface,
                 ebookState.intro,
                 ebookState.outline,
                 ebookState.summary,
                 ebookState.closing,
+                ebookState.bibliography,
                 ...ebookState.chapters.map(c => c.content),
                 ...ebookState.manualSections.map(s => s.content)
             ];
@@ -761,18 +781,29 @@
             showToast("Bagian manual berhasil ditambahkan", "success");
         }
 
+        function safeVal(id) {
+            const el = document.getElementById(id);
+            return el ? (el.value ?? '') : '';
+        }
+
+        function safeSetVal(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.value = value ?? '';
+        }
+
+
         function getFormValues() {
             return {
-                masalah: document.getElementById("masalah_input").value,
-                kebutuhan: document.getElementById("kebutuhan_input").value,
-                solusi: document.getElementById("solusi_input").value,
-                pengalaman: document.getElementById("pengalaman_input").value,
-                kompetensi: document.getElementById("kompetensi_input").value,
-                calon_pembaca: document.getElementById("calon_pembaca_input").value,
-                gaya: document.getElementById("gaya_input").value,
-                jumlah_outline: document.getElementById("jumlah_bab_input").value, // string
-                tentang_penulis: document.getElementById("penulis_input").value,
-                pengantar_penulis: document.getElementById("pengantar_input").value
+                masalah: safeVal("masalah_input"),
+                kebutuhan: safeVal("kebutuhan_input"),
+                solusi: safeVal("solusi_input"),
+                pengalaman: safeVal("pengalaman_input"),
+                kompetensi: safeVal("kompetensi_input"),
+                calon_pembaca: safeVal("calon_pembaca_input"),
+                gaya: safeVal("gaya_input"),
+                jumlah_outline: safeVal("jumlah_bab_input"),
+                tentang_penulis: safeVal("penulis_input"),
+                pengantar_penulis: safeVal("pengantar_input")
             };
         }
 
@@ -925,6 +956,7 @@
 
                     // Simpan hanya judul
                     ebookState.title = result.html;
+                    ebookState.preface = null;
                     ebookState.intro = null; // Reset intro agar bisa dibuat lagi
                     ebookState.outline = null; // Reset outline
 
@@ -933,16 +965,65 @@
                     showToast("Judul book berhasil dibuat!", "success");
 
                     // Tampilkan dialog konfirmasi untuk lanjut ke pendahuluan
-                    setTimeout(() => {
-                        if (confirm(
-                                "Judul book berhasil dibuat! Apakah Anda ingin melanjutkan membuat Pendahuluan?"
-                            )) {
-                            generateEbook('intro');
-                        }
-                    }, 500);
+                    // setTimeout(() => {
+                    //     if (confirm(
+                    //             "Judul book berhasil dibuat! Apakah Anda ingin melanjutkan membuat Pendahuluan?"
+                    //         )) {
+                    //         generateEbook('intro');
+                    //     }
+                    // }, 500);
 
                     return;
                 }
+
+                // JIKA ACTION PREFACE - buat kata pengantar
+                if (action === "preface") {
+                    if (!ebookState.title) {
+                        showToast("Buat judul book terlebih dahulu!", "error");
+                        return;
+                    }
+
+                    const currentChapterCount = ebookState.chapters.length;
+                    const chapterTitles = extractChapterTitles();
+
+                    const response = await fetch("/ebook/generate", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({
+                            action: action,
+                            masalah: val.masalah,
+                            kebutuhan: val.kebutuhan,
+                            solusi: val.solusi,
+                            pengalaman: val.pengalaman,
+                            kompetensi: val.kompetensi,
+                            calon_pembaca: val.calon_pembaca,
+                            gaya: val.gaya,
+                            jumlah_outline: val.jumlah_outline,
+                            tentang_penulis: val.tentang_penulis,
+                            pengantar_penulis: val.pengantar_penulis,
+                            existing_title: ebookState.title || "",
+                            current_chapter_count: currentChapterCount,
+                            chapter_titles: chapterTitles,
+                            target_chapter: null
+                        })
+                    });
+
+                    const result = await response.json();
+                    if (!result.status) {
+                        showToast(result.message, "error");
+                        return;
+                    }
+
+                    ebookState.preface = result.html;
+                    saveEbookState();
+                    renderEbookContent();
+                    showToast("Kata Pengantar berhasil dibuat!", "success");
+                    return;
+                }
+
 
                 // JIKA ACTION INTRO - dan judul sudah ada, buat pendahuluan
                 if (action === "intro") {
@@ -994,13 +1075,13 @@
                     showToast("Pendahuluan berhasil dibuat!", "success");
 
                     // Tampilkan dialog konfirmasi untuk lanjut ke daftar isi
-                    setTimeout(() => {
-                        if (confirm(
-                                "Pendahuluan berhasil dibuat! Apakah Anda ingin melanjutkan membuat Daftar Isi?"
-                            )) {
-                            generateOutlineFromUserInput();
-                        }
-                    }, 500);
+                    // setTimeout(() => {
+                    //     if (confirm(
+                    //             "Pendahuluan berhasil dibuat! Apakah Anda ingin melanjutkan membuat Daftar Isi?"
+                    //         )) {
+                    //         generateOutlineFromUserInput();
+                    //     }
+                    // }, 500);
 
                     return;
                 }
@@ -1071,6 +1152,13 @@
                         showToast(result.message, "error");
                         return;
                     }
+                    const extracted = extractReferencesFromChapterHtml(result.html);
+
+                    // simpan referensi global
+                    ebookState.references = mergeUniqueRefs(ebookState.references || [], extracted.refs);
+
+                    // pakai konten bab yang sudah “bersih” (tanpa blok referensi bab auto)
+                    const cleanedChapterHtml = extracted.cleanHtml;
 
                     // Ekstrak judul bab dari konten
                     const tempDiv = document.createElement("div");
@@ -1089,7 +1177,7 @@
                     // Buat objek bab baru
                     const newChapter = {
                         id: "chapter_" + Date.now(),
-                        content: result.html,
+                        content: cleanedChapterHtml,
                         type: "chapter",
                         chapterNumber: nextChapterNumber,
                         title: chapterTitle
@@ -1366,6 +1454,7 @@
         function getActionName(action) {
             const names = {
                 'title': 'Judul',
+                'preface': 'Kata Pengantar',
                 'intro': 'Pendahuluan',
                 'outline': 'Daftar isi',
                 'summary': 'Ringkasan',
@@ -1378,6 +1467,9 @@
             switch (action) {
                 case 'title':
                     ebookState.title = html;
+                    break;
+                case 'preface':
+                    ebookState.preface = html;
                     break;
                 case 'intro':
                     ebookState.intro = html;
@@ -1441,6 +1533,7 @@
             let placeholder = document.getElementById("ebook_placeholder");
 
             const isEmpty = !ebookState.title &&
+                !ebookState.preface &&
                 !ebookState.intro &&
                 !ebookState.outline &&
                 ebookState.chapters.length === 0 &&
@@ -1474,6 +1567,19 @@
             </div>
         </div>`;
             }
+
+            // Render kata pengantar jika ada
+            if (ebookState.preface) {
+                html += `
+    <div class="section-container" data-type="preface">
+        ${addActionButtons('preface', null)}
+        <div contenteditable="true" onfocus="showActions(this)" onblur="saveEditedSection('preface', this.innerHTML)"
+            class="outline-none cursor-text">
+            ${ebookState.preface}
+        </div>
+    </div>`;
+            }
+
 
             // Render pendahuluan jika ada
             if (ebookState.intro) {
@@ -1553,6 +1659,19 @@
         </div>`;
             }
 
+            if (ebookState.bibliography) {
+                html += `
+    <div class="section-container" data-type="bibliography">
+      ${addActionButtons('bibliography', null)}
+      <div contenteditable="true"
+           onfocus="showActions(this)"
+           onblur="saveEditedSection('bibliography', this.innerHTML)"
+           class="outline-none cursor-text">
+        ${ebookState.bibliography}
+      </div>
+    </div>
+  `;
+            }
             contentEl.innerHTML = html;
             updateStats(); // Update stats setelah render
         }
@@ -1590,6 +1709,14 @@
                 `;
             }
 
+            if (type !== 'manual' && type !== 'bibliography') {
+                buttons += `
+      <button onclick="regenerateSection('${type}', '${id}')"
+              class="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors duration-200">
+        <i class="fas fa-sync-alt mr-1"></i> Regenerate
+      </button>
+    `;
+            }
             buttons += `
                 <button onclick="copySection('${type}', '${id}')"
                         class="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600 transition-colors duration-200">
@@ -1836,6 +1963,14 @@
         function deleteSection(type, id) {
             if (!confirm("Anda yakin ingin menghapus bagian ini?")) return;
 
+            if (type === 'bibliography') {
+                ebookState.bibliography = null;
+                saveEbookState();
+                renderEbookContent();
+                showToast("Daftar pustaka dihapus", "success");
+                return;
+            }
+            if (type === 'preface') ebookState.preface = null;
             if (type === 'chapter') {
                 const index = ebookState.chapters.findIndex(c => c.id === id);
                 if (index !== -1) {
@@ -1873,6 +2008,125 @@
             showToast("Bagian berhasil dihapus", "success");
         }
 
+        function normalizeRefText(t) {
+            return (t || '')
+                .replace(/\s+/g, ' ')
+                .replace(/^\[\s*C\d+\s*\]\s*/i, '') // hapus prefix [C1]
+                .trim();
+        }
+
+        function mergeUniqueRefs(existing, incoming) {
+            const map = new Map();
+            (existing || []).forEach(r => {
+                const key = normalizeRefText(r).toLowerCase();
+                if (key) map.set(key, normalizeRefText(r));
+            });
+            (incoming || []).forEach(r => {
+                const key = normalizeRefText(r).toLowerCase();
+                if (key && !map.has(key)) map.set(key, normalizeRefText(r));
+            });
+            return Array.from(map.values());
+        }
+
+        // Ambil referensi dari HTML bab dan hapus blok "Referensi Bab (auto)" dari konten bab
+        function extractReferencesFromChapterHtml(chapterHtml) {
+            const temp = document.createElement('div');
+            temp.innerHTML = chapterHtml || '';
+
+            let foundRefs = [];
+
+            // cari heading referensi
+            const headings = temp.querySelectorAll('h2,h3');
+            headings.forEach(h => {
+                const title = (h.textContent || '').trim().toLowerCase();
+                if (title.includes('referensi bab') && title.includes('auto')) {
+                    const next = h.nextElementSibling;
+                    if (next && (next.tagName === 'UL' || next.tagName === 'OL')) {
+                        next.querySelectorAll('li').forEach(li => {
+                            const t = normalizeRefText(li.textContent);
+                            if (t) foundRefs.push(t);
+                        });
+
+                        // hapus heading + list
+                        next.remove();
+                        h.remove();
+                    }
+                }
+            });
+
+            return {
+                cleanHtml: temp.innerHTML,
+                refs: foundRefs
+            };
+        }
+
+        // (Opsional) saat load, rapikan semua bab lama yang masih menyimpan blok referensi
+        function rebuildReferencesFromAllChapters() {
+            let all = ebookState.references || [];
+
+            ebookState.chapters = (ebookState.chapters || []).map(ch => {
+                const {
+                    cleanHtml,
+                    refs
+                } = extractReferencesFromChapterHtml(ch.content);
+                if (refs.length) all = mergeUniqueRefs(all, refs);
+                return {
+                    ...ch,
+                    content: cleanHtml
+                };
+            });
+
+            ebookState.references = all;
+        }
+
+
+        async function generateDaftarPustaka() {
+            // pastikan kumpulan referensi up to date (kalau ada bab lama)
+            rebuildReferencesFromAllChapters();
+
+            const refs = (ebookState.references || []).map(r => normalizeRefText(r)).filter(Boolean);
+
+            if (refs.length === 0) {
+                showToast("Belum ada referensi. Buat Bab (AI) dulu agar kutipan & referensi terkumpul.", "warning");
+                return;
+            }
+
+            // kirim ke backend untuk diformat rapi jadi HTML
+            try {
+                isGenerating = true;
+                showLoadingIndicator("daftarpustaka");
+
+                const response = await fetch("/ebook/generate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        action: "daftarpustaka",
+                        references: refs
+                    })
+                });
+
+                const result = await response.json();
+                if (!result.status) {
+                    showToast(result.message || "Gagal membuat daftar pustaka", "error");
+                    return;
+                }
+
+                ebookState.bibliography = result.html;
+                saveEbookState();
+                renderEbookContent();
+                showToast("Daftar pustaka berhasil dibuat otomatis!", "success");
+            } catch (e) {
+                console.error(e);
+                showToast("Error membuat daftar pustaka: " + e.message, "error");
+            } finally {
+                isGenerating = false;
+                removeLoadingIndicator();
+            }
+        }
+
 
         function saveManualSection(id, content) {
             const section = ebookState.manualSections.find(s => s.id === id);
@@ -1884,6 +2138,8 @@
         }
 
         function saveEditedSection(type, content, id = null) {
+            if (type === 'preface') ebookState.preface = content;
+            if (type === 'bibliography') ebookState.bibliography = content;
             if (type === 'title') ebookState.title = content;
             if (type === 'intro') ebookState.intro = content;
             if (type === 'outline') ebookState.outline = content;
@@ -1917,12 +2173,15 @@
             if (confirm("Anda yakin ingin menghapus semua konten ebook? Tindakan ini tidak dapat dibatalkan.")) {
                 ebookState = {
                     title: null,
+                    preface: null,
                     intro: null,
                     outline: null,
                     chapters: [],
                     summary: null,
                     closing: null,
-                    manualSections: []
+                    manualSections: [],
+                    references: [], // ✅ kumpulan referensi unik
+                    bibliography: null
                 };
 
                 saveEbookState();
@@ -2009,11 +2268,13 @@
         function showLoadingIndicator(action) {
             const actionText = {
                 'title': 'Judul',
+                'preface': 'Kata Pengantar',
                 'intro': 'Pendahuluan',
                 'outline': 'Daftar Isi',
                 'chapter': 'Bab Baru',
                 'summary': 'Ringkasan',
-                'closing': 'Penutup'
+                'closing': 'Penutup',
+                'daftarpustaka': 'Daftar Pustaka'
             };
 
             const loader = document.createElement("div");

@@ -61,8 +61,8 @@ class AksesAplikasiController extends Controller
     public function generateEbookPart(Request $request)
     {
         $request->validate([
-            'action' => 'required|in:title,intro,outline,chapter,summary,closing',
-            'masalah' => 'required|string',
+            'action' => 'required|in:title,preface,intro,outline,chapter,summary,closing,daftarpustaka',
+            'masalah' => 'nullable|string',
             'kebutuhan' => 'nullable|string',
             'solusi' => 'nullable|string',
             'pengalaman' => 'nullable|string',
@@ -70,7 +70,8 @@ class AksesAplikasiController extends Controller
             'calon_pembaca' => 'nullable|string',
             'pengantar_penulis' => 'nullable|string',
             'tentang_penulis' => 'nullable|string',
-            'gaya' => 'required|string',
+            'gaya' => 'nullable|string',
+            'references' => 'nullable|array',
             'jumlah_outline' => 'nullable|string', // "5 Bab 5 Sub Bab"
             'existing_title' => 'nullable|string',
             'current_chapter_count' => 'nullable|integer|min:0',
@@ -185,6 +186,28 @@ Judul harus:
 5. BERFOKUS PADA MASALAH DAN SOLUSI
 ";
                 break;
+
+            case 'preface':
+                $instruction =
+                    "BUATKAN KATA PENGANTAR BUKU (KATA PENGANTAR SAJA):\n" .
+                    "Format WAJIB:\n" .
+                    "<h2>Kata Pengantar</h2>\n" .
+                    "<p>(paragraf 1: sapaan hangat + konteks kenapa topik ini penting untuk pembaca)</p>\n" .
+                    "<p>(paragraf 2: empati terhadap masalah pembaca dan gambaran singkat perjuangannya)</p>\n" .
+                    "<p>(paragraf 3: janji manfaat buku + apa yang akan dipelajari secara garis besar tanpa daftar isi)</p>\n" .
+                    "<p>(paragraf 4: ajakan membaca sampai tuntas + komitmen penerapan)</p>\n" .
+                    "<blockquote><p>(1 kalimat motivasi yang relevan)</p></blockquote>\n\n" .
+                    "CATATAN PENTING:\n" .
+                    "- HANYA buat 'Kata Pengantar'.\n" .
+                    "- JANGAN buat Pendahuluan, Daftar Isi, atau Bab.\n" .
+                    "- Jangan pakai label 'Masalah:', 'Solusi:', dll.\n" .
+                    "- Tulis naratif mengalir, hangat, dan meyakinkan.\n" .
+                    "- Boleh sisipkan 1-2 kalimat pengalaman penulis jika relevan.\n" .
+                    "- Panjang minimal 450 kata.\n" .
+                    "- Gaya bahasa: {$gaya}\n" .
+                    "- STOP setelah blockquote.\n";
+                break;
+
 
 
             case 'intro':
@@ -310,6 +333,16 @@ Judul harus:
                     "6. Gaya bahasa: {$gaya}\n" .
                     "7. Fokus pada solusi praktis untuk masalah: {$masalah}\n" .
                     "8. Pastikan alur antar sub-bab mengalir natural\n\n" .
+                    "9. WAJIB sisipkan kutipan di dalam paragraf (bukan di judul) dengan format [C1], [C2], [C3] dst.\n" .
+                    "   - Minimal 6 kutipan untuk satu bab.\n" .
+                    "   - Kutipan harus tersebar di beberapa sub-bab (bukan cuma di akhir).\n" .
+                    "10. Setelah seluruh bab selesai (paling bawah), WAJIB buat blok referensi ini (sekali saja):\n" .
+                    "    <h3>Referensi Bab (auto)</h3>\n" .
+                    "    <ul>\n" .
+                    "      <li>[C1] Tulis referensi lengkap (Penulis, Tahun, Judul, Penerbit/Jurnal/URL bila perlu)</li>\n" .
+                    "      <li>[C2] ...</li>\n" .
+                    "    </ul>\n" .
+                    "    Jangan tulis penjelasan lain di blok ini.\n" .
                     "CONTOH FORMAT SUB-BAB YANG BENAR:\n" .
                     "─────────────────────────────────────────────────────────────\n" .
                     "<h3>{$targetChapter}.1 [Judul Sub-bab Sesuai Daftar Isi]</h3>\n" .
@@ -362,6 +395,35 @@ Ringkasan harus:
                 break;
 
 
+            case 'daftarpustaka':
+                $refs = $request->references ?? [];
+
+                $refs = array_map(function ($r) {
+                    $r = trim((string)$r);
+                    // buang prefix [C1] kalau masih ada
+                    $r = preg_replace('/^\[\s*C\d+\s*\]\s*/i', '', $r);
+                    return $r;
+                }, $refs);
+
+                $refs = array_values(array_filter($refs));
+                $refs = array_values(array_unique($refs));
+
+                // urutkan biar rapi
+                natcasesort($refs);
+                $refs = array_values($refs);
+
+                $html = "<h2>Daftar Pustaka</h2><ol>";
+                foreach ($refs as $r) {
+                    $safe = htmlspecialchars($r, ENT_QUOTES, 'UTF-8');
+                    $html .= "<li>{$safe}</li>";
+                }
+                $html .= "</ol>";
+
+                return response()->json([
+                    'status' => true,
+                    'html' => $html
+                ]);
+                break;
             default:
                 return response()->json([
                     'status'  => false,
@@ -424,7 +486,8 @@ Ringkasan harus:
             }
             $minWords = match ($action) {
                 'title' => 1,      // ✅ judul cukup 1 kata pun boleh
-                'outline' => 50,   // (opsional) daftar isi tidak perlu panjang
+                'outline' => 50,
+                'preface' => 450, // (opsional) daftar isi tidak perlu panjang
                 'intro' => 900,
                 'chapter' => 1600,
                 'summary' => 500,
