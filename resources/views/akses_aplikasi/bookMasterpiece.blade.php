@@ -9,6 +9,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Merriweather:wght@300;400;700&family=Source+Serif+Pro:wght@300;400;600&display=swap"
+        rel="stylesheet">
+
+    <link
         href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Source+Serif+Pro:wght@300;400;600&display=swap"
         rel="stylesheet">
     <style>
@@ -245,6 +249,145 @@
                 page-break-inside: avoid !important;
             }
         }
+
+        .ebook-img {
+            max-width: 100%;
+            height: auto;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        /* Toolbar gambar (floating) */
+        #img-toolbar {
+            position: fixed;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, .12);
+        }
+
+        #img-toolbar .tool-btn {
+            width: 36px;
+            height: 32px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        #img-toolbar .tool-btn.active {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #fff;
+        }
+
+        #img-toolbar .tool-btn:hover {
+            background: #f3f4f6;
+        }
+
+        #img-toolbar .tool-btn.active:hover {
+            background: #1d4ed8;
+        }
+
+        #imgDelete {
+            color: #ef4444;
+        }
+
+        #imgDelete:hover {
+            background: #fee2e2;
+        }
+
+        .bm-gear-btn {
+            width: 34px;
+            height: 32px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .bm-gear-btn:hover {
+            background: #f3f4f6;
+        }
+
+        #bm-settings-popover {
+            position: fixed;
+            z-index: 99999;
+            width: 230px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, .12);
+            padding: 12px;
+            display: none;
+        }
+
+        #bm-settings-popover label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+            margin-top: 10px;
+            margin-bottom: 6px;
+        }
+
+        #bm-settings-popover select {
+            width: 100%;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        #bm-settings-popover .bm-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 6px;
+        }
+
+        /* ====== Apply formatting per-section via CSS variables ====== */
+        /* Set di contenteditable: style="--bm-align:...; --bm-font:...; --bm-lh:..." */
+
+        .section-container [contenteditable="true"] {
+            font-family: var(--bm-font, inherit);
+            line-height: var(--bm-lh, inherit);
+        }
+
+        /* Override default .ebook-content p { text-align: justify } */
+        .section-container [contenteditable="true"] p {
+            text-align: var(--bm-align, justify) !important;
+            text-justify: inter-word;
+        }
+
+        .section-container [contenteditable="true"] li {
+            text-align: var(--bm-align, justify) !important;
+        }
+
+        .section-container [contenteditable="true"] blockquote {
+            line-height: var(--bm-lh, inherit);
+        }
+
+        .section-container [contenteditable="true"] {
+            text-align: var(--bm-align, justify) !important;
+        }
+
+        /* Pastikan semua elemen block ikut (judul, div, dsb) */
+        .section-container [contenteditable="true"] :is(p, div, li, blockquote, h1, h2, h3, h4, h5, h6) {
+            text-align: var(--bm-align, justify) !important;
+        }
     </style>
 </head>
 
@@ -372,6 +515,13 @@
                     </div>
 
                     <div>
+                        <label class="text-sm font-medium block mb-1">Kontrak Kreatif Penulis AI</label>
+                        <textarea rows="4" id="kontrak_kreatif_input"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            placeholder="Contoh: AI dalam buku yang akan saya buat, saya ingin Anda menjadi: asisten menulis kreatif - editor buku saya, partner brainstorming ide menulis - jangan pernah menjiplak - gunakan kalimat orisinal dan bebas plagiasi - bantu saya menjaga suara penulis (author voice) - jika ide saya lemah, bantu perkuat - tetap dengan gaya bahasa, tone dan voice saya, dan tulisan tidak generik AI."></textarea>
+
+                    </div>
+                    <div>
                         <label class="text-sm font-medium block mb-1">Tentang Penulis (Opsional):</label>
                         <textarea rows="2" id="penulis_input"
                             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
@@ -450,6 +600,13 @@
                         <i class="fas fa-book"></i>
                         Buat Daftar Pustaka
                     </button>
+
+                    <button onclick="generateEbook('profilpenulis')"
+                        class="w-full bg-gray-800 text-white py-3 rounded-lg text-sm hover:bg-gray-900 transition-colors duration-200 flex items-center justify-center gap-2">
+                        <i class="fas fa-user-pen"></i>
+                        Buat Profil Penulis
+                    </button>
+
 
                 </div>
 
@@ -541,6 +698,38 @@
     <div id="ebook_pdf_clone" style="display:none; position: absolute; left: -9999px; width: 800px;"></div>
 
 
+
+
+    <!-- Hidden file input untuk sisip gambar -->
+    <input type="file" id="imgInsertInput" accept="image/*" class="hidden" />
+
+    <!-- Toolbar floating untuk gambar -->
+    <div id="img-toolbar">
+        <div class="flex items-center gap-2">
+            <span class="text-xs text-gray-600">Ukuran:</span>
+            <input id="imgSizeRange" type="range" min="10" max="100" value="50" class="w-36">
+            <span id="imgSizeLabel" class="text-xs font-semibold w-10 text-right">50%</span>
+        </div>
+
+        <div class="flex items-center gap-1 border-l pl-2">
+            <button id="imgAlignLeft" class="tool-btn" title="Rata kiri">
+                <i class="fas fa-align-left"></i>
+            </button>
+            <button id="imgAlignCenter" class="tool-btn" title="Rata tengah">
+                <i class="fas fa-align-center"></i>
+            </button>
+            <button id="imgAlignRight" class="tool-btn" title="Rata kanan">
+                <i class="fas fa-align-right"></i>
+            </button>
+        </div>
+        <div class="flex items-center gap-1 border-l pl-2">
+            <button id="imgDelete" class="tool-btn" title="Hapus gambar">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    </div>
+
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script>
@@ -591,7 +780,9 @@
             closing: null,
             manualSections: [],
             references: [],
-            bibliography: null
+            bibliography: null,
+            authorProfile: null,
+            sectionFormats: {}
         };
 
         let isGenerating = false;
@@ -658,6 +849,7 @@
                 'solusi_input',
                 'pengalaman_input',
                 'kompetensi_input',
+                'kontrak_kreatif_input',
                 'calon_pembaca_input',
                 'gaya_input',
                 'jumlah_bab_input',
@@ -688,6 +880,7 @@
                 solusi: safeVal("solusi_input"),
                 pengalaman: safeVal("pengalaman_input"),
                 kompetensi: safeVal("kompetensi_input"),
+                kontrak_kreatif: safeVal("kontrak_kreatif_input"),
                 calon_pembaca: safeVal("calon_pembaca_input"),
                 gaya: safeVal("gaya_input"),
                 jumlah_outline: safeVal("jumlah_bab_input"),
@@ -710,6 +903,7 @@
             safeSetVal("solusi_input", d.solusi || '');
             safeSetVal("pengalaman_input", d.pengalaman || '');
             safeSetVal("kompetensi_input", d.kompetensi || '');
+            safeSetVal("kontrak_kreatif_input", d.kontrak_kreatif || '');
             safeSetVal("calon_pembaca_input", d.calon_pembaca || '');
 
             safeSetVal("gaya_input", d.gaya || 'Edukatif & Praktis (Mengajar tanpa menggurui)');
@@ -722,6 +916,8 @@
             const savedState = localStorage.getItem('ebook_state');
             if (savedState) {
                 ebookState = JSON.parse(savedState);
+
+                if (!ebookState.sectionFormats) ebookState.sectionFormats = {};
 
                 // FIX: jika daftar chapter tidak cocok dengan tampilan, reset
                 if (!ebookState.chapters || ebookState.chapters.length === 0) {
@@ -752,6 +948,7 @@
                 ebookState.summary,
                 ebookState.closing,
                 ebookState.bibliography,
+                ebookState.authorProfile,
                 ...ebookState.chapters.map(c => c.content),
                 ...ebookState.manualSections.map(s => s.content)
             ];
@@ -817,6 +1014,7 @@
                 solusi: safeVal("solusi_input"),
                 pengalaman: safeVal("pengalaman_input"),
                 kompetensi: safeVal("kompetensi_input"),
+                kontrak_kreatif: safeVal("kontrak_kreatif_input"),
                 calon_pembaca: safeVal("calon_pembaca_input"),
                 gaya: safeVal("gaya_input"),
                 jumlah_outline: safeVal("jumlah_bab_input"),
@@ -953,6 +1151,7 @@
                             pengalaman: val.pengalaman,
                             solusi: val.solusi,
                             kompetensi: val.kompetensi,
+                            kontrak_kreatif: val.kontrak_kreatif,
                             calon_pembaca: val.calon_pembaca,
                             gaya: val.gaya,
                             jumlah_outline: val.jumlah_outline,
@@ -1017,6 +1216,7 @@
                             solusi: val.solusi,
                             pengalaman: val.pengalaman,
                             kompetensi: val.kompetensi,
+                            kontrak_kreatif: val.kontrak_kreatif,
                             calon_pembaca: val.calon_pembaca,
                             gaya: val.gaya,
                             jumlah_outline: val.jumlah_outline,
@@ -1066,6 +1266,7 @@
                             solusi: val.solusi,
                             pengalaman: val.pengalaman,
                             kompetensi: val.kompetensi,
+                            kontrak_kreatif: val.kontrak_kreatif,
                             calon_pembaca: val.calon_pembaca,
                             gaya: val.gaya,
                             jumlah_outline: val.jumlah_outline,
@@ -1150,6 +1351,7 @@
                             pengalaman: val.pengalaman,
                             solusi: val.solusi,
                             kompetensi: val.kompetensi,
+                            kontrak_kreatif: val.kontrak_kreatif,
                             calon_pembaca: val.calon_pembaca,
                             gaya: val.gaya,
                             jumlah_outline: val.jumlah_outline,
@@ -1228,6 +1430,7 @@
                         solusi: val.solusi,
                         pengalaman: val.pengalaman,
                         kompetensi: val.kompetensi,
+                        kontrak_kreatif: val.kontrak_kreatif,
                         calon_pembaca: val.calon_pembaca,
                         gaya: val.gaya,
                         jumlah_outline: val.jumlah_outline,
@@ -1292,6 +1495,7 @@
                         solusi: val.solusi,
                         pengalaman: val.pengalaman,
                         kompetensi: val.kompetensi,
+                        kontrak_kreatif: val.kontrak_kreatif,
                         calon_pembaca: val.calon_pembaca,
                         gaya: val.gaya,
                         jumlah_outline: val.jumlah_outline,
@@ -1476,7 +1680,8 @@
                 'intro': 'Pendahuluan',
                 'outline': 'Daftar isi',
                 'summary': 'Ringkasan',
-                'closing': 'Penutup'
+                'closing': 'Penutup',
+                'profilpenulis': 'Profil Penulis'
             };
             return names[action] || 'Konten';
         }
@@ -1501,7 +1706,11 @@
                 case 'closing':
                     ebookState.closing = html;
                     break;
+                case 'profilpenulis':
+                    ebookState.authorProfile = html;
+                    break;
             }
+
         }
 
         function createPlaceholder() {
@@ -1579,7 +1788,7 @@
                 html += `
         <div class="section-container" data-type="title">
             ${addActionButtons('title', null)}
-            <div contenteditable="true" onfocus="showActions(this)" onblur="saveEditedSection('title', this.innerHTML)"
+            <div contenteditable="true" ${bmStyleAttr('title', null)} onfocus="showActions(this)" onblur="saveEditedSection('title', this.innerHTML)"
                  class="outline-none cursor-text">
                 ${ebookState.title}
             </div>
@@ -1591,7 +1800,7 @@
                 html += `
     <div class="section-container" data-type="preface">
         ${addActionButtons('preface', null)}
-        <div contenteditable="true" onfocus="showActions(this)" onblur="saveEditedSection('preface', this.innerHTML)"
+        <div contenteditable="true" ${bmStyleAttr('preface', null)} onfocus="showActions(this)" onblur="saveEditedSection('preface', this.innerHTML)"
             class="outline-none cursor-text">
             ${ebookState.preface}
         </div>
@@ -1604,7 +1813,7 @@
                 html += `
         <div class="section-container" data-type="intro">
             ${addActionButtons('intro', null)}
-            <div contenteditable="true" onfocus="showActions(this)" onblur="saveEditedSection('intro', this.innerHTML)"
+            <div contenteditable="true" ${bmStyleAttr('intro', null)} onfocus="showActions(this)" onblur="saveEditedSection('intro', this.innerHTML)"
                  class="outline-none cursor-text">
                 ${ebookState.intro}
             </div>
@@ -1616,7 +1825,7 @@
                 html += `
         <div class="section-container toc-container" data-type="outline">
             ${addActionButtons('outline', null)}
-            <div contenteditable="true" onfocus="showActions(this)" onblur="saveEditedSection('outline', this.innerHTML)"
+            <div contenteditable="true" ${bmStyleAttr('outline', null)} onfocus="showActions(this)" onblur="saveEditedSection('outline', this.innerHTML)"
                  class="outline-none cursor-text">
                 ${ebookState.outline}
             </div>
@@ -1632,7 +1841,7 @@
         <div class="section-container" data-id="${chapter.id}" data-type="chapter">
             <div class="chapter-badge">Bab ${chapterNum}: ${chapterTitle}</div>
             ${addActionButtons('chapter', chapter.id)}
-            <div contenteditable="true" onfocus="showActions(this)"
+            <div contenteditable="true" ${bmStyleAttr('chapter', chapter.id)} onfocus="showActions(this)"
                  onblur="saveEditedSection('chapter', this.innerHTML, '${chapter.id}')"
                  class="outline-none cursor-text">
                 ${chapter.content}
@@ -1645,7 +1854,7 @@
                 html += `
         <div class="section-container" data-id="${section.id}" data-type="manual">
             ${addActionButtons('manual', section.id)}
-            <div contenteditable="true" onfocus="showActions(this)"
+            <div contenteditable="true" ${bmStyleAttr('manual', section.id)} onfocus="showActions(this)"
                  onblur="saveManualSection('${section.id}', this.innerHTML)"
                  class="outline-none cursor-text">
                 ${section.content}
@@ -1658,7 +1867,7 @@
                 html += `
         <div class="section-container summary-section" data-type="summary">
             ${addActionButtons('summary', null)}
-            <div contenteditable="true" onfocus="showActions(this)" onblur="saveEditedSection('summary', this.innerHTML)"
+            <div contenteditable="true" ${bmStyleAttr('summary', null)} onfocus="showActions(this)" onblur="saveEditedSection('summary', this.innerHTML)"
                  class="outline-none cursor-text">
                 ${ebookState.summary}
             </div>
@@ -1670,9 +1879,23 @@
                 html += `
         <div class="section-container closing-section" data-type="closing">
             ${addActionButtons('closing', null)}
-            <div contenteditable="true" onfocus="showActions(this)" onblur="saveEditedSection('closing', this.innerHTML)"
+            <div contenteditable="true" ${bmStyleAttr('closing', null)} onfocus="showActions(this)" onblur="saveEditedSection('closing', this.innerHTML)"
                  class="outline-none cursor-text">
                 ${ebookState.closing}
+            </div>
+        </div>`;
+            }
+
+            // Render profil penulis jika ada
+            if (ebookState.authorProfile) {
+                html += `
+        <div class="section-container" data-type="profilpenulis">
+            ${addActionButtons('profilpenulis', null)}
+            <div contenteditable="true" ${bmStyleAttr('profilpenulis', null)}
+                 onfocus="showActions(this)"
+                 onblur="saveEditedSection('profilpenulis', this.innerHTML)"
+                 class="outline-none cursor-text">
+                ${ebookState.authorProfile}
             </div>
         </div>`;
             }
@@ -1681,7 +1904,7 @@
                 html += `
     <div class="section-container" data-type="bibliography">
       ${addActionButtons('bibliography', null)}
-      <div contenteditable="true"
+      <div contenteditable="true" ${bmStyleAttr('bibliography', null)}
            onfocus="showActions(this)"
            onblur="saveEditedSection('bibliography', this.innerHTML)"
            class="outline-none cursor-text">
@@ -1690,7 +1913,9 @@
     </div>
   `;
             }
+
             contentEl.innerHTML = html;
+            initImageToolsOnce();
             updateStats(); // Update stats setelah render
         }
 
@@ -1711,12 +1936,28 @@
 
             if (type === 'chapter') {
                 buttons += `
-                <button onclick="insertChapterAfter('${id}')"
-                        class="px-3 py-1 bg-purple-500 text-white rounded text-sm hover:bg-purple-600 transition-colors duration-200">
-                    <i class="fas fa-plus mr-1"></i> Sisipkan Bab
-                </button>
-                `;
+        <button onclick="insertChapterAfter('${id}')"
+                class="px-3 py-1 bg-purple-500 text-white rounded text-sm hover:bg-purple-600 transition-colors duration-200">
+            <i class="fas fa-plus mr-1"></i> Sisipkan Bab
+        </button>
+        <button onclick="insertImageToSection('chapter','${id}')"
+        class="px-3 py-1 bg-amber-500 text-white rounded text-sm hover:bg-amber-600 transition-colors duration-200">
+  <i class="fas fa-image mr-1"></i> Sisip Gambar
+</button>
+
+
+        <button onclick="continueChapter('${id}')"
+                class="px-3 py-1 bg-emerald-600 text-white rounded text-sm hover:bg-emerald-700 transition-colors duration-200">
+            <i class="fas fa-forward mr-1"></i> Perpanjang Bab
+        </button>
+
+        <button onclick="openContinueSubBabModal('${id}')"
+                class="px-3 py-1 bg-teal-600 text-white rounded text-sm hover:bg-teal-700 transition-colors duration-200">
+            <i class="fas fa-layer-group mr-1"></i> Perpanjang Sub-bab
+        </button>
+    `;
             }
+
 
             // if (type !== 'manual') {
             //     buttons += `
@@ -1735,7 +1976,11 @@
       </button>
     `;
             }
+            const safeId = id ?? '';
             buttons += `
+            <button class="bm-gear-btn" title="Pengaturan" onclick="toggleTextSettings(event,'${type}','${safeId}')">
+    <i class="fas fa-gear"></i>
+  </button>
                 <button onclick="copySection('${type}', '${id}')"
                         class="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600 transition-colors duration-200">
                     <i class="far fa-copy mr-1"></i> Copy
@@ -1755,6 +2000,320 @@
             </div>
             `;
         }
+
+        function getChapterById(chapterId) {
+            return ebookState.chapters.find(c => c.id === chapterId);
+        }
+
+        function extractSubBabsFromChapterHtml(chapterHtml) {
+            const temp = document.createElement('div');
+            temp.innerHTML = chapterHtml || '';
+            const list = [];
+            temp.querySelectorAll('h3').forEach(h3 => {
+                const t = (h3.textContent || '').trim();
+                const m = t.match(/^(\d+\.\d+)\s+(.+)$/);
+                if (m) list.push({
+                    number: m[1],
+                    title: m[2].trim()
+                });
+            });
+            return list;
+        }
+
+        function getSubBabSegmentHtml(chapterHtml, subBabNumber) {
+            const temp = document.createElement('div');
+            temp.innerHTML = chapterHtml || '';
+
+            const h3s = Array.from(temp.querySelectorAll('h3'));
+            const idx = h3s.findIndex(h => (h.textContent || '').trim().startsWith(subBabNumber + ' '));
+
+            if (idx === -1) return {
+                found: false,
+                segmentHtml: '',
+                segmentText: ''
+            };
+
+            const startH3 = h3s[idx];
+            const endH3 = h3s[idx + 1] || null;
+
+            // Ambil semua node setelah startH3 sampai sebelum endH3
+            const nodes = [];
+            let cur = startH3.nextSibling;
+            while (cur && cur !== endH3) {
+                nodes.push(cur);
+                cur = cur.nextSibling;
+            }
+
+            const wrapper = document.createElement('div');
+            wrapper.appendChild(startH3.cloneNode(true));
+            nodes.forEach(n => wrapper.appendChild(n.cloneNode(true)));
+
+            const segmentHtml = wrapper.innerHTML;
+
+            // text (untuk prompt) - dibatasi biar tidak kebanyakan
+            const segmentText = (wrapper.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 2500);
+
+            return {
+                found: true,
+                segmentHtml,
+                segmentText
+            };
+        }
+
+        function insertSnippetAfterSubBab(chapterHtml, subBabNumber, snippetHtml) {
+            const temp = document.createElement('div');
+            temp.innerHTML = chapterHtml || '';
+
+            const h3s = Array.from(temp.querySelectorAll('h3'));
+            const idx = h3s.findIndex(h => (h.textContent || '').trim().startsWith(subBabNumber + ' '));
+            if (idx === -1) return chapterHtml; // fallback: tidak berubah
+
+            const startH3 = h3s[idx];
+            const endH3 = h3s[idx + 1] || null;
+
+            // cari posisi sisip: sebelum endH3 atau di akhir
+            const frag = document.createElement('div');
+            frag.innerHTML = snippetHtml || '';
+
+            if (endH3) {
+                // sisip sebelum endH3 (paling rapi)
+                const parent = endH3.parentNode;
+                Array.from(frag.childNodes).forEach(n => parent.insertBefore(n, endH3));
+            } else {
+                // tidak ada subbab berikutnya -> append di akhir bab
+                Array.from(frag.childNodes).forEach(n => temp.appendChild(n));
+            }
+
+            return temp.innerHTML;
+        }
+
+        async function continueChapter(chapterId) {
+            const chapter = getChapterById(chapterId);
+            if (!chapter) return showToast("Bab tidak ditemukan", "error");
+
+            const apiKey = document.getElementById("api_key_input").value.trim();
+            if (!apiKey) return showToast("API Key belum disimpan.", "error");
+
+            if (isGenerating) return showToast("Sedang membuat konten, mohon tunggu...", "warning");
+
+            const val = getFormValues();
+
+            isGenerating = true;
+            showLoadingIndicator("chapter");
+
+            try {
+                const response = await fetch("/ebook/generate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        action: "continue_chapter",
+                        masalah: val.masalah,
+                        kebutuhan: val.kebutuhan,
+                        solusi: val.solusi,
+                        pengalaman: val.pengalaman,
+                        kompetensi: val.kompetensi,
+                        kontrak_kreatif: val.kontrak_kreatif,
+                        calon_pembaca: val.calon_pembaca,
+                        gaya: val.gaya,
+                        tentang_penulis: val.tentang_penulis,
+                        pengantar_penulis: val.pengantar_penulis,
+
+                        existing_title: ebookState.title || "",
+                        chapter_number: chapter.chapterNumber,
+                        chapter_title: chapter.title,
+                        chapter_html: chapter.content
+                    })
+                });
+
+                const result = await response.json();
+                if (!result.status) return showToast(result.message || "Gagal melanjutkan bab", "error");
+
+                // ambil referensi dari snippet (kalau ada)
+                const extracted = extractReferencesFromChapterHtml(result.html);
+                ebookState.references = mergeUniqueRefs(ebookState.references || [], extracted.refs);
+
+                // append snippet ke akhir bab
+                chapter.content = insertSnippetBeforeFirstSubBab(
+                    chapter.content,
+                    chapter.chapterNumber,
+                    (extracted.cleanHtml || '').trim()
+                );
+
+                saveEbookState();
+                renderEbookContent();
+                showToast("Bab berhasil dilanjutkan!", "success");
+            } catch (e) {
+                console.error(e);
+                showToast("Error melanjutkan bab: " + e.message, "error");
+            } finally {
+                isGenerating = false;
+                removeLoadingIndicator();
+            }
+        }
+
+
+        function openContinueSubBabModal(chapterId) {
+            const chapter = getChapterById(chapterId);
+            if (!chapter) return showToast("Bab tidak ditemukan", "error");
+
+            const subs = extractSubBabsFromChapterHtml(chapter.content);
+            if (!subs.length) return showToast("Sub-bab tidak ditemukan pada bab ini", "warning");
+
+            // modal
+            const overlay = document.createElement('div');
+            overlay.className = "fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4";
+            overlay.innerHTML = `
+      <div class="bg-white w-full max-w-md rounded-xl shadow-lg p-5">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-lg font-semibold">Lanjutkan Sub-bab</h3>
+          <button class="text-gray-500 hover:text-gray-700" id="closeModalBtn">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <label class="text-sm font-medium block mb-2">Pilih sub-bab yang mau dilanjutkan:</label>
+        <select id="subbabSelect" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+          ${subs.map(s => `<option value="${s.number}">${s.number} — ${escapeHtml(s.title)}</option>`).join('')}
+        </select>
+
+        <div class="mt-4 flex gap-2 justify-end">
+          <button id="cancelBtn" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-sm">Batal</button>
+          <button id="goBtn" class="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-sm">
+            <i class="fas fa-forward mr-1"></i> Lanjutkan
+          </button>
+        </div>
+      </div>
+    `;
+
+            document.body.appendChild(overlay);
+
+            const close = () => overlay.remove();
+            overlay.querySelector('#closeModalBtn').onclick = close;
+            overlay.querySelector('#cancelBtn').onclick = close;
+
+            overlay.querySelector('#goBtn').onclick = async () => {
+                const subBabNumber = overlay.querySelector('#subbabSelect').value;
+                close();
+                await continueSubBab(chapterId, subBabNumber);
+            };
+        }
+
+        function insertSnippetBeforeFirstSubBab(chapterHtml, chapterNumber, snippetHtml) {
+            const temp = document.createElement('div');
+            temp.innerHTML = chapterHtml || '';
+
+            const frag = document.createElement('div');
+            frag.innerHTML = snippetHtml || '';
+
+            // cari sub-bab pertama: h3 yang diawali "X.Y" sesuai nomor bab
+            const re = new RegExp('^\\s*' + chapterNumber + '\\.\\d+\\b');
+            const firstSubBab = Array.from(temp.querySelectorAll('h3'))
+                .find(h => re.test((h.textContent || '').trim()));
+
+            if (firstSubBab) {
+                const parent = firstSubBab.parentNode;
+                Array.from(frag.childNodes).forEach(n => parent.insertBefore(n, firstSubBab));
+                return temp.innerHTML;
+            }
+
+            // fallback: kalau tidak ketemu sub-bab, sisipkan setelah <h2> (judul bab)
+            const h2 = temp.querySelector('h2');
+            if (h2 && h2.parentNode) {
+                const parent = h2.parentNode;
+                const refNode = h2.nextSibling; // bisa null (berarti append)
+                Array.from(frag.childNodes).forEach(n => parent.insertBefore(n, refNode));
+                return temp.innerHTML;
+            }
+
+            // fallback terakhir: append
+            Array.from(frag.childNodes).forEach(n => temp.appendChild(n));
+            return temp.innerHTML;
+        }
+
+
+        function escapeHtml(str) {
+            return String(str || '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        async function continueSubBab(chapterId, subBabNumber) {
+            const chapter = getChapterById(chapterId);
+            if (!chapter) return showToast("Bab tidak ditemukan", "error");
+
+            const apiKey = document.getElementById("api_key_input").value.trim();
+            if (!apiKey) return showToast("API Key belum disimpan.", "error");
+
+            const subInfo = extractSubBabsFromChapterHtml(chapter.content).find(s => s.number === subBabNumber);
+            if (!subInfo) return showToast("Sub-bab tidak ditemukan", "error");
+
+            const seg = getSubBabSegmentHtml(chapter.content, subBabNumber);
+            if (!seg.found) return showToast("Gagal membaca segmen sub-bab", "error");
+
+            if (isGenerating) return showToast("Sedang membuat konten, mohon tunggu...", "warning");
+
+            const val = getFormValues();
+
+            isGenerating = true;
+            showLoadingIndicator("chapter");
+
+            try {
+                const response = await fetch("/ebook/generate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        action: "continue_subbab",
+                        masalah: val.masalah,
+                        kebutuhan: val.kebutuhan,
+                        solusi: val.solusi,
+                        pengalaman: val.pengalaman,
+                        kompetensi: val.kompetensi,
+                        kontrak_kreatif: val.kontrak_kreatif,
+                        calon_pembaca: val.calon_pembaca,
+                        gaya: val.gaya,
+
+                        existing_title: ebookState.title || "",
+                        chapter_number: chapter.chapterNumber,
+                        chapter_title: chapter.title,
+
+                        subbab_number: subBabNumber,
+                        subbab_title: subInfo.title,
+                        subbab_text: seg.segmentText,
+                        chapter_html: chapter.content
+                    })
+                });
+
+                const result = await response.json();
+                if (!result.status) return showToast(result.message || "Gagal melanjutkan sub-bab", "error");
+
+                // extract referensi dari snippet
+                const extracted = extractReferencesFromChapterHtml(result.html);
+                ebookState.references = mergeUniqueRefs(ebookState.references || [], extracted.refs);
+
+                // sisipkan snippet tepat setelah sub-bab tsb
+                chapter.content = insertSnippetAfterSubBab(chapter.content, subBabNumber, extracted.cleanHtml);
+
+                saveEbookState();
+                renderEbookContent();
+                showToast(`Sub-bab ${subBabNumber} berhasil dilanjutkan!`, "success");
+            } catch (e) {
+                console.error(e);
+                showToast("Error melanjutkan sub-bab: " + e.message, "error");
+            } finally {
+                isGenerating = false;
+                removeLoadingIndicator();
+            }
+        }
+
 
         function moveSectionUp(type, id) {
             if (type === 'chapter') {
@@ -1844,6 +2403,7 @@
                         solusi: val.solusi,
                         pengalaman: val.pengalaman,
                         kompetensi: val.kompetensi,
+                        kontrak_kreatif: val.kontrak_kreatif,
                         calon_pembaca: val.calon_pembaca,
                         gaya: val.gaya,
                         jumlah_outline: val.jumlah_outline,
@@ -1989,6 +2549,7 @@
                 return;
             }
             if (type === 'preface') ebookState.preface = null;
+            if (type === 'profilpenulis') ebookState.authorProfile = null;
             if (type === 'chapter') {
                 const index = ebookState.chapters.findIndex(c => c.id === id);
                 if (index !== -1) {
@@ -2156,6 +2717,7 @@
         }
 
         function saveEditedSection(type, content, id = null) {
+            if (type === 'profilpenulis') ebookState.authorProfile = content;
             if (type === 'preface') ebookState.preface = content;
             if (type === 'bibliography') ebookState.bibliography = content;
             if (type === 'title') ebookState.title = content;
@@ -2199,7 +2761,9 @@
                     closing: null,
                     manualSections: [],
                     references: [], // ✅ kumpulan referensi unik
-                    bibliography: null
+                    bibliography: null,
+                    authorProfile: null,
+                    sectionFormats: {}
                 };
 
                 saveEbookState();
@@ -2292,7 +2856,8 @@
                 'chapter': 'Bab Baru',
                 'summary': 'Ringkasan',
                 'closing': 'Penutup',
-                'daftarpustaka': 'Daftar Pustaka'
+                'daftarpustaka': 'Daftar Pustaka',
+                'profilpenulis': 'Profil Penulis'
             };
 
             const loader = document.createElement("div");
@@ -2366,6 +2931,499 @@
                     document.execCommand("insertText", false, textData);
                 }
             }
+        });
+
+        // ====== Image Insert & Toolbar ======
+        let __activeEditor = null; // contenteditable terakhir yang fokus
+        let __selectedImg = null; // img yang sedang dipilih
+        let __imageToolsInit = false;
+
+        function initImageToolsOnce() {
+            if (__imageToolsInit) return;
+            __imageToolsInit = true;
+
+            // Simpan editor aktif saat fokus
+            document.addEventListener('focusin', (e) => {
+                const ed = e.target?.closest?.('[contenteditable="true"]');
+                if (ed) __activeEditor = ed;
+            });
+
+            // Hapus gambar
+            document.getElementById('imgDelete').addEventListener('click', () => {
+                if (!__selectedImg) return;
+                deleteSelectedImage();
+            });
+
+            // Delegasi klik: kalau klik gambar => tampilkan toolbar
+            document.addEventListener('click', (e) => {
+                const toolbar = document.getElementById('img-toolbar');
+                const img = e.target?.closest?.('img');
+
+                // klik tombol toolbar jangan menutup
+                if (toolbar && toolbar.contains(e.target)) return;
+
+                // jika klik gambar di dalam editor
+                if (img && img.closest('[contenteditable="true"]')) {
+                    __selectedImg = img;
+                    // pastikan kelas untuk style
+                    if (!__selectedImg.classList.contains('ebook-img')) {
+                        __selectedImg.classList.add('ebook-img');
+                    }
+                    showImageToolbar(__selectedImg);
+                    return;
+                }
+
+                // klik di luar => tutup toolbar
+                hideImageToolbar();
+            });
+
+            // ESC untuk tutup toolbar
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') hideImageToolbar();
+            });
+
+            // Range slider
+            const range = document.getElementById('imgSizeRange');
+            range.addEventListener('input', () => {
+                if (!__selectedImg) return;
+                const val = parseInt(range.value || '50', 10);
+                applyImageWidth(__selectedImg, val);
+                updateToolbarUI(__selectedImg);
+            });
+
+            // Align buttons
+            document.getElementById('imgAlignLeft').addEventListener('click', () => {
+                if (!__selectedImg) return;
+                setImageAlign(__selectedImg, 'left');
+                updateToolbarUI(__selectedImg);
+            });
+            document.getElementById('imgAlignCenter').addEventListener('click', () => {
+                if (!__selectedImg) return;
+                setImageAlign(__selectedImg, 'center');
+                updateToolbarUI(__selectedImg);
+            });
+            document.getElementById('imgAlignRight').addEventListener('click', () => {
+                if (!__selectedImg) return;
+                setImageAlign(__selectedImg, 'right');
+                updateToolbarUI(__selectedImg);
+            });
+
+            // File input change
+            const fileInput = document.getElementById('imgInsertInput');
+            fileInput.addEventListener('change', async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+
+                try {
+                    const dataUrl = await readFileAsDataURL(file);
+                    insertImageAtCursor(dataUrl);
+                } catch (err) {
+                    console.error(err);
+                    showToast("Gagal menyisipkan gambar", "error");
+                } finally {
+                    fileInput.value = ""; // reset supaya bisa pilih file yang sama lagi
+                }
+            });
+        }
+
+        // panggil sekali (aman meskipun renderEbookContent dipanggil berkali-kali)
+        initImageToolsOnce();
+
+        function insertImageToSection(type, id) {
+            initImageToolsOnce();
+
+            // Fokuskan editor section bab yang dimaksud
+            let editor = null;
+
+            if (type === 'chapter') {
+                const container = document.querySelector(`.section-container[data-id="${id}"][data-type="chapter"]`);
+                editor = container?.querySelector('[contenteditable="true"]') || null;
+            } else {
+                // fallback: editor aktif terakhir
+                editor = __activeEditor;
+            }
+
+            if (editor) {
+                editor.focus();
+                __activeEditor = editor;
+            } else {
+                showToast("Klik area teks bab dulu sebelum sisip gambar", "warning");
+                return;
+            }
+
+            // buka picker
+            document.getElementById('imgInsertInput').click();
+        }
+
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const r = new FileReader();
+                r.onload = () => resolve(r.result);
+                r.onerror = reject;
+                r.readAsDataURL(file);
+            });
+        }
+
+        function insertImageAtCursor(dataUrl) {
+            const editor = __activeEditor;
+            if (!editor) {
+                showToast("Klik area teks dulu sebelum sisip gambar", "warning");
+                return;
+            }
+
+            // Buat elemen img
+            const img = document.createElement('img');
+            img.src = dataUrl;
+            img.alt = "Gambar";
+            img.className = "ebook-img";
+
+            // default: 50% center
+            applyImageWidth(img, 50);
+            setImageAlign(img, 'center');
+
+            // sisipkan di caret
+            const sel = window.getSelection();
+            if (!sel || sel.rangeCount === 0) {
+                // fallback append
+                editor.appendChild(img);
+                editor.appendChild(document.createElement('p')).innerHTML = "<br>";
+            } else {
+                const range = sel.getRangeAt(0);
+                // pastikan range masih di editor
+                if (!editor.contains(range.commonAncestorContainer)) {
+                    editor.appendChild(img);
+                    editor.appendChild(document.createElement('p')).innerHTML = "<br>";
+                } else {
+                    range.deleteContents();
+                    range.insertNode(img);
+
+                    // tambah paragraf kosong setelah gambar agar bisa lanjut ngetik
+                    const p = document.createElement('p');
+                    p.innerHTML = "<br>";
+                    img.parentNode.insertBefore(p, img.nextSibling);
+
+                    // pindahkan caret ke paragraf kosong
+                    const newRange = document.createRange();
+                    newRange.setStart(p, 0);
+                    newRange.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(newRange);
+                }
+            }
+
+            // set selected + tampilkan toolbar
+            __selectedImg = img;
+            showImageToolbar(img);
+            showToast("Gambar berhasil disisipkan", "success");
+        }
+
+        function applyImageWidth(img, percent) {
+            const p = Math.max(10, Math.min(100, parseInt(percent, 10) || 50));
+            img.dataset.width = String(p);
+            img.style.width = p + "%";
+            img.style.height = "auto";
+            img.style.maxWidth = "100%";
+            img.style.display = "block";
+        }
+
+        function setImageAlign(img, align) {
+            img.dataset.align = align;
+
+            // pakai margin auto untuk block align
+            img.style.display = "block";
+            if (align === 'left') {
+                img.style.marginLeft = "0";
+                img.style.marginRight = "auto";
+            } else if (align === 'center') {
+                img.style.marginLeft = "auto";
+                img.style.marginRight = "auto";
+            } else if (align === 'right') {
+                img.style.marginLeft = "auto";
+                img.style.marginRight = "0";
+            }
+        }
+
+        function showImageToolbar(img) {
+            const toolbar = document.getElementById('img-toolbar');
+            if (!toolbar) return;
+
+            toolbar.style.display = "flex";
+
+            // posisikan toolbar di atas gambar (mirip docs)
+            const rect = img.getBoundingClientRect();
+            const top = Math.max(10, rect.top - 60);
+            let left = rect.left;
+
+            // jangan keluar layar kanan
+            const tbW = 360;
+            const maxLeft = window.innerWidth - tbW - 10;
+            left = Math.max(10, Math.min(left, maxLeft));
+
+            toolbar.style.top = `${top}px`;
+            toolbar.style.left = `${left}px`;
+
+            updateToolbarUI(img);
+        }
+
+        function hideImageToolbar() {
+            const toolbar = document.getElementById('img-toolbar');
+            if (toolbar) toolbar.style.display = "none";
+            __selectedImg = null;
+        }
+
+        function updateToolbarUI(img) {
+            const range = document.getElementById('imgSizeRange');
+            const label = document.getElementById('imgSizeLabel');
+
+            // width
+            let w = parseInt(img.dataset.width || '0', 10);
+            if (!w) {
+                const styleW = (img.style.width || '').trim();
+                if (styleW.endsWith('%')) w = parseInt(styleW, 10);
+            }
+            w = w || 50;
+            range.value = String(w);
+            label.textContent = w + "%";
+
+            // align active
+            const a = img.dataset.align || 'center';
+            document.getElementById('imgAlignLeft').classList.toggle('active', a === 'left');
+            document.getElementById('imgAlignCenter').classList.toggle('active', a === 'center');
+            document.getElementById('imgAlignRight').classList.toggle('active', a === 'right');
+        }
+
+        function deleteSelectedImage() {
+            if (!__selectedImg) return;
+
+            const img = __selectedImg;
+            const editor = img.closest('[contenteditable="true"]');
+
+            // Ambil node setelah img (kadang kita auto buat <p><br></p> setelah gambar)
+            const next = img.nextSibling;
+
+            // Hapus paragraf kosong setelah gambar jika ada
+            // (case: <p><br></p> atau <p>&nbsp;</p> atau p kosong)
+            if (next && next.nodeType === 1 && next.tagName === 'P') {
+                const text = (next.textContent || '').replace(/\u00A0/g, '').trim();
+                const html = (next.innerHTML || '').replace(/\u00A0/g, '').trim().toLowerCase();
+
+                const isEmptyP =
+                    text === '' &&
+                    (html === '' || html === '<br>' || html === '<br/>' || html === '<br />');
+
+                if (isEmptyP) next.remove();
+            }
+
+            // Hapus gambar
+            img.remove();
+
+            // Tutup toolbar & reset selected
+            hideImageToolbar();
+
+            // Fokuskan editor lagi biar user bisa lanjut ngetik
+            if (editor) {
+                editor.focus();
+
+                // taruh caret di akhir editor
+                const sel = window.getSelection();
+                const range = document.createRange();
+                range.selectNodeContents(editor);
+                range.collapse(false);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+
+            showToast("Gambar berhasil dihapus", "success");
+        }
+
+        // ====== Text Settings Per Section ======
+        let __bmSettingsOpenKey = null;
+
+        function bmSectionKey(type, id) {
+            return id ? `${type}:${id}` : `${type}`;
+        }
+
+        function bmEnsureFormats() {
+            if (!ebookState.sectionFormats) ebookState.sectionFormats = {};
+        }
+
+        function bmGetFormat(type, id) {
+            bmEnsureFormats();
+            const key = bmSectionKey(type, id);
+            const d = {
+                align: 'justify',
+                font: 'serif',
+                lh: '1.7'
+            };
+            return {
+                ...d,
+                ...(ebookState.sectionFormats[key] || {})
+            };
+        }
+
+        function bmFontCss(fontOpt) {
+            if (fontOpt === 'sans') {
+                return "'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+            }
+            // serif
+            return "'Merriweather','Times New Roman',serif";
+        }
+
+        function bmStyleAttr(type, id) {
+            const f = bmGetFormat(type, id);
+            const align = f.align || 'justify';
+            const lh = f.lh || '1.7';
+            const font = bmFontCss(f.font || 'serif');
+            // pakai CSS variable -> tidak mengotori konten HTML di dalamnya
+            return `style="--bm-align:${align};--bm-lh:${lh};--bm-font:${font};"`;
+        }
+
+        function bmFindEditor(type, id) {
+            if (id) {
+                return document.querySelector(
+                    `.section-container[data-type="${type}"][data-id="${id}"] [contenteditable="true"]`);
+            }
+            return document.querySelector(`.section-container[data-type="${type}"] [contenteditable="true"]`);
+        }
+
+        function bmApplyFormatToDom(type, id) {
+            const ed = bmFindEditor(type, id);
+            if (!ed) return;
+
+            const f = bmGetFormat(type, id);
+
+            // ✅ buang inline align dulu supaya semua paragraf ikut
+            bmStripInlineAlign(ed);
+
+            ed.style.setProperty('--bm-align', f.align || 'justify');
+            ed.style.setProperty('--bm-lh', f.lh || '1.7');
+            ed.style.setProperty('--bm-font', bmFontCss(f.font || 'serif'));
+        }
+
+
+        function bmStripInlineAlign(ed) {
+            if (!ed) return;
+            ed.querySelectorAll('p,div,li,blockquote,h1,h2,h3,h4,h5,h6').forEach(el => {
+                // hapus inline text-align
+                if (el.style) el.style.removeProperty('text-align');
+
+                // kalau style attribute kosong, hapus biar bersih
+                const st = el.getAttribute('style');
+                if (st && st.trim() === '') el.removeAttribute('style');
+            });
+        }
+
+
+        function bmSaveFormat(type, id, patch) {
+            bmEnsureFormats();
+            const key = bmSectionKey(type, id);
+            const now = bmGetFormat(type, id);
+            ebookState.sectionFormats[key] = {
+                ...now,
+                ...patch
+            };
+            saveEbookState(); // simpan ke localStorage
+            bmApplyFormatToDom(type, id); // apply langsung tanpa render ulang
+        }
+
+        function bmEnsurePopover() {
+            let pop = document.getElementById('bm-settings-popover');
+            if (pop) return pop;
+
+            pop = document.createElement('div');
+            pop.id = 'bm-settings-popover';
+            pop.innerHTML = `
+    <div class="bm-title">Pengaturan</div>
+
+    <label>Perataan</label>
+    <select id="bm_align">
+      <option value="left">Rata Kiri</option>
+      <option value="justify">Rata Kanan-Kiri (Justify)</option>
+      <option value="center">Rata Tengah</option>
+      <option value="right">Rata Kanan</option>
+    </select>
+
+    <label>Font</label>
+    <select id="bm_font">
+      <option value="sans">Sans Serif (Inter)</option>
+      <option value="serif">Serif (Merriweather)</option>
+    </select>
+
+    <label>Spasi Baris</label>
+    <select id="bm_lh">
+      <option value="1.2">Rapat (1.2)</option>
+      <option value="1.7">Normal (1.7)</option>
+      <option value="2.0">Lebar (2.0)</option>
+      <option value="2.5">Sangat Lebar (2.5)</option>
+    </select>
+  `;
+            document.body.appendChild(pop);
+
+            // jangan auto-close saat klik di dalam popover
+            pop.addEventListener('click', (e) => e.stopPropagation());
+
+            return pop;
+        }
+
+        function bmClosePopover() {
+            const pop = document.getElementById('bm-settings-popover');
+            if (pop) pop.style.display = 'none';
+            __bmSettingsOpenKey = null;
+        }
+
+        function toggleTextSettings(e, type, id) {
+            e.stopPropagation();
+            const key = bmSectionKey(type, id || null);
+
+            const pop = bmEnsurePopover();
+            const f = bmGetFormat(type, id || null);
+
+            // toggle
+            if (pop.style.display === 'block' && __bmSettingsOpenKey === key) {
+                bmClosePopover();
+                return;
+            }
+
+            __bmSettingsOpenKey = key;
+
+            // set current values
+            pop.querySelector('#bm_align').value = f.align || 'justify';
+            pop.querySelector('#bm_font').value = f.font || 'serif';
+            pop.querySelector('#bm_lh').value = f.lh || '1.7';
+
+            // attach change handlers (replace each time to ensure correct target)
+            pop.querySelector('#bm_align').onchange = (ev) => bmSaveFormat(type, id || null, {
+                align: ev.target.value
+            });
+            pop.querySelector('#bm_font').onchange = (ev) => bmSaveFormat(type, id || null, {
+                font: ev.target.value
+            });
+            pop.querySelector('#bm_lh').onchange = (ev) => bmSaveFormat(type, id || null, {
+                lh: ev.target.value
+            });
+
+            // position near button
+            const rect = e.currentTarget.getBoundingClientRect();
+            pop.style.display = 'block';
+
+            // default: bawah tombol
+            let top = rect.bottom + 8;
+            let left = rect.left;
+
+            // keep in viewport
+            const popW = 230;
+            const popH = 220;
+            if (left + popW + 10 > window.innerWidth) left = window.innerWidth - popW - 10;
+            if (top + popH + 10 > window.innerHeight) top = rect.top - popH - 8;
+
+            pop.style.top = `${Math.max(10, top)}px`;
+            pop.style.left = `${Math.max(10, left)}px`;
+        }
+
+        // close on outside click + ESC
+        document.addEventListener('click', () => bmClosePopover());
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') bmClosePopover();
         });
     </script>
 

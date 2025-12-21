@@ -15,10 +15,10 @@
                     </h2>
 
                     {{-- Last Updated --}}
-                    <p class="text-muted fs-6 mb-5">
+                    {{-- <p class="text-muted fs-6 mb-5">
                         Last updated:
                         <strong>31 Oktober 2025, 01:15</strong>
-                    </p>
+                    </p> --}}
 
                     {{-- Tombol Akses --}}
                     <a href="https://gemini.google.com/share/ce0239c238a1" target="_blank"
