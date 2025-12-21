@@ -1934,6 +1934,15 @@
             let buttons = '';
 
 
+            if (type === 'intro') {
+                buttons += `
+    <button onclick="openContinueIntroModal()"
+            class="px-3 py-1 bg-teal-600 text-white rounded text-sm hover:bg-teal-700 transition-colors duration-200">
+      <i class="fas fa-forward mr-1"></i> Perpanjang
+    </button>
+  `;
+            }
+
 
             if (type === 'chapter') {
                 buttons += `
@@ -1968,6 +1977,15 @@
         //     </button>
         //     `;
             // }
+
+            if (type === 'outline') {
+                buttons += `
+      <button onclick="openExtendOutlineModal()"
+              class="px-3 py-1 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700 transition-colors duration-200">
+        <i class="fas fa-plus mr-1"></i> Perpanjang Daftar Isi
+      </button>
+    `;
+            }
 
             if (type !== 'manual' && type !== 'bibliography') {
                 buttons += `
@@ -2202,6 +2220,189 @@
             };
         }
 
+        function openContinueIntroModal() {
+            if (!ebookState.intro) return showToast("Pendahuluan belum dibuat", "warning");
+
+            const options = [{
+                    key: "Pendahuluan",
+                    label: "Pendahuluan"
+                },
+                {
+                    key: "Untuk Siapa Buku Ini",
+                    label: "Untuk Siapa Buku Ini"
+                },
+                {
+                    key: "Cara Menggunakan Buku Ini",
+                    label: "Cara Menggunakan Buku Ini"
+                },
+            ];
+
+            const overlay = document.createElement('div');
+            overlay.className = "fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4";
+            overlay.innerHTML = `
+    <div class="bg-white w-full max-w-md rounded-xl shadow-lg p-5">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-lg font-semibold">Perpanjang Bagian Intro</h3>
+        <button class="text-gray-500 hover:text-gray-700" id="closeIntroModalBtn">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <label class="text-sm font-medium block mb-2">Pilih bagian yang mau diperpanjang:</label>
+      <select id="introPartSelect" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+        ${options.map(o => `<option value="${escapeHtml(o.key)}">${escapeHtml(o.label)}</option>`).join('')}
+      </select>
+
+      <div class="mt-4 flex gap-2 justify-end">
+        <button id="cancelIntroBtn" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-sm">Batal</button>
+        <button id="goIntroBtn" class="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-sm">
+          <i class="fas fa-forward mr-1"></i> Perpanjang
+        </button>
+      </div>
+    </div>
+  `;
+
+            document.body.appendChild(overlay);
+
+            const close = () => overlay.remove();
+            overlay.querySelector('#closeIntroModalBtn').onclick = close;
+            overlay.querySelector('#cancelIntroBtn').onclick = close;
+
+            overlay.querySelector('#goIntroBtn').onclick = async () => {
+                const heading = overlay.querySelector('#introPartSelect').value;
+                close();
+                await continueIntroPart(heading);
+            };
+        }
+
+        function getH2SegmentHtml(html, headingText) {
+            const temp = document.createElement('div');
+            temp.innerHTML = html || '';
+
+            const h2s = Array.from(temp.querySelectorAll('h2'));
+            const idx = h2s.findIndex(h => (h.textContent || '').trim().toLowerCase() === String(headingText).trim()
+                .toLowerCase());
+
+            if (idx === -1) {
+                return {
+                    found: false,
+                    segmentHtml: '',
+                    segmentText: ''
+                };
+            }
+
+            const startH2 = h2s[idx];
+            const endH2 = h2s[idx + 1] || null;
+
+            const nodes = [];
+            let cur = startH2.nextSibling;
+            while (cur && cur !== endH2) {
+                nodes.push(cur);
+                cur = cur.nextSibling;
+            }
+
+            const wrapper = document.createElement('div');
+            wrapper.appendChild(startH2.cloneNode(true));
+            nodes.forEach(n => wrapper.appendChild(n.cloneNode(true)));
+
+            const segmentHtml = wrapper.innerHTML;
+            const segmentText = (wrapper.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 2500);
+
+            return {
+                found: true,
+                segmentHtml,
+                segmentText
+            };
+        }
+
+        function insertSnippetIntoH2Section(html, headingText, snippetHtml) {
+            const temp = document.createElement('div');
+            temp.innerHTML = html || '';
+
+            const h2s = Array.from(temp.querySelectorAll('h2'));
+            const idx = h2s.findIndex(h => (h.textContent || '').trim().toLowerCase() === String(headingText).trim()
+                .toLowerCase());
+
+            if (idx === -1) return html;
+
+            const endH2 = h2s[idx + 1] || null;
+
+            const frag = document.createElement('div');
+            frag.innerHTML = snippetHtml || '';
+
+            if (endH2) {
+                const parent = endH2.parentNode;
+                Array.from(frag.childNodes).forEach(n => parent.insertBefore(n, endH2));
+            } else {
+                Array.from(frag.childNodes).forEach(n => temp.appendChild(n));
+            }
+
+            return temp.innerHTML;
+        }
+
+        async function continueIntroPart(headingText) {
+            if (!ebookState.intro) return showToast("Pendahuluan belum dibuat", "warning");
+
+            const apiKey = document.getElementById("api_key_input").value.trim();
+            if (!apiKey) return showToast("API Key belum disimpan.", "error");
+
+            if (isGenerating) return showToast("Sedang membuat konten, mohon tunggu...", "warning");
+
+            const seg = getH2SegmentHtml(ebookState.intro, headingText);
+            if (!seg.found) {
+                return showToast(`Bagian "${headingText}" tidak ditemukan di Pendahuluan`, "error");
+            }
+
+            const val = getFormValues();
+
+            isGenerating = true;
+            showLoadingIndicator("intro");
+
+            try {
+                const response = await fetch("/ebook/generate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        action: "continue_intro_part",
+                        masalah: val.masalah,
+                        kebutuhan: val.kebutuhan,
+                        solusi: val.solusi,
+                        pengalaman: val.pengalaman,
+                        kompetensi: val.kompetensi,
+                        kontrak_kreatif: val.kontrak_kreatif,
+                        calon_pembaca: val.calon_pembaca,
+                        gaya: val.gaya,
+                        existing_title: ebookState.title || "",
+
+                        intro_heading: headingText,
+                        intro_text: seg.segmentText,
+                        intro_html: ebookState.intro
+                    })
+                });
+
+                const result = await response.json();
+                if (!result.status) return showToast(result.message || "Gagal memperpanjang intro", "error");
+
+                // Sisipkan hasil AI tepat di bagian heading yang dipilih
+                ebookState.intro = insertSnippetIntoH2Section(ebookState.intro, headingText, (result.html || '')
+                    .trim());
+
+                saveEbookState();
+                renderEbookContent();
+                showToast(`Bagian "${headingText}" berhasil diperpanjang!`, "success");
+            } catch (e) {
+                console.error(e);
+                showToast("Error memperpanjang intro: " + e.message, "error");
+            } finally {
+                isGenerating = false;
+                removeLoadingIndicator();
+            }
+        }
+
+
         function insertSnippetBeforeFirstSubBab(chapterHtml, chapterNumber, snippetHtml) {
             const temp = document.createElement('div');
             temp.innerHTML = chapterHtml || '';
@@ -2309,6 +2510,265 @@
             } catch (e) {
                 console.error(e);
                 showToast("Error melanjutkan sub-bab: " + e.message, "error");
+            } finally {
+                isGenerating = false;
+                removeLoadingIndicator();
+            }
+        }
+
+        // ====== EXTEND OUTLINE (Tambah Bab / Tambah Sub-bab) ======
+        function outlineGetMainOl(outlineHtml) {
+            const temp = document.createElement('div');
+            temp.innerHTML = outlineHtml || '';
+            const ol = temp.querySelector('ol');
+            return {
+                temp,
+                ol
+            };
+        }
+
+        function outlineGetSubBabCount(outlineHtml, chapterNumber) {
+            const data = extractChapterTitlesFromOutline(); // sudah ada di kode kamu
+            const ch = data.find(x => x.number === chapterNumber);
+            return ch ? (ch.subBabs?.length || 0) : 0;
+        }
+
+        function openExtendOutlineModal() {
+            if (!ebookState.outline) return showToast("Daftar isi belum dibuat.", "warning");
+
+            const chapters = extractChapterTitlesFromOutline();
+            if (!chapters.length) return showToast("Tidak menemukan struktur bab dari daftar isi.", "warning");
+
+            const overlay = document.createElement('div');
+            overlay.className = "fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4";
+            overlay.innerHTML = `
+    <div class="bg-white w-full max-w-lg rounded-xl shadow-lg p-5">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-lg font-semibold">Perpanjang Daftar Isi</h3>
+        <button class="text-gray-500 hover:text-gray-700" id="closeModalBtn">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <label class="flex items-center gap-2 text-sm">
+          <input type="radio" name="extMode" value="add_chapter" checked />
+          <span><b>Tambah Bab Baru</b> (otomatis + sub-bab)</span>
+        </label>
+
+        <label class="flex items-center gap-2 text-sm">
+          <input type="radio" name="extMode" value="add_subbab" />
+          <span><b>Tambah Sub-bab</b> ke Bab tertentu</span>
+        </label>
+
+        <div id="pickBabWrap" class="mt-2 hidden">
+          <label class="text-sm font-medium block mb-2">Pilih bab:</label>
+          <select id="pickBabSelect" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+            ${chapters.map(ch => `<option value="${ch.number}">Bab ${ch.number}: ${escapeHtml(ch.title)}</option>`).join('')}
+          </select>
+
+          <label class="text-sm font-medium block mt-3 mb-2">Tambah berapa sub-bab?</label>
+          <select id="addCountSelect" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+            <option value="1">+1 sub-bab</option>
+            <option value="2" selected>+2 sub-bab</option>
+            <option value="3">+3 sub-bab</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-5 flex gap-2 justify-end">
+        <button id="cancelBtn" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-sm">Batal</button>
+        <button id="goBtn" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm">
+          <i class="fas fa-plus mr-1"></i> Terapkan
+        </button>
+      </div>
+    </div>
+  `;
+
+            document.body.appendChild(overlay);
+
+            const close = () => overlay.remove();
+            overlay.querySelector('#closeModalBtn').onclick = close;
+            overlay.querySelector('#cancelBtn').onclick = close;
+
+            const radios = overlay.querySelectorAll('input[name="extMode"]');
+            const pickWrap = overlay.querySelector('#pickBabWrap');
+
+            const refreshUI = () => {
+                const mode = overlay.querySelector('input[name="extMode"]:checked')?.value;
+                pickWrap.classList.toggle('hidden', mode !== 'add_subbab');
+            };
+            radios.forEach(r => r.onchange = refreshUI);
+            refreshUI();
+
+            overlay.querySelector('#goBtn').onclick = async () => {
+                const mode = overlay.querySelector('input[name="extMode"]:checked')?.value;
+
+                if (mode === 'add_chapter') {
+                    close();
+                    await extendOutlineAddChapter();
+                    return;
+                }
+
+                const chapterNum = parseInt(overlay.querySelector('#pickBabSelect').value, 10);
+                const addCount = parseInt(overlay.querySelector('#addCountSelect').value, 10);
+                close();
+                await extendOutlineAddSubBab(chapterNum, addCount);
+            };
+        }
+
+        async function extendOutlineAddChapter() {
+            const apiKey = document.getElementById("api_key_input").value.trim();
+            if (!apiKey) return showToast("API Key belum disimpan.", "error");
+            if (!ebookState.outline) return showToast("Daftar isi belum ada.", "error");
+            if (isGenerating) return showToast("Sedang membuat konten, mohon tunggu...", "warning");
+
+            const val = getFormValues();
+            const chapters = extractChapterTitlesFromOutline();
+            const nextChapterNumber = (chapters.length || 0) + 1;
+
+            isGenerating = true;
+            showLoadingIndicator("outline");
+
+            try {
+                const response = await fetch("/ebook/generate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        action: "extend_outline",
+                        extend_mode: "add_chapter",
+                        next_chapter_number: nextChapterNumber,
+                        outline_html: ebookState.outline,
+
+                        // konteks buku
+                        masalah: val.masalah,
+                        kebutuhan: val.kebutuhan,
+                        solusi: val.solusi,
+                        pengalaman: val.pengalaman,
+                        kompetensi: val.kompetensi,
+                        kontrak_kreatif: val.kontrak_kreatif,
+                        calon_pembaca: val.calon_pembaca,
+                        gaya: val.gaya,
+                        jumlah_outline: val.jumlah_outline,
+                        existing_title: ebookState.title || ""
+                    })
+                });
+
+                const result = await response.json();
+                if (!result.status) return showToast(result.message || "Gagal menambah bab di daftar isi", "error");
+
+                // result.html = <li>Bab N: ...<ul>...</ul></li>
+                const {
+                    temp,
+                    ol
+                } = outlineGetMainOl(ebookState.outline);
+                if (!ol) return showToast("Struktur <ol> daftar isi tidak ditemukan.", "error");
+
+                const wrap = document.createElement('div');
+                wrap.innerHTML = result.html || '';
+                const li = wrap.querySelector('li');
+                if (!li) return showToast("Format hasil AI tidak valid (li tidak ditemukan).", "error");
+
+                ol.appendChild(li);
+                ebookState.outline = temp.innerHTML;
+
+                saveEbookState();
+                renderEbookContent();
+                showToast(`Bab ${nextChapterNumber} berhasil ditambahkan ke daftar isi!`, "success");
+            } catch (e) {
+                console.error(e);
+                showToast("Error perpanjang daftar isi: " + e.message, "error");
+            } finally {
+                isGenerating = false;
+                removeLoadingIndicator();
+            }
+        }
+
+        async function extendOutlineAddSubBab(chapterNumber, addCount = 2) {
+            const apiKey = document.getElementById("api_key_input").value.trim();
+            if (!apiKey) return showToast("API Key belum disimpan.", "error");
+            if (!ebookState.outline) return showToast("Daftar isi belum ada.", "error");
+            if (isGenerating) return showToast("Sedang membuat konten, mohon tunggu...", "warning");
+
+            const val = getFormValues();
+            const lastCount = outlineGetSubBabCount(ebookState.outline,
+                chapterNumber); // misal sudah 5, maka next mulai 6
+
+            isGenerating = true;
+            showLoadingIndicator("outline");
+
+            try {
+                const response = await fetch("/ebook/generate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        action: "extend_outline",
+                        extend_mode: "add_subbab",
+                        outline_html: ebookState.outline,
+
+                        chapter_number: chapterNumber,
+                        last_subbab_index: lastCount,
+                        add_count: addCount,
+
+                        // konteks buku
+                        masalah: val.masalah,
+                        kebutuhan: val.kebutuhan,
+                        solusi: val.solusi,
+                        pengalaman: val.pengalaman,
+                        kompetensi: val.kompetensi,
+                        kontrak_kreatif: val.kontrak_kreatif,
+                        calon_pembaca: val.calon_pembaca,
+                        gaya: val.gaya,
+                        jumlah_outline: val.jumlah_outline,
+                        existing_title: ebookState.title || ""
+                    })
+                });
+
+                const result = await response.json();
+                if (!result.status) return showToast(result.message || "Gagal menambah sub-bab", "error");
+
+                // result.html = beberapa <li>X.Y ...</li> (tanpa ul)
+                const {
+                    temp,
+                    ol
+                } = outlineGetMainOl(ebookState.outline);
+                if (!ol) return showToast("Struktur <ol> daftar isi tidak ditemukan.", "error");
+
+                // cari LI bab yang sesuai, lalu UL-nya
+                const babLi = Array.from(ol.children).find(li => {
+                    const txt = (li.firstChild?.textContent || li.textContent || '').trim();
+                    return new RegExp(`^\\s*Bab\\s+${chapterNumber}\\s*:\\s*`, 'i').test(txt);
+                });
+
+                if (!babLi) return showToast(`Bab ${chapterNumber} tidak ditemukan di daftar isi.`, "error");
+
+                let ul = babLi.querySelector('ul');
+                if (!ul) {
+                    ul = document.createElement('ul');
+                    babLi.appendChild(ul);
+                }
+
+                const wrap = document.createElement('div');
+                wrap.innerHTML = `<ul>${result.html || ''}</ul>`;
+                const newLis = wrap.querySelectorAll('li');
+                if (!newLis.length) return showToast("Format hasil AI tidak valid (li sub-bab tidak ditemukan).",
+                    "error");
+
+                newLis.forEach(li => ul.appendChild(li));
+                ebookState.outline = temp.innerHTML;
+
+                saveEbookState();
+                renderEbookContent();
+                showToast(`Sub-bab untuk Bab ${chapterNumber} berhasil ditambahkan!`, "success");
+            } catch (e) {
+                console.error(e);
+                showToast("Error perpanjang sub-bab di daftar isi: " + e.message, "error");
             } finally {
                 isGenerating = false;
                 removeLoadingIndicator();

@@ -61,7 +61,7 @@ class AksesAplikasiController extends Controller
     public function generateEbookPart(Request $request)
     {
         $request->validate([
-            'action' => 'required|in:title,preface,intro,outline,chapter,summary,closing,daftarpustaka,profilpenulis,continue_chapter,continue_subbab',
+            'action' => 'required|in:title,preface,intro,outline,chapter,summary,closing,daftarpustaka,profilpenulis,continue_chapter,continue_subbab,continue_intro_part,extend_outline',
             'masalah' => 'nullable|string',
             'kebutuhan' => 'nullable|string',
             'solusi' => 'nullable|string',
@@ -88,6 +88,18 @@ class AksesAplikasiController extends Controller
             'subbab_number' => 'nullable|string',
             'subbab_title' => 'nullable|string',
             'subbab_text' => 'nullable|string',
+
+            'intro_heading' => 'nullable|string',
+            'intro_text' => 'nullable|string',
+            'intro_html' => 'nullable|string',
+
+            'extend_mode'         => 'nullable|in:add_chapter,add_subbab',
+            'outline_html'        => 'nullable|string',
+            'next_chapter_number' => 'nullable|integer|min:1',
+
+            'chapter_number'      => 'nullable|integer|min:1',
+            'last_subbab_index'   => 'nullable|integer|min:0',
+            'add_count'           => 'nullable|integer|min:1|max:5',
 
 
         ]);
@@ -539,6 +551,59 @@ Ringkasan harus:
 
                 break;
 
+            case 'continue_intro_part':
+                $heading = $request->intro_heading ?? 'Pendahuluan';
+                $introText = $request->intro_text ?? '';
+
+                $instruction =
+                    "LANJUTKAN BAGIAN INTRO YANG SUDAH ADA.\n" .
+                    "Target bagian (h2) yang harus dilanjutkan: {$heading}\n\n" .
+                    "KONTEKS isi bagian saat ini (ringkas):\n{$introText}\n\n" .
+                    "ATURAN OUTPUT:\n" .
+                    "- Output HANYA HTML bersih: p,ul,ol,li,blockquote (TANPA h1/h2/h3).\n" .
+                    "- Jangan ulangi paragraf yang sama.\n" .
+                    "- Tambahkan isi baru yang memperdalam, memberi contoh kecil, dan lebih actionable.\n" .
+                    "- Panjang tambahan: 250–450 kata.\n" .
+                    "- Tetap konsisten dengan gaya bahasa: {$gaya}\n" .
+                    "- Jangan buat bagian lain (jangan menulis heading baru).\n";
+
+                break;
+
+
+            case 'extend_outline':
+                $mode = $request->extend_mode ?? 'add_chapter';
+
+                if ($mode === 'add_chapter') {
+                    $next = (int)($request->next_chapter_number ?? ($totalBab + 1));
+                    $instruction =
+                        "TUGAS: TAMBAH 1 BAB BARU KE DAFTAR ISI.\n\n" .
+                        "Nomor bab yang harus dibuat: {$next}\n" .
+                        "Sub-bab per bab target: {$subBabPerBab}\n\n" .
+                        "ATURAN OUTPUT:\n" .
+                        "- Output HANYA 1 item <li> untuk bab baru, format WAJIB:\n" .
+                        "  <li>Bab {$next}: Judul Bab<ul><li>{$next}.1 Judul Sub-bab</li>...</ul></li>\n" .
+                        "- Jangan sertakan <h2>, <ol>, atau teks lain.\n" .
+                        "- Judul harus nyambung dengan masalah & solusi buku.\n" .
+                        "- Gaya bahasa judul: ringkas, kuat, progresif.\n";
+                } else {
+                    $chapterNum = (int)($request->chapter_number ?? 1);
+                    $lastIdx    = (int)($request->last_subbab_index ?? 0);
+                    $addCount   = (int)($request->add_count ?? 2);
+
+                    $start = $lastIdx + 1;
+
+                    $instruction =
+                        "TUGAS: TAMBAH SUB-BAB KE BAB {$chapterNum} DI DAFTAR ISI.\n\n" .
+                        "Sub-bab terakhir saat ini: {$chapterNum}.{$lastIdx}\n" .
+                        "Tambahkan: {$addCount} sub-bab baru dimulai dari {$chapterNum}.{$start}\n\n" .
+                        "ATURAN OUTPUT:\n" .
+                        "- Output HANYA beberapa <li> sub-bab (tanpa <ul>), contoh:\n" .
+                        "  <li>{$chapterNum}.{$start} Judul Sub-bab</li>\n" .
+                        "- Jangan tulis bab utama.\n" .
+                        "- Jangan sertakan <h2>, <ol>, atau teks lain.\n" .
+                        "- Judul harus progresif dan relevan dengan masalah & solusi.\n";
+                }
+                break;
             default:
                 return response()->json([
                     'status'  => false,
