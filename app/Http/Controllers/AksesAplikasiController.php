@@ -61,7 +61,7 @@ class AksesAplikasiController extends Controller
     public function generateEbookPart(Request $request)
     {
         $request->validate([
-            'action' => 'required|in:title,preface,intro,outline,chapter,summary,closing,daftarpustaka,profilpenulis,continue_chapter,continue_subbab,continue_intro_part,extend_outline,continue_preface,continue_summary',
+            'action' => 'required|in:title,preface,intro,outline,chapter,summary,closing,daftarpustaka,profilpenulis,continue_chapter,continue_subbab,continue_intro_part,extend_outline,continue_preface,continue_summary,continue_closing',
             'masalah' => 'nullable|string',
             'kebutuhan' => 'nullable|string',
             'solusi' => 'nullable|string',
@@ -248,21 +248,39 @@ ATURAN WAJIB:
                 break;
 
             case 'profilpenulis':
+                $gaya = $request->gaya ?? 'Edukatif & Praktis (Mengajar tanpa menggurui)';
+
+                // Bahan bio dari user (sering masih orang pertama: "Saya ...")
+                $bio = trim($request->tentang_penulis ?? '');
+
+                $pengalaman = trim($request->pengalaman ?? '');
+                $kompetensi = trim($request->kompetensi ?? '');
+                $calon = trim($request->calon_pembaca ?? '');
+                $judul = trim(strip_tags($request->existing_title ?? ''));
+
                 $instruction =
-                    "BUATKAN PROFIL PENULIS (HANYA BAGIAN INI, JANGAN BUAT KONTEN LAIN):\n" .
-                    "Format WAJIB:\n" .
-                    "<h2>Tentang Penulis</h2>\n" .
-                    "<p>(paragraf 1: bio singkat, hangat, kredibel)</p>\n" .
-                    "<p>(paragraf 2: pengalaman relevan + kenapa menulis buku ini)</p>\n" .
-                    "<p>(paragraf 3: fokus kontribusi/manfaat untuk pembaca + penutup singkat)</p>\n\n" .
-                    "ATURAN:\n" .
-                    "- Jika 'Tentang Penulis' input user ada, jadikan inti (boleh dipoles agar lebih profesional).\n" .
-                    "- Jika kosong, buat bio dari Experience & Competence (jangan mengarang gelar spesifik/instansi).\n" .
-                    "- Jangan tulis 'sebagai AI'.\n" .
-                    "- Panjang 220–350 kata.\n" .
-                    "- Gaya bahasa: {$gaya}\n" .
-                    "- STOP setelah selesai.\n";
+                    "TULIS BAGIAN 'PROFIL PENULIS' UNTUK BUKU.\n\n" .
+                    "WAJIB: gunakan gaya bahasa ORANG KETIGA (narator membicarakan penulis).\n" .
+                    "- Jangan gunakan kata: saya, aku, kami, kita.\n" .
+                    "- Gunakan: ia/dia/beliau/penulis ini.\n" .
+                    "- Jika input bio menggunakan orang pertama, ubah menjadi orang ketiga dengan natural.\n\n" .
+                    "KONTEKS PENULIS (bahan mentah):\n" .
+                    "- Tentang penulis: {$bio}\n" .
+                    "- Pengalaman: {$pengalaman}\n" .
+                    "- Kompetensi: {$kompetensi}\n\n" .
+                    "KONTEKS BUKU:\n" .
+                    "- Judul buku: {$judul}\n" .
+                    "- Target pembaca: {$calon}\n\n" .
+                    "ATURAN OUTPUT:\n" .
+                    "- Output HTML bersih: h2, p, ul, li, blockquote (tanpa h1).\n" .
+                    "- Buat 2–4 paragraf (total 140–220 kata).\n" .
+                    "- Opsional: 1 list (ul) berisi 3–5 poin kekuatan/keahlian penulis.\n" .
+                    "- Nada bahasa tetap konsisten dengan gaya: {$gaya} (tapi tetap orang ketiga).\n" .
+                    "- Jangan menulis penutup/ucapan terima kasih panjang. Fokus profil.\n";
+
+                // lalu lanjutkan proses call model sesuai struktur kamu
                 break;
+
 
 
 
