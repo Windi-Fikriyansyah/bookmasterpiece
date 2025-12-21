@@ -21,7 +21,7 @@
                         class="btn btn-primary btn-lg px-4 py-3 d-inline-flex align-items-center gap-2 mb-5">
                         <i class="ti ti-external-link fs-4"></i>
                         <span class="fw-medium fs-5">
-                            Akses Book Masterpiece AI Versi Terbaru (3.0)
+                            Akses Book Masterpiece AI Versi Terbaru (4.0)
                         </span>
                     </a>
 
@@ -42,7 +42,7 @@
                     {{-- Info Versi --}}
                     <div class="mb-5">
                         <h4 class="fw-semibold mb-3">
-                            Book Masterpiece AI Versi 3.0
+                            Book Masterpiece AI Versi 4.0
                         </h4>
 
                         <ul class="list-unstyled fs-5 ms-2">
@@ -72,7 +72,7 @@
                             karena dapat menyebabkan error saat pembuatan konten ebook.
                             <br><br>
                             Wajib menggunakan
-                            <strong>versi 3.0 (Update 19 November 2025)</strong>.
+                            <strong>versi 4.0 (Update 19 November 2025)</strong>.
                         </p>
                     </div> --}}
 
