@@ -546,7 +546,12 @@
                     <button onclick="generateEbook('title')"
                         class="w-full bg-blue-600 text-white py-3 rounded-lg text-sm hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2">
                         <i class="fas fa-heading"></i>
-                        Buat Judul Book
+                        Buat Judul Buku
+                    </button>
+                    <button onclick="generateOutlineFromUserInput()"
+                        class="w-full bg-blue-600 text-white py-3 rounded-lg text-sm hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2">
+                        <i class="fas fa-list-ol"></i>
+                        Buat Daftar Isi
                     </button>
 
                     <button onclick="generateEbook('preface')"
@@ -563,11 +568,7 @@
 
 
                     <!-- TAMBAH tombol ini di bagian Langkah 2, setelah tombol "Buat Pendahuluan" -->
-                    <button onclick="generateOutlineFromUserInput()"
-                        class="w-full bg-blue-600 text-white py-3 rounded-lg text-sm hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2">
-                        <i class="fas fa-list-ol"></i>
-                        Buat Daftar Isi
-                    </button>
+
 
                     <div class="grid grid-cols-2 gap-3 pt-2">
                         <button onclick="addManualSection()"
