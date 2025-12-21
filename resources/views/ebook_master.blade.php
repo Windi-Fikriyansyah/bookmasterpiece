@@ -48,19 +48,19 @@
                         <ul class="list-unstyled fs-5 ms-2">
                             <li class="mb-2">
                                 <i class="ti ti-check text-success me-2"></i>
-                                Bisa sisipkan bab baru antar bab
+                                Buat Gambar (AI)
                             </li>
                             <li class="mb-2">
                                 <i class="ti ti-check text-success me-2"></i>
-                                Bisa regenerate berkali-kali oleh AI
+                                Upload Gambar
                             </li>
                             <li class="mb-2">
                                 <i class="ti ti-check text-success me-2"></i>
-                                Bisa menambah judul bab secara manual
+                                Perpanjang Isi Bab
                             </li>
                             <li class="mb-2">
                                 <i class="ti ti-check text-success me-2"></i>
-                                Menggunakan update AI Google terbaru
+                                Rata Kanan Kiri
                             </li>
                         </ul>
                     </div>
