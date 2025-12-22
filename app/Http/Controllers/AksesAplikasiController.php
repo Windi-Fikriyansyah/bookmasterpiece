@@ -432,23 +432,53 @@ ATURAN WAJIB:
                 break;
 
 
+            // Di dalam class AksesAplikasiController, pada fungsi generateEbookPart(), tambahkan case 'summary' yang lebih spesifik:
+
             case 'summary':
                 $ctx = $request->summary_context ?? '';
                 $rules = $request->summary_rules ?? '';
 
                 $instruction =
-                    "ANDA HANYA BOLEH MENULIS BERDASARKAN SUMARRY_CONTEXT DI BAWAH.\n" .
-                    "DILARANG menambah ide/solusi/kesimpulan yang tidak tertulis di konteks.\n" .
-                    "Jika konteks pendek, ringkasan boleh pendek.\n\n" .
-                    "ATURAN OUTPUT:\n" .
-                    "- Output HANYA HTML bersih berisi <p> (tanpa h1/h2/h3, tanpa ul/ol).\n" .
-                    "- Jangan menambahkan poin baru.\n" .
-                    "- Jangan mengisi kekosongan dengan asumsi.\n\n" .
+                    "BUAT RINGKASAN DAN KESIMPULAN BUKU YANG SPESIFIK, PADAT, DAN JELAS.\n\n" .
+                    "STRUKTUR OUTPUT WAJIB:\n" .
+                    "<h2>Ringkasan dan Kesimpulan</h2>\n" .
+                    "<h3>Ringkasan Utama</h3>\n" .
+                    "<p>(3-4 paragraf yang meringkas inti buku secara menyeluruh)</p>\n\n" .
+
+                    "<h3>Kesimpulan per Bab</h3>\n" .
+                    "<p>(Buat kesimpulan untuk setiap bab yang sudah ada, format:</p>\n" .
+                    "<ul>\n" .
+                    "<li><strong>Bab X: [Judul Bab]</strong> - [1-2 kalimat kesimpulan spesifik]</li>\n" .
+                    "</ul>\n" .
+                    "<p>)</p>\n\n" .
+
+                    "<h3>Poin-Poin Kunci</h3>\n" .
+                    "<ul>\n" .
+                    "<li>[Poin penting 1]</li>\n" .
+                    "<li>[Poin penting 2]</li>\n" .
+                    "<li>[Poin penting 3]</li>\n" .
+                    "<li>[Poin penting 4]</li>\n" .
+                    "</ul>\n\n" .
+
+                    "<h3>Aksi yang Direkomendasikan</h3>\n" .
+                    "<ol>\n" .
+                    "<li>[Aksi spesifik 1]</li>\n" .
+                    "<li>[Aksi spesifik 2]</li>\n" .
+                    "<li>[Aksi spesifik 3]</li>\n" .
+                    "</ol>\n\n" .
+
+                    "ATURAN KETAT:\n" .
+                    "1. Ringkasan HARUS berdasarkan SUMMARY_CONTEXT di bawah\n" .
+                    "2. Kesimpulan per bab HARUS spesifik sesuai isi bab/sub-bab\n" .
+                    "3. Gunakan bahasa yang padat dan jelas\n" .
+                    "4. Maksimal 800 kata total\n" .
+                    "5. Fokus pada manfaat praktis untuk pembaca\n" .
+                    "6. Hindari pengulangan yang tidak perlu\n\n" .
+
                     ($rules ? "RULES TAMBAHAN:\n{$rules}\n\n" : "") .
                     "SUMMARY_CONTEXT (SATU-SATUNYA SUMBER):\n{$ctx}\n";
 
                 break;
-
 
 
 
@@ -803,6 +833,38 @@ ATURAN WAJIB:
         }
     }
 
+    // Tambahkan fungsi helper untuk parsing summary context yang lebih baik
+    private function parseSummaryContextForConclusions($summaryContext)
+    {
+        $lines = explode("\n", $summaryContext);
+        $chapters = [];
+        $currentChapter = null;
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+
+            // Deteksi bab
+            if (preg_match('/^BAB\s+(\d+):\s*(.+)$/i', $line, $matches)) {
+                $currentChapter = [
+                    'number' => $matches[1],
+                    'title' => $matches[2],
+                    'content' => '',
+                    'subchapters' => []
+                ];
+                $chapters[] = $currentChapter;
+            }
+            // Deteksi sub-bab
+            elseif (preg_match('/^Sub-?bab:\s*(.+)$/i', $line, $matches) && $currentChapter !== null) {
+                $currentChapter['subchapters'][] = $matches[1];
+            }
+            // Isi bab
+            elseif (strpos($line, 'Isi Bab:') !== false && $currentChapter !== null) {
+                $currentChapter['content'] = str_replace('Isi Bab:', '', $line);
+            }
+        }
+
+        return $chapters;
+    }
     private function maxCitationNumber(string $html): int
     {
         if ($html === '') return 0;

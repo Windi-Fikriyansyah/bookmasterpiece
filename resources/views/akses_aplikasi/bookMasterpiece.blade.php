@@ -2482,7 +2482,8 @@
          * - Pengantar Bab (sebelum sub-bab)
          * - Sub-bab X.Y: Judul + ringkas isi sub-bab (berdasarkan konten yang sudah ada)
          */
-        function buildChaptersDigestWithSubBabs(maxCharsTotal = 18000, perSubBabMax = 900, introMax = 700) {
+        // Ganti fungsi buildChaptersDigestWithSubBabs dengan yang lebih terstruktur:
+        function buildChaptersDigestWithSubBabs(maxCharsTotal = 12000) {
             const chapters = (ebookState.chapters || [])
                 .slice()
                 .sort((a, b) => (a.chapterNumber || 0) - (b.chapterNumber || 0));
@@ -2490,39 +2491,71 @@
             const parts = [];
             let used = 0;
 
-            for (const ch of chapters) {
-                const num = ch.chapterNumber || 0;
-                const title = ch.title || `Bab ${num}`;
+            chapters.forEach((ch, index) => {
+                const num = ch.chapterNumber || (index + 1);
 
-                // intro bab (sebelum sub-bab)
-                const introText = getChapterIntroText(ch.content || '', num, introMax);
-                let block = `Bab ${num}: ${title}\n`;
-                if (introText) block += `Pengantar Bab:\n${introText}\n`;
+                // Ekstrak judul bab
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = ch.content || '';
+                const h2 = tempDiv.querySelector('h2');
+                let chapterTitle = `Bab ${num}`;
 
-                // sub-bab dari HTML bab yang sudah dibuat
-                const subs = extractSubBabsFromChapterHtml(ch.content || '');
-
-                if (subs.length) {
-                    for (const s of subs) {
-                        const seg = getSubBabSegmentHtml(ch.content || '', s.number);
-                        const segText = normalizeSpaces(seg.segmentText || '').slice(0, perSubBabMax);
-
-                        // kalau segmen tidak kebaca, fallback ambil teks bab overall (biar tidak kosong)
-                        const fallback = normalizeSpaces(stripHtmlToText(ch.content || '', perSubBabMax));
-
-                        block += `Sub-bab ${s.number}: ${s.title}\n${segText || fallback}\n\n`;
+                if (h2) {
+                    const match = h2.textContent.match(/Bab\s+\d+:\s*(.+)/i);
+                    if (match && match[1]) {
+                        chapterTitle = match[1].trim();
                     }
-                } else {
-                    // fallback kalau bab belum punya sub-bab
-                    const text = normalizeSpaces(stripHtmlToText(ch.content || '', Math.min(perSubBabMax, 1200)));
-                    block += `${text}\n\n`;
                 }
 
-                // cut total
-                if (used + block.length > maxCharsTotal) break;
+                // Ekstrak isi bab (tanpa sub-bab)
+                const allContent = stripHtmlToText(ch.content || '', 1500);
+
+                // Ekstrak sub-bab
+                const subBabElements = tempDiv.querySelectorAll('h3');
+                const subBabs = [];
+
+                subBabElements.forEach(h3 => {
+                    const subText = stripHtmlToText(h3.textContent || '', 100);
+                    const nextContent = [];
+                    let nextNode = h3.nextElementSibling;
+
+                    // Ambil konten sub-bab (maks 3 paragraf berikutnya)
+                    let paraCount = 0;
+                    while (nextNode && paraCount < 3) {
+                        if (nextNode.tagName === 'P') {
+                            nextContent.push(stripHtmlToText(nextNode.textContent || '', 200));
+                            paraCount++;
+                        } else if (nextNode.tagName === 'H3') {
+                            break;
+                        }
+                        nextNode = nextNode.nextElementSibling;
+                    }
+
+                    subBabs.push({
+                        title: subText,
+                        content: nextContent.join(' ')
+                    });
+                });
+
+                // Format output terstruktur
+                let block = `BAB ${num}: ${chapterTitle}\n`;
+                block += `Isi Bab: ${allContent}\n`;
+
+                if (subBabs.length > 0) {
+                    block += `Subbab:\n`;
+                    subBabs.forEach((sub, idx) => {
+                        block += `  - Subbab ${num}.${idx + 1}: ${sub.title}\n`;
+                        block += `    Isi: ${sub.content}\n`;
+                    });
+                }
+
+                block += "\n";
+
+                if (used + block.length > maxCharsTotal) return;
+
                 parts.push(block);
                 used += block.length;
-            }
+            });
 
             return parts.join("\n---\n");
         }
@@ -2608,66 +2641,132 @@
                     },
                     body: JSON.stringify({
                         action: "continue_summary",
-                        summary_mode: "strict",
+                        summary_mode: "structured",
 
-                        // ✅ sumber utama (WAJIB)
-                        summary_context: buildChaptersDigestWithSubBabs(18000, 900, 700),
+                        // Konteks terstruktur
+                        summary_context: buildChaptersDigestWithSubBabs(10000),
 
-                        // aturan ketat
+                        // Spesifikasi output
+                        summary_spec: "Buat kesimpulan per bab yang spesifik dan poin-poin aksi yang jelas",
+
+                        // Aturan ketat
                         summary_rules: [
-                            "Tambahkan ringkasan HANYA dari SUMMARY_CONTEXT.",
-                            "DILARANG menambah informasi/kesimpulan baru yang tidak ada di konteks.",
-                            "Kalau tidak ada hal baru, jangan dipaksa panjang."
+                            "1. Buat kesimpulan spesifik untuk setiap bab yang ada",
+                            "2. Fokus pada poin-poin kunci yang actionable",
+                            "3. Gunakan bahasa yang padat dan jelas",
+                            "4. Maksimal tambahan 300 kata",
+                            "5. Tambahkan bagian 'Poin-Poin Aksi' yang konkret"
                         ].join("\n"),
 
-                        // konteks ringkasan saat ini (biar nyambung)
-                        summary_text: stripHtmlToText(ebookState.summary, 2500),
+                        // Konteks ringkasan saat ini
+                        summary_text: stripHtmlToText(ebookState.summary, 2000),
                         summary_html: ebookState.summary,
 
-                        // konteks buku (opsional)
+                        // Konteks buku
                         masalah: val.masalah,
                         kebutuhan: val.kebutuhan,
                         solusi: val.solusi,
-                        pengalaman: val.pengalaman,
-                        kompetensi: val.kompetensi,
-                        kontrak_kreatif: val.kontrak_kreatif,
-                        calon_pembaca: val.calon_pembaca,
                         gaya: val.gaya,
                         existing_title: ebookState.title || ""
                     })
-
                 });
 
-                // Aman kalau server balikin HTML error (419/500) biar gak "Unexpected token <"
                 const text = await response.text();
                 let result;
                 try {
                     result = JSON.parse(text);
                 } catch (e) {
-                    console.error("Server tidak mengembalikan JSON:", text);
-                    showToast("Response server bukan JSON (cek error 419/500 di Network).", "error");
+                    console.error("Response bukan JSON:", text);
+                    showToast("Error server: " + text.substring(0, 100), "error");
                     return;
                 }
 
-                if (!result.status) return showToast(result.message || "Gagal memperpanjang ringkasan", "error");
+                if (!result.status) {
+                    showToast(result.message || "Gagal memperpanjang ringkasan", "error");
+                    return;
+                }
 
-                // Append hasil AI ke akhir ringkasan
+                // Gabungkan dengan ringkasan yang ada
                 ebookState.summary = sanitizeSummaryHtml(
                     (ebookState.summary || '') + "\n" + (result.html || "").trim()
                 );
 
-
                 saveEbookState();
                 renderEbookContent();
-                showToast("Ringkasan berhasil diperpanjang!", "success");
+                showToast("Kesimpulan berhasil ditambahkan ke ringkasan!", "success");
 
             } catch (e) {
                 console.error(e);
-                showToast("Error memperpanjang ringkasan: " + e.message, "error");
+                showToast("Error: " + e.message, "error");
             } finally {
                 isGenerating = false;
                 removeLoadingIndicator();
             }
+        }
+
+        // Fungsi untuk mengekstrak kesimpulan dari konten bab
+        function extractChapterConclusions(chapterHtml, chapterNumber) {
+            const temp = document.createElement('div');
+            temp.innerHTML = chapterHtml || '';
+
+            const conclusions = [];
+
+            // Cari poin-poin penting (biasanya dalam list atau paragraf terakhir)
+            const lists = temp.querySelectorAll('ul, ol');
+            lists.forEach(list => {
+                const items = list.querySelectorAll('li');
+                items.forEach(item => {
+                    const text = (item.textContent || '').trim();
+                    if (text.length > 20 && text.length < 150) {
+                        if (text.toLowerCase().includes('tips') ||
+                            text.toLowerCase().includes('kesimpulan') ||
+                            text.toLowerCase().includes('langkah') ||
+                            text.toLowerCase().includes('poin')) {
+                            conclusions.push(text);
+                        }
+                    }
+                });
+            });
+
+            // Cari paragraf penutup
+            const allParas = temp.querySelectorAll('p');
+            if (allParas.length >= 2) {
+                const lastParas = Array.from(allParas).slice(-2);
+                lastParas.forEach(p => {
+                    const text = (p.textContent || '').trim();
+                    if (text.length > 30 && text.length < 200) {
+                        conclusions.push(text);
+                    }
+                });
+            }
+
+            return {
+                chapterNumber: chapterNumber,
+                conclusions: conclusions.slice(0, 3) // Ambil maksimal 3 poin
+            };
+        }
+
+        // Fungsi untuk membangun konteks kesimpulan
+        function buildConclusionsContext() {
+            const chapters = (ebookState.chapters || [])
+                .sort((a, b) => (a.chapterNumber || 0) - (b.chapterNumber || 0));
+
+            const context = [];
+
+            chapters.forEach(ch => {
+                const num = ch.chapterNumber || 0;
+                const title = ch.title || `Bab ${num}`;
+                const conclusions = extractChapterConclusions(ch.content, num);
+
+                context.push(`BAB ${num}: ${title}`);
+                context.push(`Poin-poin penting:`);
+                conclusions.conclusions.forEach((c, idx) => {
+                    context.push(`  ${idx + 1}. ${c}`);
+                });
+                context.push('');
+            });
+
+            return context.join('\n');
         }
 
 
