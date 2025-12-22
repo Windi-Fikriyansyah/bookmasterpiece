@@ -927,6 +927,8 @@
 
                 if (ebookState.summary) ebookState.summary = sanitizeSummaryHtml(ebookState.summary);
 
+                if (ebookState.authorProfile) ebookState.authorProfile = sanitizeAuthorProfileHtml(ebookState
+                    .authorProfile);
 
                 rebuildReferencesFromAllChapters();
                 saveEbookState();
@@ -1028,6 +1030,7 @@
         }
 
 
+
         function extractChapterTitles() {
             const titles = [];
 
@@ -1122,7 +1125,8 @@
             const val = getFormValues();
 
             // Hanya untuk action selain 'title', cek masalah harus diisi
-            if (action !== 'title' && !val.masalah.trim()) {
+            const needMasalah = !['title', 'profilpenulis'].includes(action);
+            if (needMasalah && !val.masalah.trim()) {
                 showToast("Masalah harus diisi dulu.", "error");
                 return;
             }
@@ -1473,6 +1477,90 @@
                     return;
                 }
 
+                // ======================
+                // ✅ SUMMARY (STRICT)
+                // ======================
+                if (action === "summary") {
+                    const chaptersDigest = buildChaptersDigestWithSubBabs(18000, 900, 700).trim();
+
+                    if (!chaptersDigest) {
+                        showToast("Buat minimal 1 Bab/Subbab yang ada isinya agar ringkasan bisa dibuat.", "warning");
+                        isGenerating = false;
+                        removeLoadingIndicator();
+                        return;
+                    }
+
+                    const strictPayload = {
+                        action: "summary",
+
+                        // konteks buku (opsional, tapi aman)
+                        masalah: val.masalah,
+                        kebutuhan: val.kebutuhan,
+                        solusi: val.solusi,
+                        pengalaman: val.pengalaman,
+                        kompetensi: val.kompetensi,
+                        kontrak_kreatif: val.kontrak_kreatif,
+                        calon_pembaca: val.calon_pembaca,
+                        gaya: val.gaya,
+                        existing_title: ebookState.title || "",
+
+                        // ✅ INI YANG WAJIB
+                        summary_mode: "strict",
+                        summary_context: chaptersDigest,
+
+                        // aturan ketat untuk backend prompt
+                        summary_rules: [
+                            "Ringkas HANYA dari SUMMARY_CONTEXT.",
+                            "DILARANG menambah ide, saran, langkah, atau kesimpulan yang tidak tertulis di konteks.",
+                            "Kalau konteks pendek, ringkasan boleh pendek.",
+                            "Jika suatu bab/subbab tidak ada isi berarti, abaikan (jangan mengarang).",
+                            "Output hanya HTML bersih: <p> saja (tanpa h1/h2/h3, tanpa ul/ol)."
+                        ].join("\n")
+                    };
+
+                    try {
+                        const response = await fetch("/ebook/generate", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                                "X-Requested-With": "XMLHttpRequest"
+                            },
+                            body: JSON.stringify(strictPayload)
+                        });
+
+                        // ✅ biar aman kalau server balikin HTML error
+                        const raw = await response.text();
+                        let result;
+                        try {
+                            result = JSON.parse(raw);
+                        } catch (e) {
+                            console.error("Response bukan JSON:", raw);
+                            showToast("Response server bukan JSON (cek 419/500 di Network).", "error");
+                            return;
+                        }
+
+                        if (!result.status) {
+                            showToast(result.message || "Gagal membuat ringkasan", "error");
+                            return;
+                        }
+
+                        ebookState.summary = sanitizeSummaryHtml(result.html);
+                        saveEbookState();
+                        renderEbookContent();
+                        showToast("Ringkasan (sesuai Bab/Sub-bab) berhasil dibuat!", "success");
+                        return;
+
+                    } catch (e) {
+                        console.error(e);
+                        showToast("Error membuat ringkasan: " + e.message, "error");
+                        return;
+                    } finally {
+                        isGenerating = false;
+                        removeLoadingIndicator();
+                    }
+                }
+
                 // Untuk action lainnya (outline, summary, closing)
                 const aboutAuthor = (action === 'closing') ? '' : val.tentang_penulis;
                 const pengantarAuthor = (action === 'closing') ? '' : val.pengantar_penulis;
@@ -1482,6 +1570,7 @@
                     "";
 
 
+                const isAuthor = action === 'profilpenulis';
                 const response = await fetch("/ebook/generate", {
                     method: "POST",
                     headers: {
@@ -1492,13 +1581,13 @@
 
                     body: JSON.stringify({
                         action: action,
-                        masalah: val.masalah,
-                        kebutuhan: val.kebutuhan,
-                        solusi: val.solusi,
-                        pengalaman: val.pengalaman,
-                        kompetensi: val.kompetensi,
-                        kontrak_kreatif: val.kontrak_kreatif,
-                        calon_pembaca: val.calon_pembaca,
+                        masalah: isAuthor ? "" : val.masalah,
+                        kebutuhan: isAuthor ? "" : val.kebutuhan,
+                        solusi: isAuthor ? "" : val.solusi,
+                        pengalaman: isAuthor ? "" : val.pengalaman,
+                        kompetensi: isAuthor ? "" : val.kompetensi,
+                        kontrak_kreatif: isAuthor ? "" : val.kontrak_kreatif,
+                        calon_pembaca: isAuthor ? "" : val.calon_pembaca,
                         gaya: val.gaya,
                         jumlah_outline: val.jumlah_outline,
                         tentang_penulis: aboutAuthor,
@@ -1506,10 +1595,12 @@
                         dont_write_author_section: (action === 'closing'),
                         existing_title: ebookState.title || "",
                         current_chapter_count: currentChapterCount,
-                        chapter_titles: chapterTitles,
                         target_chapter: action === 'chapter' ? nextChapterNumber : null,
-                        chapters_digest: chapters_digest,
-                        outline_text: stripHtmlToText(ebookState.outline || "", 6000),
+                        outline_text: isAuthor ? "" : stripHtmlToText(ebookState.outline || "", 6000),
+                        chapters_digest: isAuthor ? "" : chapters_digest,
+                        chapter_titles: isAuthor ? [] : chapterTitles,
+                        only_author_profile: (action === 'profilpenulis'),
+                        dont_write_non_author_content: (action === 'profilpenulis'),
                     })
                 });
 
@@ -1777,7 +1868,7 @@
                     ebookState.closing = sanitizeClosingHtml(html);
                     break;
                 case 'profilpenulis':
-                    ebookState.authorProfile = html;
+                    ebookState.authorProfile = sanitizeAuthorProfileHtml(html);
                     break;
             }
 
@@ -2517,7 +2608,23 @@
                     },
                     body: JSON.stringify({
                         action: "continue_summary",
+                        summary_mode: "strict",
 
+                        // ✅ sumber utama (WAJIB)
+                        summary_context: buildChaptersDigestWithSubBabs(18000, 900, 700),
+
+                        // aturan ketat
+                        summary_rules: [
+                            "Tambahkan ringkasan HANYA dari SUMMARY_CONTEXT.",
+                            "DILARANG menambah informasi/kesimpulan baru yang tidak ada di konteks.",
+                            "Kalau tidak ada hal baru, jangan dipaksa panjang."
+                        ].join("\n"),
+
+                        // konteks ringkasan saat ini (biar nyambung)
+                        summary_text: stripHtmlToText(ebookState.summary, 2500),
+                        summary_html: ebookState.summary,
+
+                        // konteks buku (opsional)
                         masalah: val.masalah,
                         kebutuhan: val.kebutuhan,
                         solusi: val.solusi,
@@ -2526,16 +2633,9 @@
                         kontrak_kreatif: val.kontrak_kreatif,
                         calon_pembaca: val.calon_pembaca,
                         gaya: val.gaya,
-                        existing_title: ebookState.title || "",
-
-                        // konteks ringkasan saat ini
-                        summary_text: stripHtmlToText(ebookState.summary, 2500),
-                        summary_html: ebookState.summary,
-                        chapters_digest: buildChaptersDigestWithSubBabs(18000, 900, 700),
-                        outline_text: stripHtmlToText(ebookState.outline || "", 6000),
-
-
+                        existing_title: ebookState.title || ""
                     })
+
                 });
 
                 // Aman kalau server balikin HTML error (419/500) biar gak "Unexpected token <"
@@ -3060,6 +3160,121 @@
             });
 
             // 8) Hapus paragraf kosong
+            temp.querySelectorAll('p').forEach(p => {
+                if (!(p.textContent || '').trim()) p.remove();
+            });
+
+            return temp.innerHTML.trim();
+        }
+
+
+        function sanitizeAuthorProfileHtml(html) {
+            const temp = document.createElement('div');
+            temp.innerHTML = html || '';
+            // ✅ Hapus paragraf-paragraf pendek di awal (biasanya isi buku/outline),
+            // sampai ketemu paragraf yang terlihat seperti bio penulis
+            const topPs = Array.from(temp.querySelectorAll(':scope > p'));
+            for (const p of topPs) {
+                const t = (p.textContent || '').replace(/\s+/g, ' ').trim();
+
+                const looksBio =
+                    /adalah|merupakan|seorang|penulis|ia\b|beliau\b/i.test(t) ||
+                    /[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+/.test(t); // nama orang (2 kata kapital)
+
+                if (looksBio) break;
+
+                // paragraf pendek seperti "Strategi pengembangan..." -> buang
+                if (t.length <= 140) p.remove();
+                else break;
+            }
+
+            // ✅ Kalau ada UL/OL, buang juga (profil penulis harus paragraf)
+            temp.querySelectorAll('ul,ol').forEach(el => el.remove());
+
+
+            // Heading / bagian yang harus dibuang kalau muncul
+            const badRe =
+                /(kata\s+pengantar|pendahuluan|daftar\s+isi|ringkasan|penutup|kesimpulan|daftar\s+pustaka|referensi|bab\s+\d+|sub-?bab|chapter)/i;
+            const goodHeadingRe = /(tentang\s+penulis|profil\s+penulis|bio\s+penulis)/i;
+
+            // 1) Hapus section yang jelas bukan tentang penulis (berdasarkan heading)
+            const headings = Array.from(temp.querySelectorAll('h1,h2,h3,h4,h5,h6'));
+            headings.forEach(h => {
+                const t = (h.textContent || '').trim();
+                const isGood = goodHeadingRe.test(t);
+                const isBad = badRe.test(t);
+
+                if (isBad && !isGood) {
+                    const toRemove = [h];
+                    let cur = h.nextSibling;
+                    while (cur && !(cur.nodeType === 1 && /^H[1-6]$/.test(cur.tagName))) {
+                        toRemove.push(cur);
+                        cur = cur.nextSibling;
+                    }
+                    toRemove.forEach(n => n?.remove?.());
+                }
+            });
+
+            // 2) Hapus paragraf/div yang terlihat seperti judul section lain (pendek tapi "Ringkasan", "Penutup", dll)
+            Array.from(temp.querySelectorAll('p,div,blockquote')).forEach(el => {
+                const t = (el.textContent || '').replace(/\s+/g, ' ').trim();
+                if (!t) return;
+
+                if (badRe.test(t) && !goodHeadingRe.test(t) && t.length <= 120) {
+                    el.remove();
+                }
+            });
+
+            // 3) Buang list item yang formatnya bab/sub-bab (mis: "Bab 1", "1.1 ...")
+            Array.from(temp.querySelectorAll('li')).forEach(li => {
+                const t = (li.textContent || '').replace(/\s+/g, ' ').trim();
+                if (/^bab\s+\d+/i.test(t) || /^\d+\.\d+/.test(t) || /sub-?bab/i.test(t)) {
+                    li.remove();
+                }
+            });
+            // bersihkan list kosong
+            Array.from(temp.querySelectorAll('ul,ol')).forEach(list => {
+                if (!list.querySelector('li')) list.remove();
+            });
+
+            // 4) Pastikan heading cuma "Tentang Penulis" saja (kalau ada banyak heading)
+            let hasGood = false;
+            Array.from(temp.querySelectorAll('h1,h2,h3,h4,h5,h6')).forEach(h => {
+                const t = (h.textContent || '').trim();
+                if (goodHeadingRe.test(t) && !hasGood) {
+                    hasGood = true;
+                } else {
+                    h.remove();
+                }
+            });
+
+            // kalau belum punya heading yang benar, tambahkan
+            if (!hasGood) {
+                const h2 = document.createElement('h2');
+                h2.textContent = 'Tentang Penulis';
+                temp.insertBefore(h2, temp.firstChild);
+            }
+
+            // 5) Bersihkan atribut aneh
+            temp.querySelectorAll('*').forEach(el => {
+                el.removeAttribute('style');
+                el.removeAttribute('class');
+            });
+
+            // 6) Buang node text liar jadi paragraf
+            Array.from(temp.childNodes).forEach(node => {
+                if (node.nodeType === 3) {
+                    const t = (node.textContent || '').replace(/\s+/g, ' ').trim();
+                    node.remove();
+                    if (t) {
+                        const p = document.createElement('p');
+                        p.textContent = t;
+                        temp.appendChild(p);
+                    }
+                }
+            });
+
+            // 7) Hapus paragraf kosong
             temp.querySelectorAll('p').forEach(p => {
                 if (!(p.textContent || '').trim()) p.remove();
             });
@@ -3802,7 +4017,7 @@
         }
 
         function saveEditedSection(type, content, id = null) {
-            if (type === 'profilpenulis') ebookState.authorProfile = content;
+            if (type === 'profilpenulis') ebookState.authorProfile = sanitizeAuthorProfileHtml(content);
             if (type === 'preface') ebookState.preface = content;
             if (type === 'bibliography') ebookState.bibliography = content;
             if (type === 'title') ebookState.title = content;

@@ -433,38 +433,22 @@ ATURAN WAJIB:
 
 
             case 'summary':
-                $gaya = $request->gaya ?? 'Bahasa Indonesia yang rapi, jelas, dan mengalir.';
-                $summaryContext = $request->summary_context ?? '';
-
-                // kalau summary_context kosong tapi chapters ada, bisa build ulang di backend (opsional)
-                $chapters = $request->chapters ?? [];
-                if (!$summaryContext && is_array($chapters)) {
-                    $parts = [];
-                    foreach ($chapters as $i => $ch) {
-                        $babTitle = $ch['title'] ?? ('Bab ' . ($i + 1));
-                        $babContent = $ch['content'] ?? '';
-                        $subParts = [];
-                        foreach (($ch['subChapters'] ?? []) as $s) {
-                            $subParts[] = "- " . ($s['title'] ?? 'Subbab') . ": " . ($s['content'] ?? '');
-                        }
-                        $parts[] = "BAB " . ($i + 1) . ": {$babTitle}\nISI: {$babContent}\nSUBBAB:\n" . implode("\n", $subParts);
-                    }
-                    $summaryContext = implode("\n\n", $parts);
-                }
+                $ctx = $request->summary_context ?? '';
+                $rules = $request->summary_rules ?? '';
 
                 $instruction =
-                    "BUAT RINGKASAN (KESIMPULAN) BERDASARKAN KONTEN NYATA DI BAWAH INI SAJA.\n\n" .
-                    "KONTEN YANG BOLEH DIPAKAI (Bab & Subbab yang SUDAH ADA ISINYA):\n" .
-                    $summaryContext . "\n\n" .
-                    "ATURAN WAJIB:\n" .
-                    "- DILARANG menyebut/membahas Bab/Subbab yang tidak ada pada konteks.\n" .
-                    "- DILARANG mengarang fakta/isi baru di luar konteks.\n" .
-                    "- Jika konteks hanya Bab 1, ringkasan fokus ke Bab 1 saja (jangan sebut Bab 2 dst).\n" .
-                    "- Output HANYA HTML bersih: <p>, <ul>, <ol>, <li>, <blockquote> (TANPA h1/h2/h3).\n" .
-                    "- Tulis sebagai paragraf mengalir, 2–5 paragraf (boleh bullet seperlunya).\n" .
-                    "- Nada tulisan konsisten dengan gaya: {$gaya}\n";
+                    "ANDA HANYA BOLEH MENULIS BERDASARKAN SUMARRY_CONTEXT DI BAWAH.\n" .
+                    "DILARANG menambah ide/solusi/kesimpulan yang tidak tertulis di konteks.\n" .
+                    "Jika konteks pendek, ringkasan boleh pendek.\n\n" .
+                    "ATURAN OUTPUT:\n" .
+                    "- Output HANYA HTML bersih berisi <p> (tanpa h1/h2/h3, tanpa ul/ol).\n" .
+                    "- Jangan menambahkan poin baru.\n" .
+                    "- Jangan mengisi kekosongan dengan asumsi.\n\n" .
+                    ($rules ? "RULES TAMBAHAN:\n{$rules}\n\n" : "") .
+                    "SUMMARY_CONTEXT (SATU-SATUNYA SUMBER):\n{$ctx}\n";
 
                 break;
+
 
 
 
