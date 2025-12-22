@@ -204,7 +204,7 @@ class AksesAplikasiController extends Controller
 
         switch ($action) {
             case 'title':
-                $instruction = "
+                $instruction = <<<PROMPT
 BUATKAN JUDUL EBOOK + TAGLINE (SUBJUDUL) SAJA (JANGAN BUAT KONTEN LAIN):
 
 Format yang HARUS digunakan:
@@ -218,11 +218,18 @@ CONTOH format yang benar:
 ATURAN WAJIB:
 1) HANYA boleh ada 1 tag <h1> dan 1 tag <p> (tagline).
 2) JANGAN buat paragraf tambahan, subjudul lain, atau daftar poin.
-3) Tagline maksimal 12 kata, tidak pakai bullet/nomor.
-4) Judul relevan dengan masalah: {$masalah}
+3) Tagline judul bebas berapa kata, yang penting sesuai dengan judul utama dan tidak pakai bullet/nomor.
+4) Judul relevan dengan konteks berikut:
+   Masalah: {$masalah}
+   Kebutuhan: {$kebutuhan}
+   Solusi: {$solusi}
+   Pengalaman: {$pengalaman}
+   Kompetensi: {$kompetensi}
 5) Menggunakan gaya bahasa: {$gaya}
-6) Judul ideal 4–10 kata (boleh lebih jika tetap natural).
-";
+6) Judul ideal 4–10 kata (boleh lebih jika tetap natural, mudah dipahami, dan menarik).
+PROMPT;
+
+                $instruction = trim($instruction);
                 break;
 
 
@@ -231,90 +238,118 @@ ATURAN WAJIB:
                     "BUATKAN KATA PENGANTAR BUKU (KATA PENGANTAR SAJA):\n" .
                     "Format WAJIB:\n" .
                     "<h2>Kata Pengantar</h2>\n" .
-                    "<p>(paragraf 1: sapaan hangat + konteks kenapa topik ini penting untuk pembaca)</p>\n" .
-                    "<p>(paragraf 2: empati terhadap masalah pembaca dan gambaran singkat perjuangannya)</p>\n" .
-                    "<p>(paragraf 3: janji manfaat buku + apa yang akan dipelajari secara garis besar tanpa daftar isi)</p>\n" .
-                    "<p>(paragraf 4: ajakan membaca sampai tuntas + komitmen penerapan)</p>\n" .
-                    "<blockquote><p>(1 kalimat motivasi yang relevan)</p></blockquote>\n\n" .
+                    "<p>(paragraf 1: ucapan syukur + optional dan singkat)</p>\n" .
+                    "<p>(paragraf 2: sapaan hangat + konteks atau latar belakang kenapa buku ini ditulis)</p>\n" .
+                    "<p>(paragraf 3: tujuan dan manfaat buku ini ditulis)</p>\n" .
+                    "<p>(paragraf 4: sasaran pembaca)</p>\n" .
+                    "<p>(paragraf 5: gambaran singkat isi buku)</p>\n" .
+                    "<p>(paragraf 6: ucapan terima kasih)</p>\n" .
+                    "<p>(paragraf 7: harapan penulis)</p>\n" .
+                    "<p>(paragraf 8: penutup)</p>\n" .
+                    "<blockquote><p>(akhiri dengan 1 kalimat motivasi yang relevan dan sederhana)</p></blockquote>\n\n" .
+                    "<p>(paragraf 9: cantumkan tempat, tanggal, dan nama penulis)</p>\n" .
                     "CATATAN PENTING:\n" .
                     "- HANYA buat 'Kata Pengantar'.\n" .
                     "- JANGAN buat Pendahuluan, Daftar Isi, atau Bab.\n" .
                     "- Jangan pakai label 'Masalah:', 'Solusi:', dll.\n" .
                     "- Tulis naratif mengalir, hangat, dan meyakinkan.\n" .
                     "- Boleh sisipkan 1-2 kalimat pengalaman penulis jika relevan.\n" .
-                    "- Panjang minimal 450 kata.\n" .
-                    "- Gaya bahasa: {$gaya}\n" .
-                    "- STOP setelah blockquote.\n";
+                    "- Panjang minimal 300 kata atau lebih.\n" .
+                    "- Gaya bahasa: {$gaya} (sesuaikan dengan gaya yang dipilih penulis)\n" .
+                    "- STOP setelah paragraf 9.\n";
+
+                $instruction = trim($instruction);
                 break;
 
             case 'profilpenulis':
                 $gaya = $request->gaya ?? 'Edukatif & Praktis (Mengajar tanpa menggurui)';
 
                 // Bahan bio dari user (sering masih orang pertama: "Saya ...")
-                $bio = trim($request->tentang_penulis ?? '');
+                $bio            = trim($request->tentang_penulis ?? '');
+                $pengalaman     = trim($request->pengalaman ?? '');
+                $kompetensi     = trim($request->kompetensi ?? '');
+                $calon          = trim($request->calon_pembaca ?? '');
+                $judul          = trim(strip_tags($request->existing_title ?? ''));
 
-                $pengalaman = trim($request->pengalaman ?? '');
-                $kompetensi = trim($request->kompetensi ?? '');
-                $calon = trim($request->calon_pembaca ?? '');
-                $judul = trim(strip_tags($request->existing_title ?? ''));
+                // Tambahkan ini (kalau memang belum ada)
+                $nama           = trim($request->nama_penulis ?? ($request->nama ?? ''));
+                $latarbelakang  = trim($request->latarbelakang ?? '');
+                $karyaprestasi  = trim($request->karyaprestasi ?? '');
+                $aktivitas      = trim($request->aktivitas ?? '');
+                $kontak         = trim($request->kontak ?? '');
 
-                $instruction =
-                    "TULIS BAGIAN 'PROFIL PENULIS' UNTUK BUKU.\n\n" .
-                    "WAJIB: gunakan gaya bahasa ORANG KETIGA (narator membicarakan penulis).\n" .
-                    "- Jangan gunakan kata: saya, aku, kami, kita.\n" .
-                    "- Gunakan: ia/dia/beliau/penulis ini.\n" .
-                    "- Jika input bio menggunakan orang pertama, ubah menjadi orang ketiga dengan natural.\n\n" .
-                    "KONTEKS PENULIS (bahan mentah):\n" .
-                    "- Tentang penulis: {$bio}\n" .
-                    "- Pengalaman: {$pengalaman}\n" .
-                    "- Kompetensi: {$kompetensi}\n\n" .
-                    "KONTEKS BUKU:\n" .
-                    "- Judul buku: {$judul}\n" .
-                    "- Target pembaca: {$calon}\n\n" .
-                    "ATURAN OUTPUT:\n" .
-                    "- Output HTML bersih: h2, p, ul, li, blockquote (tanpa h1).\n" .
-                    "- Buat 2–4 paragraf (total 140–220 kata).\n" .
-                    "- Opsional: 1 list (ul) berisi 3–5 poin kekuatan/keahlian penulis.\n" .
-                    "- Nada bahasa tetap konsisten dengan gaya: {$gaya} (tapi tetap orang ketiga).\n" .
-                    "- Jangan menulis penutup/ucapan terima kasih panjang. Fokus profil.\n";
+                $instruction = <<<PROMPT
+TULIS BAGIAN "PROFIL PENULIS" UNTUK BUKU.
 
-                // lalu lanjutkan proses call model sesuai struktur kamu
+WAJIB: gunakan gaya bahasa ORANG KETIGA (narator membicarakan penulis).
+- Jangan gunakan kata: saya, aku, kami, kita.
+- Gunakan: ia/dia/penulis ini.
+- Jika input bio menggunakan orang pertama, ubah menjadi orang ketiga dengan natural.
+
+KONTEKS PENULIS (bahan mentah):
+- Tentang penulis: {$bio}
+- Nama lengkap penulis: {$nama}
+- Latar belakang singkat: {$latarbelakang}
+- Bidang keahlian atau minat: {$kompetensi}
+- Pengalaman relevan: {$pengalaman}
+- Karya atau prestasi (jika ada): {$karyaprestasi}
+- Aktivitas saat ini: {$aktivitas}
+- Kontak dan media sosial: {$kontak}
+- Gaya bahasa yang diinginkan: {$gaya}
+
+KONTEKS BUKU:
+- Judul buku: {$judul}
+- Target pembaca: {$calon}
+
+ATURAN OUTPUT:
+- Output HTML bersih: h2, p, ul, li, blockquote (tanpa h1).
+- Buat 2–4 paragraf (total 140–220 kata atau lebih).
+- Opsional: 1 list (ul) berisi 3–5 poin kekuatan/keahlian penulis.
+- Nada bahasa konsisten dengan gaya: {$gaya} (tapi tetap orang ketiga).
+- Jangan menulis penutup/ucapan terima kasih panjang. Fokus profil saja.
+PROMPT;
+
+                $instruction = trim($instruction);
                 break;
+
 
 
 
 
             case 'intro':
-                $instruction =
-                    "BUATKAN BAGIAN AWAL BUKU (PENDAHULUAN SAJA):\n" .
-                    "Format WAJIB:\n" .
-                    "<h2>Pendahuluan</h2>\n" .
-                    "<p>(paragraf 1: jelaskan masalah yang dihadapi pembaca dengan bahasa yang empatik dan relatable)</p>\n" .
-                    "<p>(paragraf 2: jelaskan dampak jika masalah tidak diselesaikan dan kebutuhan pembaca)</p>\n" .
-                    "<p>(paragraf 3: perkenalkan solusi yang ditawarkan buku ini dengan meyakinkan)</p>\n" .
-                    "<p>(paragraf 4: jelaskan manfaat dan hasil yang akan didapat setelah membaca buku)</p>\n\n" .
-                    "<h2>Untuk Siapa Buku Ini</h2>\n" .
-                    "<p>(paragraf 1: deskripsikan persona calon pembaca dengan detail dan situasi mereka)</p>\n" .
-                    "<p>(paragraf 2: jelaskan hasil spesifik yang mereka cari dan mengapa buku ini cocok untuk mereka)</p>\n\n" .
-                    "<h2>Cara Menggunakan Buku Ini</h2>\n" .
-                    "<p>(paragraf 1: jelaskan struktur umum buku dan alur pembahasan dari bab ke bab)</p>\n" .
-                    "<p>(paragraf 2: berikan tips cara praktis membaca dan menerapkan isi buku untuk hasil maksimal)</p>\n\n" .
-                    "CATATAN PENTING:\n" .
-                    "- HANYA BUAT BAGIAN PENDAHULUAN SAJA.\n" .
-                    "- JANGAN GUNAKAN sub-heading seperti 'Masalah:', 'Kebutuhan:', 'Solusi:', dll.\n" .
-                    "- JANGAN BUAT DAFTAR ISI di bagian ini.\n" .
-                    "- JANGAN BUAT ISI BAB apapun di bagian ini.\n" .
-                    "- JANGAN BUAT BAGIAN 'Pengantar Penulis' di sini.\n" .
-                    "- JANGAN BUAT BAGIAN 'Tentang Penulis' di sini.\n" .
-                    "- Tulis dalam bentuk PARAGRAF NARATIF yang mengalir natural.\n" .
-                    "- Integrasikan Masalah, Kebutuhan, Solusi secara natural dalam narasi tanpa label eksplisit.\n" .
-                    "- Total minimal 600 kata.\n" .
-                    "- Gunakan pengalaman penulis (Experience) sebagai konteks/cerita singkat yang relevan di dalam narasi.\n" .
-                    "- Jika pengalaman kosong, abaikan bagian ini.\n" .
-                    "- Gaya bahasa: {$gaya}\n" .
-                    "- STOP setelah selesai menulis bagian 'Cara Menggunakan Buku Ini'.\n" .
-                    "- Pastikan setiap paragraf mengalir natural dan tidak terkesan seperti daftar poin.\n";
+                $instruction = <<<PROMPT
+BUATKAN BAGIAN AWAL BUKU (PENDAHULUAN SAJA):
+
+Format WAJIB:
+<h2>Pendahuluan</h2>
+<p>(paragraf 1: jelaskan konteks permasalahan atau fenomena dengan gaya bahasa penulis, seperti berinteraksi dengan pembaca)</p>
+<p>(paragraf 2: jelaskan posisi buku, dampak jika masalah tidak diselesaikan, dan kebutuhan pembaca)</p>
+<p>(paragraf 3: tuliskan pertanyaan kunci yang akan dijawab dan perkenalkan solusi yang ditawarkan buku ini dengan meyakinkan)</p>
+<p>(paragraf 4: jelaskan nilai unik buku, manfaat, dan hasil yang akan didapat setelah membaca buku)</p>
+<p>(paragraf 5: jelaskan pendekatan dari struktur umum ke lebih spesifik dan cara membaca buku)</p>
+<p>(paragraf 6: jelaskan siapa yang paling diuntungkan)</p>
+<p>(paragraf 7: jelaskan cara menggunakan buku ini, sekaligus gambaran dampak yang diharapkan)</p>
+
+CATATAN PENTING:
+- HANYA buat bagian Pendahuluan saja.
+- JANGAN gunakan sub-heading seperti "Masalah:", "Kebutuhan:", "Solusi:", dll.
+- JANGAN buat Daftar Isi di bagian ini.
+- JANGAN buat isi Bab apa pun di bagian ini.
+- JANGAN buat bagian "Pengantar Penulis" di sini.
+- JANGAN buat bagian "Tentang Penulis" di sini.
+- Tulis dalam bentuk paragraf naratif yang mengalir natural.
+- Integrasikan masalah, kebutuhan, solusi secara natural dalam narasi tanpa label eksplisit.
+- Total minimal satu halaman (atau sedikit lebih).
+- Gunakan pengalaman penulis (Experience) sebagai konteks/cerita singkat yang relevan di dalam narasi.
+- Jika pengalaman kosong, abaikan bagian pengalaman.
+- Gaya bahasa: {$gaya}
+- STOP setelah paragraf tentang "cara menggunakan buku ini".
+- Pastikan setiap paragraf mengalir natural dan tidak terkesan menggurui.
+PROMPT;
+
+                $instruction = trim($instruction);
                 break;
+
 
             case 'outline':
                 $instruction =
@@ -332,7 +367,9 @@ ATURAN WAJIB:
                     "- Semua judul harus MENJAWAB Masalah: '{$masalah}'\n" .
                     "- Semua judul harus MEMENUHI Kebutuhan: '{$kebutuhan}'\n" .
                     "- Semua judul harus MENGARAH KE Solusi: '{$solusi}'\n" .
-                    "- Jangan tambahkan penjelasan atau komentar apapun di luar format di atas.\n";
+                    "- Jangan tambahkan penjelasan atau komentar apapun di luar format di atas.\n" .
+                    "- buat daftar isi dengan pembukaan sampai penutup harus sesuai dengan langkah solusi jitu, berikut diberikan contoh atau tamplate sebagai akhir dari baba tau sub bab.\n";
+                "- tambahkan daftar pustaka dan profil penulis di dalam poin daftar isi. \n";
                 break;
 
 
@@ -435,65 +472,91 @@ ATURAN WAJIB:
             // Di dalam class AksesAplikasiController, pada fungsi generateEbookPart(), tambahkan case 'summary' yang lebih spesifik:
 
             case 'summary':
-                $ctx = $request->summary_context ?? '';
-                $rules = $request->summary_rules ?? '';
+                $ctx   = trim($request->summary_context ?? '');
+                $rules = trim($request->summary_rules ?? '');
 
-                $instruction =
-                    "BUAT RINGKASAN DAN KESIMPULAN BUKU YANG SPESIFIK, PADAT, DAN JELAS.\n\n" .
-                    "STRUKTUR OUTPUT WAJIB:\n" .
-                    "<h2>Ringkasan dan Kesimpulan</h2>\n" .
-                    "<h3>Ringkasan Utama</h3>\n" .
-                    "<p>(3-4 paragraf yang meringkas inti buku secara menyeluruh)</p>\n\n" .
+                $instruction = <<<PROMPT
+BUAT RINGKASAN DAN KESIMPULAN BUKU YANG SPESIFIK, PADAT, DAN JELAS dari BAB 1 sampai selesai (bab/sub-bab terakhir).
 
-                    "<h3>Kesimpulan per Bab</h3>\n" .
-                    "<p>(Buat kesimpulan untuk setiap bab yang sudah ada, format:</p>\n" .
-                    "<ul>\n" .
-                    "<li><strong>Bab X: [Judul Bab]</strong> - [1-2 kalimat kesimpulan spesifik]</li>\n" .
-                    "</ul>\n" .
-                    "<p>)</p>\n\n" .
+STRUKTUR OUTPUT WAJIB (HTML):
+<h2>Ringkasan dan Kesimpulan Seluruh Isi Buku</h2>
 
-                    "<h3>Poin-Poin Kunci</h3>\n" .
-                    "<ul>\n" .
-                    "<li>[Poin penting 1]</li>\n" .
-                    "<li>[Poin penting 2]</li>\n" .
-                    "<li>[Poin penting 3]</li>\n" .
-                    "<li>[Poin penting 4]</li>\n" .
-                    "</ul>\n\n" .
+<h3>Ringkasan Utama</h3>
+<p>(3–4 paragraf yang merangkum inti buku secara menyeluruh, hanya berdasarkan konteks)</p>
 
-                    "<h3>Aksi yang Direkomendasikan</h3>\n" .
-                    "<ol>\n" .
-                    "<li>[Aksi spesifik 1]</li>\n" .
-                    "<li>[Aksi spesifik 2]</li>\n" .
-                    "<li>[Aksi spesifik 3]</li>\n" .
-                    "</ol>\n\n" .
+<h3>Kesimpulan per Bab dan (jika ada) Sub-Bab</h3>
+<ul>
+  <li><strong>Bab 1: [Judul Bab]</strong> — [1–2 kalimat kesimpulan spesifik sesuai isi Bab 1]
+    <ul>
+      <li><strong>Sub-bab (opsional): [Judul Sub-bab]</strong> — [1 kalimat kesimpulan spesifik sesuai sub-bab]</li>
+    </ul>
+  </li>
+  <li><strong>Bab 2: [Judul Bab]</strong> — [1–2 kalimat kesimpulan spesifik]</li>
+  <!-- lanjutkan sampai bab/sub-bab terakhir yang ada -->
+</ul>
 
-                    "ATURAN KETAT:\n" .
-                    "1. Ringkasan HARUS berdasarkan SUMMARY_CONTEXT di bawah\n" .
-                    "2. Kesimpulan per bab HARUS spesifik sesuai isi bab/sub-bab\n" .
-                    "3. Gunakan bahasa yang padat dan jelas\n" .
-                    "4. Maksimal 800 kata total\n" .
-                    "5. Fokus pada manfaat praktis untuk pembaca\n" .
-                    "6. Hindari pengulangan yang tidak perlu\n\n" .
+<h3>Poin-Poin Kunci</h3>
+<ul>
+  <li>[Poin penting 1]</li>
+  <li>[Poin penting 2]</li>
+  <li>[Poin penting 3]</li>
+  <li>[Poin penting 4]</li>
+</ul>
 
-                    ($rules ? "RULES TAMBAHAN:\n{$rules}\n\n" : "") .
-                    "SUMMARY_CONTEXT (SATU-SATUNYA SUMBER):\n{$ctx}\n";
+<h3>Aksi yang Direkomendasikan</h3>
+<ol>
+  <li>[Aksi spesifik 1]</li>
+  <li>[Aksi spesifik 2]</li>
+  <li>[Aksi spesifik 3]</li>
+</ol>
 
+ATURAN KETAT:
+1) Ringkasan HARUS berdasarkan SUMMARY_CONTEXT di bawah (jangan tambah fakta/ide baru di luar konteks).
+2) Kesimpulan per bab HARUS spesifik sesuai isi bab/sub-bab yang benar-benar ada di konteks.
+3) Gunakan bahasa penulis yang mudah dipahami dan terasa natural.
+4) Minimal 500 kata total (atau sesuaikan bila konteks sangat pendek, tapi tetap lengkap & jelas).
+5) Fokus pada manfaat praktis untuk pembaca.
+6) Hindari pengulangan yang tidak perlu.
+7) JANGAN menambahkan bab/sub-bab yang tidak ada di SUMMARY_CONTEXT.
+8) JANGAN menulis penutup panjang di luar struktur di atas.
+
+PROMPT;
+
+                if ($rules !== '') {
+                    $instruction .= "RULES TAMBAHAN:\n{$rules}\n\n";
+                }
+
+                $instruction .= "SUMMARY_CONTEXT (SATU-SATUNYA SUMBER):\n{$ctx}\n";
+                $instruction = trim($instruction);
                 break;
+
 
 
 
             case 'closing':
-                $instruction =
-                    "BUATKAN BAGIAN AKHIR BUKU (LENGKAP):\n" .
-                    "<h2>Penutup</h2>\n" .
-                    "(refleksi, rangkum manfaat, ajakan aksi 7 hari ke depan)\n" .
-                    "<blockquote><p>kalimat motivasi yang relevan</p></blockquote>\n" .
-                    "<h2>Tentang Penulis</h2>\n" .
-                    "(gunakan teks Tentang Penulis jika ada; jika kosong, buat bio kredibel dari Kompetensi)\n\n" .
-                    "Ketentuan panjang:\n" .
-                    "- Total minimal 600 kata.\n" .
-                    "- Tutup dengan CTA yang jelas sesuai solusi.\n";
+                $instruction = <<<PROMPT
+BUATKAN BAGIAN AKHIR BUKU (LENGKAP).
+
+STRUKTUR OUTPUT WAJIB (HTML):
+<h2>Penutup</h2>
+<p>(refleksi singkat + rangkum manfaat utama buku)</p>
+<p>(ajakan aksi yang jelas: praktik langsung, langkah awal, dan komitmen pembaca)</p>
+<p>(hubungkan kembali dengan tema/judul buku secara natural, hangat, dan meyakinkan)</p>
+<blockquote><p>(1 kalimat motivasi yang relevan dan sederhana)</p></blockquote>
+
+<h2>Tentang Penulis</h2>
+<p>(gunakan teks "Tentang Penulis" jika ada; jika kosong, buat bio kredibel dari kompetensi dan pengalaman yang tersedia)</p>
+<p>(akhiri dengan pernyataan terima kasih dan ucapan selamat karena sudah menuntaskan buku ini)</p>
+
+KETENTUAN:
+- Total minimal 400 kata atau lebih.
+- Tulis naratif mengalir (tanpa sub-heading seperti "Manfaat:", "Aksi:", dll).
+- Tutup dengan CTA yang jelas dan sesuai solusi buku.
+PROMPT;
+
+                $instruction = trim($instruction);
                 break;
+
 
 
             case 'daftarpustaka':
