@@ -1511,11 +1511,12 @@
                         // aturan ketat untuk backend prompt
                         summary_rules: [
                             "Ringkas HANYA dari SUMMARY_CONTEXT.",
-                            "DILARANG menambah ide, saran, langkah, atau kesimpulan yang tidak tertulis di konteks.",
+                            "DILARANG menambah ide di luar konteks.",
                             "Kalau konteks pendek, ringkasan boleh pendek.",
                             "Jika suatu bab/subbab tidak ada isi berarti, abaikan (jangan mengarang).",
-                            "Output hanya HTML bersih: <p> saja (tanpa h1/h2/h3, tanpa ul/ol)."
+                            "Output HTML bersih boleh pakai: <h3>, <p>, <ul>, <ol>, <li> (tanpa h1)."
                         ].join("\n")
+
                     };
 
                     try {
@@ -3174,36 +3175,30 @@
             const temp = document.createElement('div');
             temp.innerHTML = html || '';
 
-            const bookTitle = (getBookTitlePlain() || '').toLowerCase();
-
             const norm = (s) => String(s || '')
                 .replace(/\s+/g, ' ')
                 .replace(/[“”"]/g, '"')
                 .trim()
                 .toLowerCase();
 
-            // 1) Hapus SEMUA heading (biar tidak ada judul buku/ringkasan/kesimpulan tampil dari AI)
+            const cleanText = (s) => String(s || '')
+                .replace(/\s+/g, ' ')
+                .replace(/\u00A0/g, ' ')
+                .trim();
+
+            const bookTitle = norm(getBookTitlePlain ? getBookTitlePlain() : '');
+
+            // 0) Buang elemen berbahaya (XSS) + elemen yang tidak dibutuhkan
+            temp.querySelectorAll('script,style,iframe,object,embed,link,meta,svg,img,video,audio,form,input,button')
+                .forEach(n => n.remove());
+
+            // 1) Hapus SEMUA heading
             temp.querySelectorAll('h1,h2,h3,h4,h5,h6').forEach(h => h.remove());
 
-            // 2) Hapus paragraf/div yang isinya SAMA DENGAN judul buku (kalau AI mengulang judul)
-            if (bookTitle) {
-                temp.querySelectorAll('p,div').forEach(el => {
-                    const t = norm(el.textContent);
-                    if (!t) return;
-                    if (t === bookTitle) el.remove();
-                });
-            }
-
-            // 3) Hapus baris yang diawali "Judul:" / "Judul Buku:" / "Title:" (kalau AI bikin label)
-            temp.querySelectorAll('p,div').forEach(el => {
-                const t = norm(el.textContent);
-                if (/^(judul(\s+buku)?|title)\s*[:\-]/i.test(t)) el.remove();
-            });
-
-            // 4) Ubah list jadi paragraf
+            // 2) Convert list -> paragraf (ambil hanya li langsung agar tidak dobel dari nested list)
             temp.querySelectorAll('ul,ol').forEach(list => {
-                const items = Array.from(list.querySelectorAll('li'))
-                    .map(li => (li.textContent || '').replace(/\s+/g, ' ').trim())
+                const items = Array.from(list.querySelectorAll(':scope > li'))
+                    .map(li => cleanText(li.textContent))
                     .filter(Boolean);
 
                 if (items.length) {
@@ -3215,56 +3210,63 @@
                 }
             });
 
-            // 5) Blockquote -> paragraf biasa
+            // 3) Blockquote -> paragraf
             temp.querySelectorAll('blockquote').forEach(bq => {
-                const t = (bq.textContent || '').replace(/\s+/g, ' ').trim();
+                const t = cleanText(bq.textContent);
                 if (!t) return bq.remove();
                 const p = document.createElement('p');
                 p.textContent = t;
                 bq.replaceWith(p);
             });
 
-            // 6) Bersihkan atribut aneh
-            temp.querySelectorAll('*').forEach(el => {
-                el.removeAttribute('style');
-                el.removeAttribute('class');
+            // 4) Hapus paragraf/div yang isinya Judul Buku / label "Judul:" / "Ringkasan"/"Kesimpulan"/"Summary"
+            temp.querySelectorAll('p,div,span').forEach(el => {
+                const t = norm(el.textContent);
+
+                if (!t) return el.remove();
+
+                // buang judul buku persis
+                if (bookTitle && t === bookTitle) return el.remove();
+
+                // buang label judul
+                if (/^(judul(\s+buku)?|title)\s*[:\-]/i.test(t)) return el.remove();
+
+                // buang heading versi paragraf
+                if (t === 'ringkasan' || t === 'kesimpulan' || t === 'summary' || t === 'conclusion') return el
+                    .remove();
             });
 
-            // 7) Paksa output jadi paragraf saja (kalau ada DIV/SPAN di root)
-            Array.from(temp.childNodes).forEach(node => {
-                if (node.nodeType === 3) {
-                    const t = (node.textContent || '').replace(/\s+/g, ' ').trim();
-                    node.remove();
-                    if (t) {
-                        const p = document.createElement('p');
-                        p.textContent = t;
-                        temp.appendChild(p);
-                    }
-                    return;
-                }
+            // 5) Kumpulkan isi jadi array paragraf (jaga urutan, tanpa melebur div berisi p)
+            const paras = [];
 
-                if (node.nodeType === 1) {
-                    const el = node;
-                    const tag = el.tagName.toUpperCase();
-                    const t = (el.textContent || '').replace(/\s+/g, ' ').trim();
-
-                    if (!t) return el.remove();
-
-                    if (tag !== 'P') {
-                        const p = document.createElement('p');
-                        p.textContent = t;
-                        el.replaceWith(p);
-                    }
-                }
-            });
-
-            // 8) Hapus paragraf kosong
+            // ambil semua <p> dulu (lebih akurat daripada textContent parent)
             temp.querySelectorAll('p').forEach(p => {
-                if (!(p.textContent || '').trim()) p.remove();
+                const t = cleanText(p.textContent);
+                if (!t) return;
+                // filter sekali lagi (jaga-jaga)
+                const tn = norm(t);
+                if (bookTitle && tn === bookTitle) return;
+                if (tn === 'ringkasan' || tn === 'kesimpulan' || tn === 'summary' || tn === 'conclusion') return;
+                paras.push(t);
+            });
+
+            // kalau tidak ada <p>, fallback ambil textContent keseluruhan
+            if (paras.length === 0) {
+                const t = cleanText(temp.textContent);
+                if (t) paras.push(t);
+            }
+
+            // 6) Rebuild: output hanya <p> polos (tanpa atribut & tanpa tag lain)
+            temp.innerHTML = '';
+            paras.forEach(t => {
+                const p = document.createElement('p');
+                p.textContent = t;
+                temp.appendChild(p);
             });
 
             return temp.innerHTML.trim();
         }
+
 
 
         function sanitizeAuthorProfileHtml(html) {
