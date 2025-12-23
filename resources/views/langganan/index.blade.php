@@ -36,7 +36,7 @@
                             </p>
 
                             <h2 class="fw-bold mb-4">
-                                Rp49.000
+                                Rp99.000
                                 <span class="fs-6 text-muted fw-normal">/bulan</span>
                             </h2>
 
