@@ -6,6 +6,15 @@
     <div class="row justify-content-center">
         <div class="col-12 col-xxl-10">
             <div class="card shadow-lg border-0 rounded-4">
+                @if (session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                        <strong>⚠️ Akses Dibatasi!</strong>
+                        <br>
+                        {{ session('error') }}
+
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
                 <div class="card-body p-5 p-lg-6">
 
                     {{-- Judul --}}
@@ -13,6 +22,32 @@
                         1. Link Akses Aplikasi
                         <span class="text-primary">“Book Masterpiece AI”</span>
                     </h3>
+                    {{-- INFO LANGGANAN --}}
+                    @if ($activeSubscription)
+                        <div class="alert alert-info d-flex align-items-center gap-3 mb-4 rounded-3">
+                            <i class="ti ti-clock fs-3"></i>
+
+                            <div>
+                                <div class="fw-semibold">
+                                    Status Langganan:
+                                    <span class="badge bg-success ms-1">Aktif</span>
+                                </div>
+
+                                <div class="small text-muted">
+                                    @if (is_null($activeSubscription->expired_at))
+                                        ⏳ Akses <strong>Lifetime (Selamanya)</strong>
+                                    @else
+                                        ⏳ Berlaku sampai:
+                                        <strong>
+                                            {{ \Carbon\Carbon::parse($activeSubscription->expired_at)->translatedFormat('d F Y') }}
+                                        </strong>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+
 
 
 

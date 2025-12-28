@@ -14,6 +14,7 @@
         content="Bootstrap admin template, Dashboard UI Kit, Dashboard Template, Backend Panel, react dashboard, angular dashboard" />
     <meta name="author" content="codedthemes" />
 
+    @stack('style')
     <!-- [Favicon] icon -->
     <link rel="icon" href="{{ asset('layouts/assets/images/favicon.svg') }}" type="image/x-icon" />
     <!-- [Google Font] Family -->
@@ -33,6 +34,29 @@
     <link rel="stylesheet" href="{{ asset('layouts/assets/css/style.css') }}" id="main-style-link" />
     <link rel="stylesheet" href="{{ asset('layouts/assets/css/style-preset.css') }}" />
 
+    <style>
+        .pc-sidebar .pc-link {
+            gap: 10px;
+            /* jarak icon ↔ text */
+        }
+
+        .pc-sidebar .pc-micon {
+            width: 22px;
+            /* default biasanya 40px+ */
+            min-width: 22px;
+            font-size: 18px;
+            /* sesuaikan icon */
+            text-align: center;
+            margin-right: 4px;
+        }
+
+        /* Untuk submenu */
+        .pc-sidebar .pc-submenu .pc-micon {
+            width: 18px;
+            min-width: 18px;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <!-- [Head] end -->
 <!-- [Body] Start -->
@@ -64,47 +88,115 @@
                                     class="ti ti-dashboard"></i></span><span class="pc-mtext">Dashboard</span></a>
                     </li>
 
-                    <li class="pc-item pc-caption">
-                        <label>AKSES APLIKASI</label>
-                        <i class="ti ti-apps"></i>
-                    </li>
                     <li class="pc-item">
-                        <a href="{{ route('ebook_master') }}" class="pc-link"><span class="pc-micon"><i
-                                    class="ti ti-book"></i></span><span class="pc-mtext">Link Akses Aplikasi "Book
-                                Masterpiece AI"</span></a>
+                        <a href="{{ route('langganan') }}" class="pc-link"><span class="pc-micon"><i
+                                    class="ti ti-credit-card"></i></span><span class="pc-mtext">Langganan</span></a>
                     </li>
-                    <li class="pc-item">
-                        <a href="{{ route('cover_master') }}" class="pc-link">
-                            <span class="pc-micon"><i class="ti ti-photo"></i></span>
-                            <span class="pc-mtext">Link Akses Aplikasi BONUS "Book Cover
-                                Masterpiece"</span>
-                        </a>
-                    </li>
-                    <li class="pc-item">
-                        <a href="{{ route('langganan') }}" class="pc-link">
-                            <span class="pc-micon"><i class="ti ti-photo"></i></span>
-                            <span class="pc-mtext">Langganan</span>
-                        </a>
-                    </li>
-                    {{-- <li class="pc-item">
-                        <a href="{{ asset('layouts/elements/bc_color.html') }}" class="pc-link">
-                            <span class="pc-micon"><i class="ti ti-trending-up"></i></span>
-                            <span class="pc-mtext">Link Akses Bonus Ebook "Ebook Banjir
-                                Pembeli Tanpa Ngiklan"</span>
-                        </a>
-                    </li> --}}
+                    @auth
 
-                    <li class="pc-item pc-caption">
-                        <label>TUTORIAL</label>
-                        <i class="ti ti-apps"></i>
-                    </li>
+                        {{-- AKSES APLIKASI --}}
+                        <li class="pc-item pc-hasmenu">
+                            <a href="javascript:void(0)" class="pc-link">
+                                <span class="pc-micon">
+                                    <i class="ti ti-apps"></i>
+                                </span>
+                                <span class="pc-mtext">Akses Aplikasi</span>
+                                <span class="pc-arrow"><i class="ti ti-chevron-right"></i></span>
+                            </a>
 
-                    <li class="pc-item">
-                        <a href="{{ route('dashboard') }}" class="pc-link">
-                            <span class="pc-micon"><i class="ti ti-video"></i></span>
-                            <span class="pc-mtext">TUTORIAL PENGGUNAAN</span>
-                        </a>
-                    </li>
+                            <ul class="pc-submenu">
+                                <li class="pc-item">
+                                    <a href="{{ route('ebook_master') }}" class="pc-link">
+                                        <span class="pc-micon">
+                                            <i class="ti ti-book"></i>
+                                        </span>
+                                        <span class="pc-mtext">Book Masterpiece AI</span>
+                                    </a>
+                                </li>
+
+                                @if (in_array($activeSubscription->duration, ['tahun', 'lifetime']))
+                                    <li class="pc-item">
+                                        <a href="{{ route('cover_master') }}" class="pc-link">
+                                            <span class="pc-micon">
+                                                <i class="ti ti-photo"></i>
+                                            </span>
+                                            <span class="pc-mtext">Book Cover Masterpiece (Bonus)</span>
+                                        </a>
+                                    </li>
+                                @endif
+                            </ul>
+                        </li>
+
+                        {{-- LINK GRUP --}}
+                        <li class="pc-item pc-hasmenu">
+                            <a href="javascript:void(0)" class="pc-link">
+                                <span class="pc-micon">
+                                    <i class="ti ti-brand-whatsapp"></i>
+                                </span>
+                                <span class="pc-mtext">Link Grup</span>
+                                <span class="pc-arrow"><i class="ti ti-chevron-right"></i></span>
+                            </a>
+
+                            <ul class="pc-submenu">
+                                @if ($activeSubscription->duration === 'bulan')
+                                    <li class="pc-item">
+                                        <a href="{{ route('group.index') }}" class="pc-link">
+                                            <span class="pc-micon">
+                                                <i class="ti ti-users"></i>
+                                            </span>
+                                            <span class="pc-mtext">Grup Eksklusif</span>
+                                        </a>
+                                    </li>
+                                @endif
+
+                                @if (in_array($activeSubscription->duration, ['tahun', 'lifetime']))
+                                    <li class="pc-item">
+                                        <a href="{{ route('group.index') }}" class="pc-link">
+                                            <span class="pc-micon">
+                                                <i class="ti ti-crown"></i>
+                                            </span>
+                                            <span class="pc-mtext">Grup Premium</span>
+                                        </a>
+                                    </li>
+                                @endif
+                            </ul>
+                        </li>
+
+                        <li class="pc-item">
+                            <a href="{{ route('bonus.index') }}" class="pc-link"><span class="pc-micon"><i
+                                        class="ti ti-gift"></i></span><span class="pc-mtext">Bonus</span></a>
+                        </li>
+
+
+                        {{-- TUTORIAL --}}
+                        <li class="pc-item pc-hasmenu">
+                            <a href="javascript:void(0)" class="pc-link">
+                                <span class="pc-micon">
+                                    <i class="ti ti-video"></i>
+                                </span>
+                                <span class="pc-mtext">Tutorial</span>
+                                <span class="pc-arrow"><i class="ti ti-chevron-right"></i></span>
+                            </a>
+
+                            <ul class="pc-submenu">
+                                <li class="pc-item">
+                                    <a href="{{ route('dashboard') }}" class="pc-link">
+                                        <span class="pc-micon">
+                                            <i class="ti ti-player-play"></i>
+                                        </span>
+                                        <span class="pc-mtext">Tutorial Penggunaan</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                    @endauth
+
+
+
+
+
+
 
 
 
@@ -140,24 +232,24 @@
             <div class="ms-auto">
                 <ul class="list-unstyled">
 
-                    <li class="dropdown pc-h-item header-user-profile">
-                        <a class="pc-head-link head-link-primary dropdown-toggle arrow-none me-0"
-                            data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false"
-                            aria-expanded="false">
-                            <img src="{{ asset('image/user.png') }}" alt="user-image" class="user-avtar" />
-                            <span>
-                                <i class="ti ti-settings"></i>
-                            </span>
-                        </a>
-                        <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
-                            <div class="dropdown-header">
-                                <h4>
-                                    Hello,
-                                    <span class="small text-muted">{{ auth()->user()->name }}</span>
-                                </h4>
-                                <hr />
-                                <div class="profile-notification-scroll position-relative"
-                                    style="max-height: calc(100vh - 280px)">
+                    {{-- JIKA SUDAH LOGIN --}}
+                    @auth
+                        <li class="dropdown pc-h-item header-user-profile">
+                            <a class="pc-head-link head-link-primary dropdown-toggle arrow-none me-0"
+                                data-bs-toggle="dropdown" href="#" role="button">
+                                <img src="{{ asset('image/user.png') }}" alt="user-image" class="user-avtar" />
+                                <span>
+                                    <i class="ti ti-settings"></i>
+                                </span>
+                            </a>
+
+                            <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
+                                <div class="dropdown-header">
+                                    <h4>
+                                        Hello,
+                                        <span class="small text-muted">{{ auth()->user()->name }}</span>
+                                    </h4>
+                                    <hr />
 
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
@@ -166,11 +258,21 @@
                                             <span>Logout</span>
                                         </button>
                                     </form>
-
                                 </div>
                             </div>
-                        </div>
-                    </li>
+                        </li>
+                    @endauth
+
+                    {{-- JIKA BELUM LOGIN --}}
+                    @guest
+                        <li class="pc-h-item">
+                            <a href="{{ route('login') }}" class="btn btn-primary d-flex align-items-center gap-2 px-3">
+                                <i class="ti ti-login"></i>
+                                <span>Sign In</span>
+                            </a>
+                        </li>
+                    @endguest
+
                 </ul>
             </div>
         </div>

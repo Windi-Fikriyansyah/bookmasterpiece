@@ -3,134 +3,86 @@
 @section('title', 'Langganan')
 
 @section('content')
-    <div class="row justify-content-center">
-        <div class="col-12 col-xxl-10">
+    <div class="row justify-content-center pb-5">
+        <div class="col-12 col-xxl-11">
 
             {{-- Header --}}
             <div class="text-center mb-5">
                 <h2 class="fw-bold mb-2">
-                    Pilih Paket <span class="text-primary">Langganan</span>
+                    Pilih Paket Book Masterpiece AI
                 </h2>
+                <h3 class="fw-bold text-primary mb-1">
+                    BOOK MASTERPIECE AI
+                </h3>
                 <p class="text-muted fs-6">
-                    Dapatkan akses penuh ke <strong>Book Masterpiece AI</strong> sesuai kebutuhanmu
+                    Asisten Menulis Buku Anda – <strong>Siap Terbit</strong>
                 </p>
             </div>
 
             {{-- Paket --}}
-            <div class="row g-4">
+            <div class="row g-4 justify-content-center">
+                @foreach ($packages as $paket)
+                    <div class="col-md-6 col-lg-4">
+                        <div
+                            class="card border-0 shadow-sm h-100 rounded-4 {{ $paket->is_featured ? 'shadow-lg' : '' }} position-relative">
 
-                {{-- Paket Bulanan --}}
-                <div class="col-md-6">
-                    <div class="card border-0 shadow-sm h-100 rounded-4">
-                        <div class="card-body p-5 text-center d-flex flex-column">
-
-                            <div class="mb-3">
-                                <span class="avtar avtar-xl bg-light-primary text-primary">
-                                    <i class="ti ti-calendar fs-2"></i>
+                            @if ($paket->badge)
+                                <span
+                                    class="badge bg-primary position-absolute top-0 start-50 translate-middle px-4 py-2 rounded-pill">
+                                    {{ $paket->badge }}
                                 </span>
-                            </div>
+                            @endif
 
-                            <h4 class="fw-bold mb-2">Paket Bulanan</h4>
-                            <p class="text-muted mb-4">
-                                Cocok untuk coba fitur dan penggunaan jangka pendek
-                            </p>
+                            <div class="card-body p-5 text-center d-flex flex-column">
 
-                            <h2 class="fw-bold mb-4">
-                                Rp99.000
-                                <span class="fs-6 text-muted fw-normal">/bulan</span>
-                            </h2>
+                                <h4 class="fw-bold mb-2 text-uppercase">{{ $paket->name }}</h4>
+                                <p class="text-muted mb-3">{{ $paket->description }}</p>
 
-                            <ul class="list-unstyled text-start mb-4">
-                                <li class="mb-2">
-                                    <i class="ti ti-check text-success me-2"></i>
-                                    Akses penuh Book Masterpiece AI
-                                </li>
-                                <li class="mb-2">
-                                    <i class="ti ti-check text-success me-2"></i>
-                                    Generate book tanpa batas
-                                </li>
-                                <li class="mb-2">
-                                    <i class="ti ti-check text-success me-2"></i>
-                                    Update fitur otomatis
-                                </li>
-                                <li class="mb-2">
-                                    <i class="ti ti-check text-success me-2"></i>
-                                    Support standar
-                                </li>
-                            </ul>
+                                <h2 class="fw-bold mb-1">
+                                    Rp{{ number_format($paket->price, 0, ',', '.') }}
+                                </h2>
 
-                            <div class="mt-auto">
-                                <a href="" class="btn btn-outline-primary btn-lg w-100">
-                                    Pilih Paket Bulanan
-                                </a>
+                                @if ($paket->price_original)
+                                    <p class="text-muted mb-4">
+                                        <del>Rp{{ number_format($paket->price_original, 0, ',', '.') }}</del> /
+                                        {{ $paket->duration }}
+                                    </p>
+                                @else
+                                    <p class="text-muted mb-4">/{{ $paket->duration }}</p>
+                                @endif
+
+                                <ul class="list-unstyled text-start mb-4">
+                                    @foreach ($paket->features as $fitur)
+                                        <li
+                                            class="mb-2 d-flex align-items-start {{ $fitur->is_bonus ? 'fw-semibold text-primary' : '' }}">
+                                            <span class="me-2">{{ $fitur->is_bonus ? '🎁' : '✅' }}</span>
+                                            <span>{{ $fitur->feature_text }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+
+                                <div class="mt-auto">
+                                    @auth
+                                        {{-- USER LOGIN → PERPANJANG --}}
+                                        <a href="{{ route('checkout.renew', $paket->slug) }}"
+                                            class="btn {{ $paket->button_class }} btn-lg w-100">
+                                            {{ $paket->button_text }}
+                                        </a>
+                                    @else
+                                        {{-- USER BARU --}}
+                                        <a href="{{ route('checkout.index', $paket->slug) }}"
+                                            class="btn {{ $paket->button_class }} btn-lg w-100">
+                                            {{ $paket->button_text }}
+                                        </a>
+                                    @endauth
+
+
+                                </div>
+
                             </div>
                         </div>
                     </div>
-                </div>
-
-                {{-- Paket Tahunan --}}
-                <div class="col-md-6">
-                    <div class="card border-0 shadow-lg h-100 rounded-4 position-relative">
-
-                        {{-- Badge Rekomendasi --}}
-                        <span
-                            class="badge bg-primary position-absolute top-0 start-50 translate-middle px-4 py-2 rounded-pill">
-                            PALING HEMAT
-                        </span>
-
-                        <div class="card-body p-5 text-center d-flex flex-column">
-
-                            <div class="mb-3">
-                                <span class="avtar avtar-xl bg-light-success text-success">
-                                    <i class="ti ti-crown fs-2"></i>
-                                </span>
-                            </div>
-
-                            <h4 class="fw-bold mb-2">Paket Tahunan</h4>
-                            <p class="text-muted mb-4">
-                                Hemat lebih besar untuk penggunaan jangka panjang
-                            </p>
-
-                            <h2 class="fw-bold mb-1">
-                                Rp150.000
-                            </h2>
-                            <p class="text-muted mb-4">
-                                <del>Rp300.000</del> / tahun
-                            </p>
-
-                            <ul class="list-unstyled text-start mb-4">
-                                <li class="mb-2">
-                                    <i class="ti ti-check text-success me-2"></i>
-                                    Semua fitur paket bulanan
-                                </li>
-                                <li class="mb-2">
-                                    <i class="ti ti-check text-success me-2"></i>
-                                    Lebih hemat hingga 15%
-                                </li>
-                                <li class="mb-2">
-                                    <i class="ti ti-check text-success me-2"></i>
-                                    Prioritas update fitur
-                                </li>
-                                <li class="mb-2">
-                                    <i class="ti ti-check text-success me-2"></i>
-                                    Priority support
-                                </li>
-                            </ul>
-
-                            <div class="mt-auto">
-                                <a href="" class="btn btn-primary btn-lg w-100">
-                                    Pilih Paket Tahunan
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            {{-- Footer Info --}}
-            <div class="text-center mt-5">
-
+                @endforeach
             </div>
 
         </div>
