@@ -205,7 +205,7 @@ Terima kasih telah berlangganan *Book Masterpiece AI*.
 {$order->password_plain}
 
 👉 Login:
-https://bookmasterpiece.ai/login
+https://bookmasterpiece.sekolahliterasi.com/login
 
 🎁 BONUS EKSKLUSIF:
 • Akses Cover Masterpiece
