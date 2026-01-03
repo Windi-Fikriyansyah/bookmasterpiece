@@ -90,7 +90,8 @@
 
                     <li class="pc-item">
                         <a href="{{ route('langganan') }}" class="pc-link"><span class="pc-micon"><i
-                                    class="ti ti-credit-card"></i></span><span class="pc-mtext">Langganan</span></a>
+                                    class="ti ti-credit-card"></i></span><span class="pc-mtext">Paket
+                                BookMaster</span></a>
                     </li>
                     @auth
 
