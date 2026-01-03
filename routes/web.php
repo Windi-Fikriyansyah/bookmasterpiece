@@ -19,7 +19,8 @@ Route::get('/dashboard', function () {
 })->name('dashboard');
 
 
-
+Route::get('/bonus/{slug}', [BonusController::class, 'view'])
+    ->name('bonus.view');
 Route::get('/cover-master', function () {
     return view('cover_master');
 })->name('cover_master');
@@ -63,8 +64,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/bonus', [BonusController::class, 'index'])
         ->name('bonus.index');
 
-    Route::get('/bonus/{slug}', [BonusController::class, 'view'])
-        ->name('bonus.view');
+
     Route::get('/checkout/renew/{slug}', [CheckoutController::class, 'renew'])
         ->middleware('auth')
         ->name('checkout.renew');
