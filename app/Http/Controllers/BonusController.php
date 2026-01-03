@@ -20,11 +20,11 @@ class BonusController extends Controller
 
     public function view($slug)
     {
-        $bonus = DB::table('bonuses')->where('slug', $slug)->first();
-        abort_if(! $bonus, 404);
+        $bonus = DB::table('bonuses')->where('slug', $slug)->firstOrFail();
 
-        return redirect()->away(
-            'https://sekolahliterasi.com/storage/' . $bonus->file_path
-        );
+        // full URL PDF dari aplikasi lain
+        $pdfUrl = 'https://sekolahliterasi.com/storage/' . $bonus->file_path;
+
+        return view('bonus.view', compact('bonus', 'pdfUrl'));
     }
 }
