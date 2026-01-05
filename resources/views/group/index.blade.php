@@ -18,7 +18,7 @@
                     <div class="d-grid gap-3">
 
                         {{-- GRUP EKSKLUSIF (SEMUA LANGGANAN AKTIF) --}}
-                        @if ($subscription->duration === 'bulan')
+                        @if (in_array($subscription->duration, ['bulan', 'tahun']))
                             <a href="https://chat.whatsapp.com/L1Bsh2TRpTELyfe5qwqrPN" target="_blank"
                                 class="btn btn-outline-success btn-lg d-flex align-items-center justify-content-center gap-2">
                                 <i class="ti ti-users"></i>
@@ -27,7 +27,7 @@
                         @endif
 
                         {{-- GRUP PREMIUM (HANYA TAHUNAN) --}}
-                        @if (in_array($subscription->duration, ['tahun', 'lifetime']))
+                        @if ($subscription->duration === 'lifetime')
                             <a href="https://chat.whatsapp.com/Fp6KqGkMcpSB4YjWhXZFsA" target="_blank"
                                 class="btn btn-warning btn-lg d-flex align-items-center justify-content-center gap-2">
                                 <i class="ti ti-crown"></i>
