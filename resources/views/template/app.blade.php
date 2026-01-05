@@ -139,7 +139,8 @@
                             </a>
 
                             <ul class="pc-submenu">
-                                @if ($activeSubscription->duration === 'bulan')
+
+                                @if (in_array($activeSubscription->duration, ['bulan', 'tahun']))
                                     <li class="pc-item">
                                         <a href="{{ route('group.index') }}" class="pc-link">
                                             <span class="pc-micon">
@@ -150,7 +151,7 @@
                                     </li>
                                 @endif
 
-                                @if (in_array($activeSubscription->duration, ['tahun', 'lifetime']))
+                                @if ($activeSubscription->duration === 'lifetime')
                                     <li class="pc-item">
                                         <a href="{{ route('group.index') }}" class="pc-link">
                                             <span class="pc-micon">
