@@ -293,7 +293,7 @@
         </div>
     </div>
     <!-- [ Main Content ] end -->
-    <footer class="pc-footer">
+    {{-- <footer class="pc-footer">
         <div class="footer-wrapper container-fluid">
             <div class="row">
                 <div class="col-sm-6 my-1">
@@ -309,7 +309,44 @@
                 </div>
             </div>
         </div>
+    </footer> --}}
+
+
+
+
+
+    <footer class="pc-footer">
+        <div class="footer-wrapper container-fluid">
+            <div class="row align-items-center">
+                <div class="col-sm-6 my-1">
+                    <p class="m-0">
+                        © {{ date('Y') }} <strong>Book Masterpiece AI</strong><br>
+                        <small>AI-Powered Book Creation Platform</small>
+                    </p>
+                </div>
+
+                <div class="col-sm-6 ms-auto my-1">
+                    <ul class="list-inline footer-link mb-0 justify-content-sm-end d-flex gap-3">
+                        <li class="list-inline-item">
+                            <a href="{{ route('about') }}">Tentang Kami</a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a href="{{ route('privacy') }}">Kebijakan Privasi</a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a href="{{ route('terms') }}">Ketentuan Layanan</a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a href="{{ route('contact') }}">Kontak</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </footer>
+
+
+
     <!-- Required Js -->
     <script src="{{ asset('layouts/assets/js/plugins/popper.min.js') }}"></script>
     <script src="{{ asset('layouts/assets/js/plugins/simplebar.min.js') }}"></script>

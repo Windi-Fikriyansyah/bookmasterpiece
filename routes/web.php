@@ -13,6 +13,23 @@ Route::get('/', function () {
     return redirect()->route('dashboard');
 });
 
+Route::view('/about', 'about')->name('about');
+
+// Privacy Policy
+Route::view('/privacy-policy', 'privacy-policy')->name('privacy');
+
+// Terms of Service
+Route::view('/terms-of-service', 'terms')->name('terms');
+
+// Contact
+Route::view('/contact', 'contact')->name('contact');
+
+
+
+
+
+
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');
