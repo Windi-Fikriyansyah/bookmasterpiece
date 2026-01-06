@@ -293,7 +293,7 @@
         </div>
     </div>
     <!-- [ Main Content ] end -->
-    {{-- <footer class="pc-footer">
+    <footer class="pc-footer">
         <div class="footer-wrapper container-fluid">
             <div class="row">
                 <div class="col-sm-6 my-1">
@@ -309,13 +309,13 @@
                 </div>
             </div>
         </div>
-    </footer> --}}
+    </footer>
 
 
 
 
 
-    <footer class="pc-footer">
+    {{-- <footer class="pc-footer">
         <div class="footer-wrapper container-fluid">
             <div class="row align-items-center">
                 <div class="col-sm-6 my-1">
@@ -343,7 +343,7 @@
                 </div>
             </div>
         </div>
-    </footer>
+    </footer> --}}
 
 
 
