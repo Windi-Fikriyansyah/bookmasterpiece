@@ -100,39 +100,9 @@
             </div>
         </div>
 
-        {{-- STATUS AKUN --}}
-        <div class="col-12 mb-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-body d-flex flex-wrap justify-content-between align-items-center">
-                    <div>
-                        <h6 class="fw-bold mb-1">Status Akun</h6>
-                        <p class="mb-0 text-muted">
-                            Paket Aktif:
-                            <strong class="text-primary">
-                                {{ ucfirst(optional($activeSubscription)->duration ?? 'Gratis') }}
-                            </strong>
-                        </p>
-                    </div>
-                    <div>
-                        <a href="{{ route('langganan') }}" class="btn btn-outline-primary btn-sm">
-                            Kelola Langganan
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        {{-- INFO LEGAL --}}
-        <div class="col-12">
-            <div class="alert alert-light border">
-                <small class="text-muted">
-                    Dengan menggunakan <strong>Book Masterpiece AI</strong>,
-                    Anda menyetujui
-                    <a href="{{ route('terms') }}">Ketentuan Layanan</a> dan
-                    <a href="{{ route('privacy') }}">Kebijakan Privasi</a>.
-                </small>
-            </div>
-        </div>
+
+
 
     </div>
 @endsection
