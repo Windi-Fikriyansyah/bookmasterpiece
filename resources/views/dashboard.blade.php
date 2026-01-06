@@ -5,22 +5,53 @@
 @section('content')
     <div class="row">
 
-        {{-- WELCOME --}}
+        {{-- HERO / MAIN CONTENT --}}
         <div class="col-12 mb-4">
             <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h4 class="fw-bold mb-1">
-                        Selamat Datang di <span class="text-primary">Book Masterpiece AI</span>
-                    </h4>
-                    <p class="text-muted mb-0">
-                        Platform AI untuk membantu Anda membuat buku digital secara cepat,
-                        profesional, dan terstruktur.
+                <div class="card-body p-4 p-md-5">
+                    <h2 class="fw-bold mb-2">
+                        <span class="text-primary">BOOK MASTERPIECE AI</span>
+                    </h2>
+
+                    <h5 class="text-muted mb-3">
+                        Asisten Menulis Buku • <span class="fw-semibold">Siap Terbit</span>
+                    </h5>
+
+                    <p class="text-muted mb-3">
+                        <strong>Book Masterpiece AI</strong> adalah aplikasi menulis buku berbasis AI
+                        yang dirancang khusus untuk membantu Anda menulis buku dengan mudah,
+                        cepat, dan benar-benar selesai — bahkan untuk pemula.
                     </p>
+
+                    <p class="text-muted mb-3">
+                        Mulai dari menentukan <strong>judul</strong>, menyusun <strong>daftar isi</strong>,
+                        menulis <strong>pengantar</strong>, <strong>bab & subbab</strong>,
+                        hingga <strong>penutup</strong>, <strong>daftar pustaka</strong>,
+                        dan <strong>profil penulis</strong>, semuanya dipandu secara sistematis
+                        dalam satu aplikasi.
+                    </p>
+
+                    <p class="text-muted mb-4">
+                        Dilengkapi fitur <strong>edit teks</strong>, <strong>tambah bab</strong>,
+                        <strong>sisipkan gambar</strong>, serta <strong>aplikasi gratis pembuat cover buku</strong>.
+                        Didukung video tutorial step-by-step dan formula penulisan teruji
+                        agar proses menulis lebih terarah dan siap terbit.
+                    </p>
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ route('ebook_master') }}" class="btn btn-primary">
+                            Mulai Menulis Buku
+                        </a>
+
+                        <a href="{{ route('langganan') }}" class="btn btn-outline-primary">
+                            Lihat Paket & Fitur
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        {{-- RINGKASAN FITUR --}}
+        {{-- FITUR RINGKAS --}}
         <div class="col-md-4 mb-4">
             <div class="card h-100 shadow-sm border-0">
                 <div class="card-body">
@@ -28,14 +59,11 @@
                         <div class="avtar avtar-l bg-light-primary me-3">
                             <i class="ti ti-book text-primary"></i>
                         </div>
-                        <h5 class="mb-0 fw-semibold">Book Masterpiece AI</h5>
+                        <h6 class="mb-0 fw-semibold">Penulisan Terstruktur</h6>
                     </div>
-                    <p class="text-muted">
-                        Buat naskah ebook dan buku secara otomatis dengan bantuan AI.
+                    <p class="text-muted mb-0">
+                        Alur menulis dari nol hingga buku selesai, dipandu langkah demi langkah.
                     </p>
-                    <a href="{{ route('ebook_master') }}" class="btn btn-primary btn-sm">
-                        Buka Aplikasi
-                    </a>
                 </div>
             </div>
         </div>
@@ -47,21 +75,11 @@
                         <div class="avtar avtar-l bg-light-success me-3">
                             <i class="ti ti-photo text-success"></i>
                         </div>
-                        <h5 class="mb-0 fw-semibold">Book Cover Masterpiece</h5>
+                        <h6 class="mb-0 fw-semibold">Cover Buku AI</h6>
                     </div>
-                    <p class="text-muted">
-                        Buat desain cover buku profesional berbasis AI (bonus paket tertentu).
+                    <p class="text-muted mb-0">
+                        Buat cover buku profesional berbasis AI (bonus paket tertentu).
                     </p>
-
-                    @if (in_array(optional($activeSubscription)->duration, ['tahun', 'lifetime']))
-                        <a href="{{ route('cover_master') }}" class="btn btn-success btn-sm">
-                            Buka Fitur
-                        </a>
-                    @else
-                        <span class="badge bg-light-warning text-warning">
-                            Upgrade Paket
-                        </span>
-                    @endif
                 </div>
             </div>
         </div>
@@ -73,14 +91,11 @@
                         <div class="avtar avtar-l bg-light-info me-3">
                             <i class="ti ti-users text-info"></i>
                         </div>
-                        <h5 class="mb-0 fw-semibold">Grup Eksklusif</h5>
+                        <h6 class="mb-0 fw-semibold">Komunitas & Tutorial</h6>
                     </div>
-                    <p class="text-muted">
-                        Akses komunitas pengguna untuk diskusi, update, dan tips penulisan.
+                    <p class="text-muted mb-0">
+                        Akses grup eksklusif, diskusi, dan video tutorial penulisan.
                     </p>
-                    <a href="{{ route('group.index') }}" class="btn btn-info btn-sm">
-                        Lihat Grup
-                    </a>
                 </div>
             </div>
         </div>
