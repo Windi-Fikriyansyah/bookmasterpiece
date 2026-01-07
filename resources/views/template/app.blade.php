@@ -182,7 +182,7 @@
 
                             <ul class="pc-submenu">
                                 <li class="pc-item">
-                                    <a href="{{ route('dashboard') }}" class="pc-link">
+                                    <a href="{{ route('tutorial.index') }}" class="pc-link">
                                         <span class="pc-micon">
                                             <i class="ti ti-player-play"></i>
                                         </span>

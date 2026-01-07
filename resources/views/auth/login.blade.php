@@ -38,11 +38,16 @@
             <!-- Password -->
             <div>
                 <label class="block text-gray-700 font-medium mb-1">Password</label>
+
                 <div class="flex items-center bg-gray-50 border border-gray-300 rounded-lg px-3">
                     <i class="fa-solid fa-lock text-gray-400 mr-2"></i>
-                    <input type="password" name="password" required
+
+                    <input id="password" type="password" name="password" required
                         class="w-full bg-transparent py-2.5 focus:outline-none" placeholder="••••••••">
+
+
                 </div>
+
                 @error('password')
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
@@ -68,6 +73,22 @@
 
     </div>
 
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
 </body>
 
 </html>

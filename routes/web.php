@@ -70,6 +70,11 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
     Route::post('/ebook/generate', [AksesAplikasiController::class, 'generateEbookPart'])
         ->name('ebook.generate');
     Route::post('/ebook/download', [AksesAplikasiController::class, 'downloadPDF']);
+
+
+    Route::get('/tutorial', function () {
+        return view('tutorial.index');
+    })->name('tutorial.index');
 });
 
 
