@@ -84,7 +84,7 @@
                         <label class="form-label fw-semibold">
                             No WhatsApp
                         </label>
-                        <input type="text" name="phone" class="form-control rounded-3" placeholder="08xxxxxxxxxx"
+                        <input type="number" name="phone" class="form-control rounded-3" placeholder="08xxxxxxxxxx"
                             required>
                         <small class="text-muted">
                             Nomor ini digunakan untuk konfirmasi & invoice
