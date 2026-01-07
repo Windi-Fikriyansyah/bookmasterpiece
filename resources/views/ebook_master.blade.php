@@ -56,7 +56,7 @@
                         class="btn btn-primary btn-lg px-4 py-3 d-inline-flex align-items-center gap-2 mb-5">
                         <i class="ti ti-external-link fs-4"></i>
                         <span class="fw-medium fs-5">
-                            Akses Book Masterpiece AI Versi Terbaru (4.0)
+                            Akses Book Masterpiece AI Versi Terbaru (5.0)
                         </span>
                     </a>
 
@@ -75,7 +75,7 @@
                     </div> --}}
 
                     {{-- Info Versi --}}
-                    <div class="mb-5">
+                    {{-- <div class="mb-5">
                         <h4 class="fw-semibold mb-3">
                             Book Masterpiece AI Versi 4.0
                         </h4>
@@ -98,7 +98,7 @@
                                 Rata Kanan Kiri
                             </li>
                         </ul>
-                    </div>
+                    </div> --}}
 
                     {{-- Peringatan --}}
                     {{-- <div class="alert alert-warning border-start border-5 rounded-3 p-4 mb-5">
@@ -115,7 +115,7 @@
                     <div class="border-top pt-4 mt-4">
                         <p class="mb-0 fs-5">
                             <strong>Catatan:</strong>
-                            Akses Book Masterpiece AI diberikan secara eksklusif selama 30 hari untuk memastikan pengalaman
+                            Akses Book Masterpiece AI diberikan sesuai paket yang dibeli untuk memastikan pengalaman
                             penggunaan yang optimal. Akun bersifat pribadi dan tidak diperkenankan untuk dibagikan, demi
                             menjaga kualitas layanan dan keamanan sistem.
                         </p>

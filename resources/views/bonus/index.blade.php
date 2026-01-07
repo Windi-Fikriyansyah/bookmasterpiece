@@ -3,7 +3,7 @@
 @section('title', 'Bonus')
 
 @section('content')
-    <div class="row g-4">
+    <div class="row g-4 pb-4">
 
         @forelse ($bonuses as $bonus)
             <div class="col-md-4">

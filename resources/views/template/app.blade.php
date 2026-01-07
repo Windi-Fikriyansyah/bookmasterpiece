@@ -140,13 +140,23 @@
 
                             <ul class="pc-submenu">
 
-                                @if (in_array($activeSubscription->duration, ['bulan', 'tahun']))
+                                @if ($activeSubscription->duration === 'bulan')
                                     <li class="pc-item">
                                         <a href="{{ route('group.index') }}" class="pc-link">
                                             <span class="pc-micon">
                                                 <i class="ti ti-users"></i>
                                             </span>
-                                            <span class="pc-mtext">Grup Eksklusif</span>
+                                            <span class="pc-mtext">Grup Exclusive</span>
+                                        </a>
+                                    </li>
+                                @endif
+                                @if ($activeSubscription->duration === 'tahun')
+                                    <li class="pc-item">
+                                        <a href="{{ route('group.index') }}" class="pc-link">
+                                            <span class="pc-micon">
+                                                <i class="ti ti-users"></i>
+                                            </span>
+                                            <span class="pc-mtext">Grup Executive</span>
                                         </a>
                                     </li>
                                 @endif

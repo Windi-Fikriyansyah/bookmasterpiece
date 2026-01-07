@@ -18,11 +18,19 @@
                     <div class="d-grid gap-3">
 
                         {{-- GRUP EKSKLUSIF (SEMUA LANGGANAN AKTIF) --}}
-                        @if (in_array($subscription->duration, ['bulan', 'tahun']))
+                        @if ($subscription->duration === 'bulan')
                             <a href="https://chat.whatsapp.com/L1Bsh2TRpTELyfe5qwqrPN" target="_blank"
                                 class="btn btn-outline-success btn-lg d-flex align-items-center justify-content-center gap-2">
                                 <i class="ti ti-users"></i>
-                                Masuk Grup Eksklusif
+                                Masuk Grup Exclusive
+                            </a>
+                        @endif
+
+                        @if ($subscription->duration === 'tahun')
+                            <a href="https://chat.whatsapp.com/GcKd1lsZBQUC7AjdFQbL61" target="_blank"
+                                class="btn btn-outline-success btn-lg d-flex align-items-center justify-content-center gap-2">
+                                <i class="ti ti-users"></i>
+                                Masuk Grup Executive
                             </a>
                         @endif
 
@@ -37,7 +45,7 @@
                             <div class="alert alert-info mt-3">
                                 <i class="ti ti-info-circle"></i>
                                 Grup Premium hanya tersedia untuk
-                                <strong>langganan tahunan</strong>.
+                                <strong>langganan Lifetime</strong>.
                             </div>
                         @endif
 
