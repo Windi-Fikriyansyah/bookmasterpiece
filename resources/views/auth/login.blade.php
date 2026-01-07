@@ -7,6 +7,23 @@
     <title>Login - Ebook Master Maker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Chrome, Edge, Safari */
+        input[type="password"]::-webkit-textfield-decoration-container,
+        input[type="password"]::-webkit-credentials-auto-fill-button,
+        input[type="password"]::-webkit-clear-button {
+            visibility: hidden;
+            display: none !important;
+            pointer-events: none;
+        }
+
+        /* Edge (legacy) */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear {
+            display: none;
+        }
+    </style>
 </head>
 
 <body class="bg-gray-100 flex items-center justify-center h-screen">
@@ -44,7 +61,9 @@
 
                     <input id="password" type="password" name="password" required
                         class="w-full bg-transparent py-2.5 focus:outline-none" placeholder="••••••••">
-
+                    <button type="button" onclick="togglePassword()" class="ml-2 text-gray-400 hover:text-gray-600">
+                        <i id="eyeIcon" class="fa-solid fa-eye"></i>
+                    </button>
 
                 </div>
 
