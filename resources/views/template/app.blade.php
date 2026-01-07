@@ -115,7 +115,7 @@
                                     </a>
                                 </li>
 
-                                @if (in_array($activeSubscription->duration, ['tahun', 'lifetime']))
+                                @if (in_array($activeSubscription->duration, ['tahun', 'lifetime', 'bulan']))
                                     <li class="pc-item">
                                         <a href="{{ route('cover_master') }}" class="pc-link">
                                             <span class="pc-micon">
