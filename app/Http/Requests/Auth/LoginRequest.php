@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class LoginRequest extends FormRequest
 {
@@ -56,6 +58,23 @@ class LoginRequest extends FormRequest
 
         // Jika user tidak ditemukan atau is_active = 0
         if (! $user || $user->is_active != 1) {
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => 'Akun Anda belum aktif. Silakan hubungi admin.',
+            ]);
+        }
+
+        $subscription = DB::table('user_subscriptions')
+            ->where('user_id', $user->id)
+            ->where('status', 'active')
+            ->where(function ($q) {
+                $q->whereNull('expired_at')
+                    ->orWhere('expired_at', '>=', Carbon::now());
+            })
+            ->first();
+
+        if (! $subscription) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
