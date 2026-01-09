@@ -584,11 +584,11 @@
                         </button>
                     </div>
 
-                    <button onclick="generateEbook('summary')"
+                    {{-- <button onclick="generateEbook('summary')"
                         class="w-full bg-gray-700 text-white py-3 rounded-lg text-sm hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center gap-2">
                         <i class="fas fa-file-signature"></i>
                         Buat Ringkasan
-                    </button>
+                    </button> --}}
 
                     <button onclick="generateEbook('closing')"
                         class="w-full bg-gray-800 text-white py-3 rounded-lg text-sm hover:bg-gray-900 transition-colors duration-200 flex items-center justify-center gap-2">
