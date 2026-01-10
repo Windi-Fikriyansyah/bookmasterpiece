@@ -125,6 +125,27 @@
                                         </a>
                                     </li>
                                 @endif
+                                @if ($activeSubscription->duration === 'lifetime')
+                                    <li class="pc-item">
+                                        <a href="{{ route('image_master') }}" class="pc-link">
+                                            <span class="pc-micon">
+                                                <i class="ti ti-photo"></i>
+                                            </span>
+                                            <span class="pc-mtext">Image Cover Masterpiece (Bonus)</span>
+                                        </a>
+                                    </li>
+                                @endif
+
+                                @if ($activeSubscription->duration === 'lifetime')
+                                    <li class="pc-item">
+                                        <a href="{{ route('story_master') }}" class="pc-link">
+                                            <span class="pc-micon">
+                                                <i class="ti ti-photo"></i>
+                                            </span>
+                                            <span class="pc-mtext">Storybook Masterpiece (Bonus)</span>
+                                        </a>
+                                    </li>
+                                @endif
                             </ul>
                         </li>
 

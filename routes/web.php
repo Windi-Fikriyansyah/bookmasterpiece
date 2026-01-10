@@ -71,6 +71,13 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
         ->name('ebook.generate');
     Route::post('/ebook/download', [AksesAplikasiController::class, 'downloadPDF']);
 
+    Route::get('/image-master', function () {
+        return view('image_master');
+    })->name('image_master');
+
+    Route::get('/storybook-master', function () {
+        return view('story_master');
+    })->name('story_master');
 
     Route::get('/tutorial', function () {
         return view('tutorial.index');
