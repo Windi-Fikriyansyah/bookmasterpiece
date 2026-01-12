@@ -48,7 +48,7 @@
                                         {{ $paket->duration }}
                                     </p>
                                 @else
-                                    <p class="text-muted mb-4">/{{ $paket->duration }}</p>
+                                    <p class="text-muted mb-4">/{{ $paket->akses }}</p>
                                 @endif
 
                                 <ul class="list-unstyled text-start mb-4">

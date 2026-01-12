@@ -104,7 +104,8 @@ class TripayCallbackController extends Controller
             // 🧠 hitung masa aktif
             $now = now();
 
-            if ($package->duration === 'lifetime') {
+            $isLifetime = in_array($package->duration, ['lifetime', 'standar', 'premium']);
+            if ($isLifetime) {
                 $expiredAt = null;
             } else {
                 $lastSub = DB::table('user_subscriptions')
