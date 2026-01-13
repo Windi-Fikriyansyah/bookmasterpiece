@@ -91,11 +91,19 @@ class TripayCallbackController extends Controller
                     'created_at' => now(),
                 ]);
 
-                // kirim WA hanya untuk user baru
+                $package = DB::table('subscription_packages')->find($order->package_id);
+
                 FonnteService::sendWA(
                     $order->phone,
-                    app(\App\Http\Controllers\TripayCallbackController::class)->waMessage($order)
+                    app(\App\Http\Controllers\TripayCallbackController::class)
+                        ->waMessage($order, $package)
                 );
+
+                // kirim WA hanya untuk user baru
+                // FonnteService::sendWA(
+                //     $order->phone,
+                //     app(\App\Http\Controllers\TripayCallbackController::class)->waMessage($order)
+                // );
             } else {
                 // 🔁 USER LAMA (PERPANJANG)
                 $userId = $user->id;
@@ -191,12 +199,44 @@ class TripayCallbackController extends Controller
     }
 
 
-    private function waMessage($order)
+    private function waMessage($order, $package)
     {
-        return
-            "Halo {$order->name},
+        $bonusMessage = '';
 
-✅ Pembayaran BERHASIL
+        // Normalisasi nama paket (aman)
+        $packageName = strtolower($package->duration ?? $package->slug ?? '');
+
+        if (str_contains($packageName, 'premium')) {
+            $bonusMessage = <<<TXT
+🎁 *BONUS PAKET PREMIUM*:
+- Bonus aplikasi Book Cover Masterpiece (desain cover instan)
+- Bonus aplikasi Book Image Masterpiece (visual & ilustrasi buku)
+- Bonus aplikasi Storybook Masterpiece (buku cerita lengkap + ilustrasi)
+- Hemat hingga 15% (jauh lebih ekonomis dibanding paket berlangganan)
+- Prioritas update fitur terbaru
+- Priority support (dibantu lebih cepat)
+- Template buku siap terbit
+- Prompt AI & Formula Pensera siap pakai
+- Prompt AI Editor, Parafrase & Verifikator
+- Video tutorial Book Masterpiece (step-by-step)
+- Akses grup premium (WhatsApp)
+TXT;
+        } else {
+            // Default → Standar
+            $bonusMessage = <<<TXT
+🎁 *BONUS PAKET STANDAR*:
+- Template Buku Siap Terbit
+- Promt AI dan Formula Pensera Siap Pakai
+- Promt AI Editor, Parafase dan Verifikator
+- Video Tutorial Book Masterpiece
+- Grup WhatsApp Eksklusif
+TXT;
+        }
+
+        return <<<MSG
+Halo {$order->name},
+
+✅ *Pembayaran BERHASIL*
 Terima kasih telah berlangganan *Book Masterpiece AI*.
 
 📧 Email Login:
@@ -208,15 +248,10 @@ Terima kasih telah berlangganan *Book Masterpiece AI*.
 👉 Login:
 https://bookmasterpiece.sekolahliterasi.com/login
 
-🎁 BONUS EKSKLUSIF:
-• Akses Cover Masterpiece
-• Formula Book Pensera
-• Prompt AI Siap Pakai
-• Template Outline Buku
-• Video Step-by-Step
-• Grup WhatsApp Eksklusif
+{$bonusMessage}
 
 Salam Literasi ✍️
-Tim Book Masterpiece AI";
+Tim *Book Masterpiece AI*
+MSG;
     }
 }
