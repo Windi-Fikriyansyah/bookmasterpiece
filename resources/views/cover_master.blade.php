@@ -21,7 +21,7 @@
                     </p> --}}
 
                     {{-- Tombol Akses --}}
-                    <a href="https://gemini.google.com/share/87875ad2979e" target="_blank"
+                    <a href="https://gemini.google.com/share/d6225d128b81" target="_blank"
                         class="btn btn-primary btn-lg px-4 py-3 d-inline-flex align-items-center gap-2 mb-5">
                         <i class="ti ti-palette fs-4"></i>
                         <span class="fw-semibold">
