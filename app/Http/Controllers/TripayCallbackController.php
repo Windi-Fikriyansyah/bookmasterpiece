@@ -55,33 +55,48 @@ class TripayCallbackController extends Controller
         // 5️⃣ PROSES DATABASE DI BELAKANG
         dispatch(function () use ($data) {
 
-            Log::channel('daily')->info('TRIPAY CALLBACK FIELDS', [
-                'status' => $data->status ?? null,
-                'reference' => $data->reference ?? null,
-                'merchant_ref' => $data->merchant_ref ?? null,
-                'is_closed_payment' => $data->is_closed_payment ?? 'NOT SENT',
+            $status = strtoupper($data->status ?? '');
+
+            Log::channel('daily')->info('TRIPAY CALLBACK PROCESSED', [
+                'merchant_ref' => $data->merchant_ref,
+                'reference' => $data->reference,
+                'status' => $status,
             ]);
-            if ($data->is_closed_payment != 1) return;
 
             $order = DB::table('orders_langganan')
                 ->where('merchant_ref', $data->merchant_ref)
                 ->where('tripay_reference', $data->reference)
                 ->first();
 
-            if (! $order || $order->status === 'PAID') return;
+            if (! $order) return;
 
+            // 🔒 JIKA BUKAN PAID → UPDATE STATUS SAJA, STOP
+            if ($status !== 'PAID') {
+                DB::table('orders_langganan')
+                    ->where('id', $order->id)
+                    ->update([
+                        'status' => $status,
+                        'updated_at' => now(),
+                    ]);
+                return;
+            }
+
+            // 🛑 DOUBLE PROTECTION
+            if ($order->status === 'PAID') return;
+
+            // ✅ VALID PAID
             DB::table('orders_langganan')->where('id', $order->id)->update([
                 'status' => 'PAID',
                 'paid_at' => now(),
+                'updated_at' => now(),
             ]);
 
             $package = DB::table('subscription_packages')->find($order->package_id);
 
-            // 🔍 cek user existing
+            // 🔍 cek user
             $user = DB::table('users')->where('email', $order->email)->first();
 
             if (! $user) {
-                // ✅ USER BARU
                 $userId = DB::table('users')->insertGetId([
                     'name' => $order->name,
                     'email' => $order->email,
@@ -91,94 +106,38 @@ class TripayCallbackController extends Controller
                     'created_at' => now(),
                 ]);
 
-                $package = DB::table('subscription_packages')->find($order->package_id);
-
+                // ✅ WA HANYA UNTUK PAID
                 FonnteService::sendWA(
                     $order->phone,
-                    app(\App\Http\Controllers\TripayCallbackController::class)
-                        ->waMessage($order, $package)
+                    app(self::class)->waMessage($order, $package)
                 );
-
-                // kirim WA hanya untuk user baru
-                // FonnteService::sendWA(
-                //     $order->phone,
-                //     app(\App\Http\Controllers\TripayCallbackController::class)->waMessage($order)
-                // );
             } else {
-                // 🔁 USER LAMA (PERPANJANG)
                 $userId = $user->id;
             }
 
-            // 🧠 hitung masa aktif
-            $now = now();
+            // 🧠 Subscription logic (aman)
+            $start = now();
+            $expiredAt = null;
 
-            $isLifetime = in_array($package->duration, ['lifetime', 'standar', 'premium']);
-            if ($isLifetime) {
-                $expiredAt = null;
-            } else {
-                $lastSub = DB::table('user_subscriptions')
-                    ->where('user_id', $userId)
-                    ->where('status', 'active')
-                    ->orderByDesc('expired_at')
-                    ->first();
-                $start = $lastSub && $lastSub->expired_at
-                    ? \Carbon\Carbon::parse($lastSub->expired_at)
-                    : now();
-                if ($start->lessThan(now())) {
-                    $start = now();
-                }
-
+            if ($package->duration !== 'lifetime') {
                 $expiredAt = $package->duration === 'bulan'
-                    ? $start->copy()->addMonths($package->duration_value)
-                    : $start->copy()->addYears($package->duration_value);
+                    ? now()->addMonths($package->duration_value)
+                    : now()->addYears($package->duration_value);
             }
 
-            // 🔍 ambil subscription terakhir (active / expired)
-            $subscription = DB::table('user_subscriptions')
-                ->where('user_id', $userId)
-                ->orderByDesc('expired_at')
-                ->first();
-
-            if ($subscription) {
-
-                // 🧠 HITUNG START BARU
-                $start = $subscription->expired_at && \Carbon\Carbon::parse($subscription->expired_at)->gt(now())
-                    ? \Carbon\Carbon::parse($subscription->expired_at)
-                    : now();
-
-                // 🧠 HITUNG EXPIRED BARU
-                if ($package->duration === 'lifetime') {
-                    $expiredAt = null;
-                } else {
-                    $expiredAt = $package->duration === 'bulan'
-                        ? $start->copy()->addMonths($package->duration_value)
-                        : $start->copy()->addYears($package->duration_value);
-                }
-
-                // ✅ UPDATE DATA YANG ADA
-                DB::table('user_subscriptions')
-                    ->where('id', $subscription->id)
-                    ->update([
-                        'package_id' => $package->id,
-                        'started_at' => now(),
-                        'expired_at' => $expiredAt,
-                        'status' => 'active',
-                        'updated_at' => now(),
-                    ]);
-            } else {
-
-                // 🆕 USER PERTAMA KALI LANGGANAN
-                DB::table('user_subscriptions')->insert([
-                    'user_id' => $userId,
+            DB::table('user_subscriptions')->updateOrInsert(
+                ['user_id' => $userId],
+                [
                     'package_id' => $package->id,
                     'started_at' => now(),
                     'expired_at' => $expiredAt,
                     'status' => 'active',
-                    'created_at' => now(),
                     'updated_at' => now(),
-                ]);
-            }
+                    'created_at' => now(),
+                ]
+            );
         })->afterResponse();
+
 
 
         return $response;
