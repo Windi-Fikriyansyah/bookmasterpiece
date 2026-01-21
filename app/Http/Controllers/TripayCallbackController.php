@@ -118,8 +118,9 @@ class TripayCallbackController extends Controller
             // 🧠 Subscription logic (aman)
             $start = now();
             $expiredAt = null;
+            $excludedPackages = ['lifetime', 'standar', 'premium'];
 
-            if ($package->duration !== 'lifetime') {
+            if (!in_array($package->duration, $excludedPackages)) {
                 $expiredAt = $package->duration === 'bulan'
                     ? now()->addMonths($package->duration_value)
                     : now()->addYears($package->duration_value);
