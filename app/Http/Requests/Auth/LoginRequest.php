@@ -65,22 +65,22 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        $subscription = DB::table('user_subscriptions')
-            ->where('user_id', $user->id)
-            ->where('status', 'active')
-            ->where(function ($q) {
-                $q->whereNull('expired_at')
-                    ->orWhere('expired_at', '>=', Carbon::now());
-            })
-            ->first();
+        // $subscription = DB::table('user_subscriptions')
+        //     ->where('user_id', $user->id)
+        //     ->where('status', 'active')
+        //     ->where(function ($q) {
+        //         $q->whereNull('expired_at')
+        //             ->orWhere('expired_at', '>=', Carbon::now());
+        //     })
+        //     ->first();
 
-        if (! $subscription) {
-            RateLimiter::hit($this->throttleKey());
+        // if (! $subscription) {
+        //     RateLimiter::hit($this->throttleKey());
 
-            throw ValidationException::withMessages([
-                'email' => 'Akun Anda belum aktif. Silakan hubungi admin.',
-            ]);
-        }
+        //     throw ValidationException::withMessages([
+        //         'email' => 'Akun Anda belum aktif. Silakan hubungi admin.',
+        //     ]);
+        // }
 
         // Lanjutkan proses Auth
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
