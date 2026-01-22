@@ -36,8 +36,7 @@ Route::get('/dashboard', function () {
 })->name('dashboard');
 
 
-Route::get('/bonus/{slug}', [BonusController::class, 'view'])
-    ->name('bonus.view');
+
 Route::get('/cover-master', function () {
     return view('cover_master');
 })->name('cover_master');
@@ -70,6 +69,9 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
     Route::post('/ebook/generate', [AksesAplikasiController::class, 'generateEbookPart'])
         ->name('ebook.generate');
     Route::post('/ebook/download', [AksesAplikasiController::class, 'downloadPDF']);
+
+    Route::get('/bonus/{slug}', [BonusController::class, 'view'])
+        ->name('bonus.view');
 
     Route::get('/image-master', function () {
         return view('image_master');

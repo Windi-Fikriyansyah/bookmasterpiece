@@ -115,7 +115,7 @@
                                     </a>
                                 </li>
 
-                                @if (in_array($activeSubscription->duration, ['tahun', 'lifetime', 'premium']))
+                                @if (in_array(optional($activeSubscription)->duration, ['tahun', 'lifetime', 'premium']))
                                     <li class="pc-item">
                                         <a href="{{ route('cover_master') }}" class="pc-link">
                                             <span class="pc-micon">
@@ -125,7 +125,7 @@
                                         </a>
                                     </li>
                                 @endif
-                                @if (in_array($activeSubscription->duration, ['lifetime', 'premium']))
+                                @if (in_array(optional($activeSubscription)->duration, ['lifetime', 'premium']))
                                     <li class="pc-item">
                                         <a href="{{ route('image_master') }}" class="pc-link">
                                             <span class="pc-micon">
@@ -136,7 +136,7 @@
                                     </li>
                                 @endif
 
-                                @if (in_array($activeSubscription->duration, ['lifetime', 'premium']))
+                                @if (in_array(optional($activeSubscription)->duration, ['lifetime', 'premium']))
                                     <li class="pc-item">
                                         <a href="{{ route('story_master') }}" class="pc-link">
                                             <span class="pc-micon">
@@ -161,7 +161,7 @@
 
                             <ul class="pc-submenu">
 
-                                @if (in_array($activeSubscription->duration, ['bulan', 'standar']))
+                                @if (in_array(optional($activeSubscription)->duration, ['bulan', 'standar']))
                                     <li class="pc-item">
                                         <a href="{{ route('group.index') }}" class="pc-link">
                                             <span class="pc-micon">
@@ -171,7 +171,7 @@
                                         </a>
                                     </li>
                                 @endif
-                                {{-- @if ($activeSubscription->duration === 'tahun')
+                                {{-- @if (optional($activeSubscription)->duration === 'tahun')
                                     <li class="pc-item">
                                         <a href="{{ route('group.index') }}" class="pc-link">
                                             <span class="pc-micon">
@@ -182,7 +182,7 @@
                                     </li>
                                 @endif --}}
 
-                                @if (in_array($activeSubscription->duration, ['lifetime', 'premium']))
+                                @if (in_array(optional($activeSubscription)->duration, ['lifetime', 'premium']))
                                     <li class="pc-item">
                                         <a href="{{ route('group.index') }}" class="pc-link">
                                             <span class="pc-micon">
