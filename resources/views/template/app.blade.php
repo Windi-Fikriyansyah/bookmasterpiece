@@ -329,8 +329,7 @@
             <div class="row">
                 <div class="col-sm-6 my-1">
                     <p class="m-0">
-                        Book Masterpiece
-
+                        Informasi pembelian paket Bookmasterpiece: 0812-1000-4073
                     </p>
                 </div>
                 <div class="col-sm-6 ms-auto my-1">
