@@ -414,27 +414,7 @@
 
                 <div class="mt-4 space-y-4">
 
-                    <div>
-                        <label class="text-sm font-medium block mb-1">Google AI API Key:</label>
 
-                        <div class="relative">
-                            <input type="password" id="api_key_input"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                                placeholder="Masukkan API Key Anda di sini">
-
-                            <!-- Tombol mata -->
-                            <button type="button" id="toggle_api_key"
-                                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700">
-                                <i id="eye_icon" class="fas fa-eye"></i>
-                            </button>
-                        </div>
-
-                        <button id="save_api_key"
-                            class="mt-3 w-full bg-green-600 text-white py-2 rounded-lg text-sm hover:bg-green-700 transition-colors duration-200">
-                            <i class="fas fa-save mr-2"></i>Simpan API Key
-                        </button>
-
-                    </div>
 
                     <div>
                         <label class="text-sm font-medium block mb-1">Masalah (Problem):</label>
@@ -734,42 +714,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const apiInput = document.getElementById("api_key_input");
-            const toggleBtn = document.getElementById("toggle_api_key");
-            const eyeIcon = document.getElementById("eye_icon");
-
-            if (toggleBtn) {
-                toggleBtn.addEventListener("click", () => {
-                    const isPassword = apiInput.type === "password";
-
-                    apiInput.type = isPassword ? "text" : "password";
-                    eyeIcon.classList.toggle("fa-eye");
-                    eyeIcon.classList.toggle("fa-eye-slash");
-                });
-            }
-        });
-    </script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            fetch("/ebook/get-api-key", {
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest"
-                    }
-                })
-                .then(res => res.json())
-                .then(res => {
-                    if (res.api_key) {
-                        const input = document.getElementById("api_key_input");
-                        if (input) {
-                            input.value = res.api_key;
-                            localStorage.setItem("api_key", res.api_key);
-                        }
-                    }
-                })
-                .catch(err => console.error("Gagal load API Key:", err));
-        });
         // Inisialisasi state ebook
         let ebookState = {
             title: null,
@@ -791,56 +735,16 @@
 
         // Load state dari localStorage saat halaman dimuat
         document.addEventListener("DOMContentLoaded", () => {
-            const savedApiKey = localStorage.getItem('api_key');
-            if (savedApiKey) {
-                document.getElementById("api_key_input").value = savedApiKey;
-            }
+
 
             loadEbookState();
             loadFormData();
             setupFormAutosave();
             updateStats();
 
-            document.getElementById('save_api_key').addEventListener('click', saveApiKey);
+
         });
 
-        function saveApiKey() {
-            const apiKey = document.getElementById('api_key_input').value.trim();
-
-            if (!apiKey) {
-                showToast("API Key tidak boleh kosong", "error");
-                return;
-            }
-
-            fetch("/save-api-key", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": document
-                            .querySelector('meta[name="csrf-token"]')
-                            .getAttribute("content")
-                    },
-                    body: JSON.stringify({
-                        api_key: apiKey
-                    })
-                })
-                .then(res => res.json())
-                .then(res => {
-                    if (!res.status) {
-                        showToast(res.message, "error");
-                        return;
-                    }
-
-                    // OPTIONAL: tetap simpan di localStorage untuk UX
-                    localStorage.setItem("api_key", apiKey);
-
-                    showToast(res.message, "success");
-                })
-                .catch(err => {
-                    console.error(err);
-                    showToast("Gagal menyimpan API Key", "error");
-                });
-        }
 
 
         function setupFormAutosave() {
@@ -1074,8 +978,7 @@
 
         async function updateOutline() {
             const val = getFormValues();
-            const apiKey = document.getElementById("api_key_input").value.trim();
-            if (!apiKey) return showToast("API Key belum disimpan.", "error");
+
 
             // Ambil daftar bab dari konten
             const existingChapters = ebookState.chapters.map((ch, i) => ({
@@ -1131,11 +1034,7 @@
                 return;
             }
 
-            const apiKey = document.getElementById("api_key_input").value.trim();
-            if (!apiKey) {
-                showToast("API Key belum disimpan.", "error");
-                return;
-            }
+
 
             let payload = {
                 action: action,
@@ -1628,12 +1527,7 @@
 
         async function generateOutlineFromUserInput() {
             const val = getFormValues();
-            const apiKey = document.getElementById("api_key_input").value.trim();
 
-            if (!apiKey) {
-                showToast("API Key belum disimpan.", "error");
-                return;
-            }
 
             if (!val.jumlah_outline.trim()) {
                 showToast("Jumlah Isi Outline Buku harus diisi terlebih dahulu!", "error");
@@ -2308,8 +2202,7 @@
             const chapter = getChapterById(chapterId);
             if (!chapter) return showToast("Bab tidak ditemukan", "error");
 
-            const apiKey = document.getElementById("api_key_input").value.trim();
-            if (!apiKey) return showToast("API Key belum disimpan.", "error");
+
 
             if (isGenerating) return showToast("Sedang membuat konten, mohon tunggu...", "warning");
 
