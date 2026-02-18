@@ -69,6 +69,7 @@ Route::middleware(['auth', 'subscription.active'])->group(function () {
     Route::post('/ebook/generate', [AksesAplikasiController::class, 'generateEbookPart'])
         ->name('ebook.generate');
     Route::post('/ebook/download', [AksesAplikasiController::class, 'downloadPDF']);
+    Route::post('/ebook/download-word', [AksesAplikasiController::class, 'downloadWord']);
 
     Route::get('/bonus/{slug}', [BonusController::class, 'view'])
         ->name('bonus.view');

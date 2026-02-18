@@ -409,7 +409,7 @@
             <!-- Langkah 1 -->
             <div class="bg-white p-6 rounded-xl shadow">
                 <h2 class="font-semibold text-lg flex items-center gap-2 text-blue-600">
-                    <span class="bg-blue-100 p-2 rounded-lg">🔧</span> Langkah 1: Konfigurasi Book
+                    <span class="bg-blue-100 p-2 rounded-lg">🔧</span> Tahap 1: Fondasi Buku
                 </h2>
 
                 <div class="mt-4 space-y-4">
@@ -519,7 +519,7 @@
             <!-- Langkah 2 -->
             <div class="bg-white p-6 rounded-xl shadow">
                 <h2 class="font-semibold text-lg flex items-center gap-2 text-blue-600 mb-4">
-                    <span class="bg-blue-100 p-2 rounded-lg">📝</span> Langkah 2: Buat Konten
+                    <span class="bg-blue-100 p-2 rounded-lg">📝</span> Tahap 2: Produksi Naskah Buku
                 </h2>
 
                 <div class="space-y-3">
@@ -591,11 +591,20 @@
 
                 </div>
 
+                
                 <!-- Tombol Reset & Download -->
                 <div class="mt-6 pt-4 border-t border-gray-200 space-y-2">
+                    <h2 class="font-semibold text-lg flex items-center gap-2 text-blue-600">
+                    <span class="bg-blue-100 p-2 rounded-lg">🔧</span> Tahap 3: Finalisasi Buku
+                </h2>
                     <button onclick="downloadEbook()"
                         class="w-full bg-purple-600 text-white py-3 rounded-lg text-sm hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center gap-2">
                         <i class="fas fa-download mr-2"></i>Download Book (PDF)
+                    </button>
+
+                    <button onclick="downloadWord()"
+                        class="w-full bg-blue-600 text-white py-3 rounded-lg text-sm hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2">
+                        <i class="fas fa-file-word mr-2"></i>Download Book (Word)
                     </button>
 
                     <button onclick="resetEbook()"
@@ -4085,6 +4094,29 @@
                     const a = document.createElement("a");
                     a.href = url;
                     a.download = "ebook.pdf";
+                    a.click();
+                });
+        }
+
+        function downloadWord() {
+            const html = document.getElementById("ebook_content").innerHTML;
+
+            fetch("/ebook/download-word", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        html: html
+                    })
+                })
+                .then(resp => resp.blob())
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = "ebook.doc";
                     a.click();
                 });
         }

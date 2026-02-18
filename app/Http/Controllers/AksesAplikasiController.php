@@ -1119,4 +1119,35 @@ PROMPT;
 
         return $pdf->download('ebook.pdf');
     }
+
+    public function downloadWord(Request $request)
+    {
+        $html = $request->input('html');
+
+        $headers = [
+            "Content-type" => "application/vnd.ms-word",
+            "Content-Disposition" => "attachment;Filename=ebook.doc"
+        ];
+
+        $finalHTML = "
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <head>
+                <meta charset='utf-8'>
+                <style>
+                    body { font-family: 'Times New Roman', serif; line-height: 1.6; }
+                    h1 { font-size: 24pt; text-align: center; }
+                    h2 { font-size: 18pt; margin-top: 12pt; }
+                    h3 { font-size: 14pt; margin-top: 10pt; }
+                    p { margin-bottom: 10pt; text-align: justify; }
+                    .action-buttons, .chapter-badge { display: none; }
+                </style>
+            </head>
+            <body>
+                {$html}
+            </body>
+            </html>
+        ";
+
+        return response($finalHTML, 200, $headers);
+    }
 }
