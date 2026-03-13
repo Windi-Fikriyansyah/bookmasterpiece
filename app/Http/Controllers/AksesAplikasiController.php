@@ -780,7 +780,7 @@ PROMPT;
             ])->timeout(120)->post(
                 "https://openrouter.ai/api/v1/chat/completions",
                 [
-                    'model' => 'arcee-ai/trinity-large-preview:free',
+                    'model' => 'openrouter/hunter-alpha',
                     'messages' => [
                         [
                             'role' => 'user',
@@ -864,7 +864,7 @@ PROMPT;
                     ])->timeout(120)->post(
                         "https://openrouter.ai/api/v1/chat/completions",
                         [
-                            'model' => 'arcee-ai/trinity-large-preview:free',
+                            'model' => 'openrouter/hunter-alpha',
                             'messages' => [
                                 [
                                     'role' => 'user',
