@@ -780,7 +780,7 @@ PROMPT;
             ])->timeout(120)->post(
                 "https://openrouter.ai/api/v1/chat/completions",
                 [
-                    'model' => 'openrouter/hunter-alpha',
+                    'model' => 'nvidia/nemotron-3-super-120b-a12b:free',
                     'messages' => [
                         [
                             'role' => 'user',
@@ -864,7 +864,7 @@ PROMPT;
                     ])->timeout(120)->post(
                         "https://openrouter.ai/api/v1/chat/completions",
                         [
-                            'model' => 'openrouter/hunter-alpha',
+                            'model' => 'nvidia/nemotron-3-super-120b-a12b:free',
                             'messages' => [
                                 [
                                     'role' => 'user',
