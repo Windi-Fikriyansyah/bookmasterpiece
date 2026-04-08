@@ -415,7 +415,7 @@
                 <!-- Input API Key Gemini -->
                 <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
                     <label class="text-xs font-bold text-blue-700 uppercase tracking-wider block mb-2">
-                        <i class="fas fa-key mr-1"></i> Google Gemini API Key
+                        <i class="fas fa-key mr-1"></i> Google API Key
                     </label>
                     <div class="flex gap-2">
                         <input type="password" id="gemini_api_key_input"
