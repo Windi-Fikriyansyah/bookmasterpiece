@@ -93,13 +93,13 @@ class AksesAplikasiController extends Controller
             'intro_text' => 'nullable|string',
             'intro_html' => 'nullable|string',
 
-            'extend_mode'         => 'nullable|in:add_chapter,add_subbab',
-            'outline_html'        => 'nullable|string',
+            'extend_mode' => 'nullable|in:add_chapter,add_subbab',
+            'outline_html' => 'nullable|string',
             'next_chapter_number' => 'nullable|integer|min:1',
 
-            'chapter_number'      => 'nullable|integer|min:1',
-            'last_subbab_index'   => 'nullable|integer|min:0',
-            'add_count'           => 'nullable|integer|min:1|max:5',
+            'chapter_number' => 'nullable|integer|min:1',
+            'last_subbab_index' => 'nullable|integer|min:0',
+            'add_count' => 'nullable|integer|min:1|max:5',
 
             'preface_text' => 'nullable|string',
             'preface_html' => 'nullable|string',
@@ -112,16 +112,15 @@ class AksesAplikasiController extends Controller
         ]);
 
         $user = DB::table('users')->where('id', auth()->id())->first();
+        $apiKey = $user->api_key;
 
-        if (!env('OPENROUTER_API_KEY')) {
+        if (!$apiKey) {
             return response()->json([
-                'status'  => false,
-                'message' => 'OpenRouter API Key belum dikonfigurasi di server. Silakan hubungi admin.',
+                'status' => false,
+                'message' => 'API Key Gemini Anda belum diatur di sidebar Fondasi Buku. Silakan masukkan API key Anda terlebih dahulu.',
             ], 400);
         }
-
-        $apiKey     = env('OPENROUTER_API_KEY');
-        $masalah    = $request->masalah;
+        $masalah = $request->masalah;
         $kebutuhan = $request->kebutuhan ?? '';
         $solusi = $request->solusi ?? '';
         $pengalaman = $request->pengalaman ?? '';
@@ -131,10 +130,10 @@ class AksesAplikasiController extends Controller
         $tentangPenulis = $request->tentang_penulis ?? '';
         $jumlahOutlineRaw = $request->jumlah_outline ?? '';
         [$totalBab, $subBabPerBab] = $this->parseOutlineSpec($jumlahOutlineRaw);
-        $gaya       = $request->gaya;
+        $gaya = $request->gaya;
         // $jumlahBab  = $request->jumlah_bab ?? 3;
         // $penulis    = $request->penulis ?? '';
-        $action     = $request->action;
+        $action = $request->action;
         $existingTitle = $request->existing_title;
         $currentChapterCount = $request->current_chapter_count ?? 0;
         $chapterTitles = $request->chapter_titles ?? [];
@@ -265,18 +264,18 @@ PROMPT;
                 $gaya = $request->gaya ?? 'Edukatif & Praktis (Mengajar tanpa menggurui)';
 
                 // Bahan bio dari user (sering masih orang pertama: "Saya ...")
-                $bio            = trim($request->tentang_penulis ?? '');
-                $pengalaman     = trim($request->pengalaman ?? '');
-                $kompetensi     = trim($request->kompetensi ?? '');
-                $calon          = trim($request->calon_pembaca ?? '');
-                $judul          = trim(strip_tags($request->existing_title ?? ''));
+                $bio = trim($request->tentang_penulis ?? '');
+                $pengalaman = trim($request->pengalaman ?? '');
+                $kompetensi = trim($request->kompetensi ?? '');
+                $calon = trim($request->calon_pembaca ?? '');
+                $judul = trim(strip_tags($request->existing_title ?? ''));
 
                 // Tambahkan ini (kalau memang belum ada)
-                $nama           = trim($request->nama_penulis ?? ($request->nama ?? ''));
-                $latarbelakang  = trim($request->latarbelakang ?? '');
-                $karyaprestasi  = trim($request->karyaprestasi ?? '');
-                $aktivitas      = trim($request->aktivitas ?? '');
-                $kontak         = trim($request->kontak ?? '');
+                $nama = trim($request->nama_penulis ?? ($request->nama ?? ''));
+                $latarbelakang = trim($request->latarbelakang ?? '');
+                $karyaprestasi = trim($request->karyaprestasi ?? '');
+                $aktivitas = trim($request->aktivitas ?? '');
+                $kontak = trim($request->kontak ?? '');
 
                 $instruction = <<<PROMPT
 TULIS BAGIAN "PROFIL PENULIS" UNTUK BUKU.
@@ -377,7 +376,7 @@ PROMPT;
                 // Validasi sub-bab
                 if (empty($subBabTitles)) {
                     return response()->json([
-                        'status'  => false,
+                        'status' => false,
                         'message' => 'Sub-bab tidak ditemukan di daftar isi. Pastikan daftar isi sudah dibuat terlebih dahulu.',
                     ], 400);
                 }
@@ -472,7 +471,7 @@ PROMPT;
             // Di dalam class AksesAplikasiController, pada fungsi generateEbookPart(), tambahkan case 'summary' yang lebih spesifik:
 
             case 'summary':
-                $ctx   = trim($request->summary_context ?? '');
+                $ctx = trim($request->summary_context ?? '');
                 $rules = trim($request->summary_rules ?? '');
 
                 $instruction = <<<PROMPT
@@ -563,7 +562,7 @@ PROMPT;
                 $refs = $request->references ?? [];
 
                 $refs = array_map(function ($r) {
-                    $r = trim((string)$r);
+                    $r = trim((string) $r);
                     // buang prefix [C1] kalau masih ada
                     $r = preg_replace('/^\[\s*C\d+\s*\]\s*/i', '', $r);
                     return $r;
@@ -592,9 +591,10 @@ PROMPT;
 
             case 'continue_chapter':
                 $chapterHtml = $request->chapter_html ?? '';
-                $chapterNo   = (int)($request->chapter_number ?? $targetChapter);
-                $chapterT    = trim((string)($request->chapter_title ?? ''));
-                if ($chapterT === '') $chapterT = "Bab {$chapterNo}";
+                $chapterNo = (int) ($request->chapter_number ?? $targetChapter);
+                $chapterT = trim((string) ($request->chapter_title ?? ''));
+                if ($chapterT === '')
+                    $chapterT = "Bab {$chapterNo}";
 
                 if (trim($chapterHtml) === '') {
                     return response()->json([
@@ -628,11 +628,11 @@ PROMPT;
 
             case 'continue_subbab':
                 $chapterHtml = $request->chapter_html ?? '';
-                $chapterNo   = (int)($request->chapter_number ?? $targetChapter);
-                $chapterT    = trim((string)($request->chapter_title ?? ''));
-                $subNo       = trim((string)($request->subbab_number ?? ''));
-                $subTitle    = trim((string)($request->subbab_title ?? ''));
-                $subText     = trim((string)($request->subbab_text ?? ''));
+                $chapterNo = (int) ($request->chapter_number ?? $targetChapter);
+                $chapterT = trim((string) ($request->chapter_title ?? ''));
+                $subNo = trim((string) ($request->subbab_number ?? ''));
+                $subTitle = trim((string) ($request->subbab_title ?? ''));
+                $subText = trim((string) ($request->subbab_text ?? ''));
 
                 if ($subNo === '' || $subTitle === '') {
                     return response()->json([
@@ -688,7 +688,7 @@ PROMPT;
                 $mode = $request->extend_mode ?? 'add_chapter';
 
                 if ($mode === 'add_chapter') {
-                    $next = (int)($request->next_chapter_number ?? ($totalBab + 1));
+                    $next = (int) ($request->next_chapter_number ?? ($totalBab + 1));
                     $instruction =
                         "TUGAS: TAMBAH 1 BAB BARU KE DAFTAR ISI.\n\n" .
                         "Nomor bab yang harus dibuat: {$next}\n" .
@@ -700,9 +700,9 @@ PROMPT;
                         "- Judul harus nyambung dengan masalah & solusi buku.\n" .
                         "- Gaya bahasa judul: ringkas, kuat, progresif.\n";
                 } else {
-                    $chapterNum = (int)($request->chapter_number ?? 1);
-                    $lastIdx    = (int)($request->last_subbab_index ?? 0);
-                    $addCount   = (int)($request->add_count ?? 2);
+                    $chapterNum = (int) ($request->chapter_number ?? 1);
+                    $lastIdx = (int) ($request->last_subbab_index ?? 0);
+                    $addCount = (int) ($request->add_count ?? 2);
 
                     $start = $lastIdx + 1;
 
@@ -768,39 +768,42 @@ PROMPT;
 
             default:
                 return response()->json([
-                    'status'  => false,
+                    'status' => false,
                     'message' => 'Action tidak dikenali.',
                 ], 400);
         }
 
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $apiKey,
                 'Content-Type' => 'application/json',
             ])->timeout(120)->post(
-                "https://openrouter.ai/api/v1/chat/completions",
-                [
-                    'model' => 'arcee-ai/trinity-large-preview:free',
-                    'messages' => [
-                        [
-                            'role' => 'user',
-                            'content' => $basePrompt . "\n\n" . $instruction
+                    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . $apiKey,
+                    [
+                        'contents' => [
+                            [
+                                'role' => 'user',
+                                'parts' => [
+                                    ['text' => $basePrompt . "\n\n" . $instruction]
+                                ]
+                            ],
                         ],
-                    ],
-                    'temperature' => 0.7,
-                    'top_p' => 0.8,
-                ]
-            );
+                        'generationConfig' => [
+                            'temperature' => 0.7,
+                            'topP' => 0.8,
+                        ]
+                    ]
+                );
 
             if ($response->failed()) {
+                $errorMsg = $response->json('error.message') ?? 'Gagal menghubungi Google Gemini AI. Periksa API Key atau quota Anda.';
                 return response()->json([
-                    'status'  => false,
-                    'message' => 'Gagal menghubungi OpenRouter AI. Periksa API Key atau quota Anda.',
+                    'status' => false,
+                    'message' => $errorMsg,
                 ], 500);
             }
 
             $data = $response->json();
-            $html = $data['choices'][0]['message']['content'] ?? '';
+            $html = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
 
             // Clean up HTML jika perlu
             $html = $this->cleanEbookHtml($html);
@@ -862,21 +865,22 @@ PROMPT;
                         'Authorization' => 'Bearer ' . $apiKey,
                         'Content-Type' => 'application/json',
                     ])->timeout(120)->post(
-                        "https://openrouter.ai/api/v1/chat/completions",
-                        [
-                            'model' => 'arcee-ai/trinity-large-preview:free',
-                            'messages' => [
-                                [
-                                    'role' => 'user',
-                                    'content' => $continuePrompt
+                            "https://openrouter.ai/api/v1/chat/completions",
+                            [
+                                'model' => 'arcee-ai/trinity-large-preview:free',
+                                'messages' => [
+                                    [
+                                        'role' => 'user',
+                                        'content' => $continuePrompt
+                                    ],
                                 ],
-                            ],
-                            'temperature' => 0.7,
-                            'top_p' => 0.8,
-                        ]
-                    );
+                                'temperature' => 0.7,
+                                'top_p' => 0.8,
+                            ]
+                        );
 
-                    if ($resp2->failed()) break;
+                    if ($resp2->failed())
+                        break;
 
                     $more = $resp2->json()['choices'][0]['message']['content'] ?? '';
                     $more = $this->cleanEbookHtml($more);
@@ -888,12 +892,12 @@ PROMPT;
 
             return response()->json([
                 'status' => true,
-                'html'   => $html,
+                'html' => $html,
                 'chapter_number' => $chapterNumber,
             ]);
         } catch (\Throwable $e) {
             return response()->json([
-                'status'  => false,
+                'status' => false,
                 'message' => 'Terjadi error: ' . $e->getMessage(),
             ], 500);
         }
@@ -933,9 +937,11 @@ PROMPT;
     }
     private function maxCitationNumber(string $html): int
     {
-        if ($html === '') return 0;
+        if ($html === '')
+            return 0;
         preg_match_all('/\[\s*C(\d+)\s*\]/i', $html, $m);
-        if (empty($m[1])) return 0;
+        if (empty($m[1]))
+            return 0;
         return max(array_map('intval', $m[1]));
     }
 
@@ -943,7 +949,8 @@ PROMPT;
     {
         $t = strip_tags($html);
         $t = preg_replace('/\s+/', ' ', trim($t));
-        if ($t === '') return 0;
+        if ($t === '')
+            return 0;
         return count(explode(' ', $t));
     }
 
@@ -954,7 +961,8 @@ PROMPT;
         $bab = 5; // default
         $sub = 5; // default
 
-        if ($raw === '') return [$bab, $sub];
+        if ($raw === '')
+            return [$bab, $sub];
 
         // Pattern untuk mendeteksi format: "5 Bab 5 Sub Bab" atau "3 Bab 4 Sub"
         // atau "7 bab 3 sub bab" atau "5 5"

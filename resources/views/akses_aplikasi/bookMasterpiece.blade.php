@@ -412,6 +412,25 @@
                     <span class="bg-blue-100 p-2 rounded-lg">🔧</span> Tahap 1: Fondasi Buku
                 </h2>
 
+                <!-- Input API Key Gemini -->
+                <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                    <label class="text-xs font-bold text-blue-700 uppercase tracking-wider block mb-2">
+                        <i class="fas fa-key mr-1"></i> Google Gemini API Key
+                    </label>
+                    <div class="flex gap-2">
+                        <input type="password" id="gemini_api_key_input"
+                            class="flex-1 border border-blue-200 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            placeholder="Masukkan API Key Gemini Anda">
+                        <button onclick="saveGeminiApiKey()"
+                            class="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                            Simpan
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-blue-500 mt-2">
+                        * API key disimpan aman untuk akun Anda. Belum punya? <a href="https://aistudio.google.com/app/apikey" target="_blank" class="underline font-bold">Dapatkan di sini (Gratis)</a>
+                    </p>
+                </div>
+
                 <div class="mt-4 space-y-4">
 
 
@@ -848,6 +867,60 @@
                 renderEbookContent();
                 updateStats();
             }
+
+            // Load Gemini API Key
+            loadGeminiApiKey();
+        }
+
+        function loadGeminiApiKey() {
+            fetch("/get-api-key")
+                .then(res => res.json())
+                .then(data => {
+                    if (data.api_key) {
+                        document.getElementById("gemini_api_key_input").value = data.api_key;
+                    }
+                })
+                .catch(err => console.error("Gagal memuat API Key:", err));
+        }
+
+        function saveGeminiApiKey() {
+            const apiKey = document.getElementById("gemini_api_key_input").value;
+            if (!apiKey) {
+                showToast("API Key tidak boleh kosong!", "error");
+                return;
+            }
+
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner animate-spin"></i>';
+            btn.disabled = true;
+
+            fetch("/save-api-key", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        api_key: apiKey
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status) {
+                        showToast(data.message, "success");
+                    } else {
+                        showToast(data.message, "error");
+                    }
+                })
+                .catch(err => {
+                    showToast("Gagal menyimpan API Key!", "error");
+                    console.error(err);
+                })
+                .finally(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                });
         }
 
         function saveEbookState() {
